@@ -35,3 +35,30 @@ clean:
 
 check: lint test
     @echo "✅ All checks passed!"
+
+# NEW: External system adapters
+integrations/          # NEW: External system adapters
+├── __init__.py
+├── siem/
+├── a2a/
+├── mcp/
+└── blockchain/
+
+# NEW: Persistence layer
+storage/               # NEW: Persistence layer
+├── __init__.py
+├── models.py          # Data models
+├── database.py        # DB abstraction
+└── repositories/      # Data access objects
+
+# NEW: Configuration management
+config/                # NEW: Configuration management
+├── __init__.py
+├── settings.py        # Config loader
+└── schemas/           # Validation schemas
+
+# NEW: REST/gRPC endpoints (future)
+api/                   # NEW: REST/gRPC endpoints (future)
+
+# NEW: Web UI (future)
+gui/                   # NEW: Web UI (future)
