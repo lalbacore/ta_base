@@ -1,0 +1,66 @@
+{
+  "workflow_id": "wf_20251122_111057",
+  "mission": "Test mission",
+  "team_id": "test_team",
+  "created_at": "2025-11-22T19:10:57.084868Z",
+  "updated_at": "2025-11-22T19:10:57.085043Z",
+  "status": "pending",
+  "current_stage": "architect",
+  "stages": {
+    "architect": {
+      "stage_name": "architect",
+      "status": "completed",
+      "input_data": {
+        "input": "test"
+      },
+      "output_data": {
+        "output": "design"
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:10:57.084872Z",
+      "completed_at": "2025-11-22T19:10:57.085037Z",
+      "duration_seconds": 0.000165
+    },
+    "builder": {
+      "stage_name": "builder",
+      "status": "pending",
+      "input_data": null,
+      "output_data": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "duration_seconds": 0.0
+    },
+    "critic": {
+      "stage_name": "critic",
+      "status": "pending",
+      "input_data": null,
+      "output_data": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "duration_seconds": 0.0
+    },
+    "governance": {
+      "stage_name": "governance",
+      "status": "pending",
+      "input_data": null,
+      "output_data": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "duration_seconds": 0.0
+    },
+    "recorder": {
+      "stage_name": "recorder",
+      "status": "pending",
+      "input_data": null,
+      "output_data": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "duration_seconds": 0.0
+    }
+  },
+  "metadata": {}
+}

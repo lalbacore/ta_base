@@ -1,0 +1,200 @@
+{
+  "workflow_id": "wf_20251122_111428",
+  "mission": "Build a Python program that prints 'Hello, World!' with proper documentation",
+  "team_id": "hello_world_team",
+  "created_at": "2025-11-22T19:14:28.814284Z",
+  "updated_at": "2025-11-22T19:14:28.840674Z",
+  "status": "completed",
+  "current_stage": "recorder",
+  "stages": {
+    "architect": {
+      "stage_name": "architect",
+      "status": "completed",
+      "input_data": "Build a Python program that prints 'Hello, World!' with proper documentation",
+      "output_data": {
+        "mission": "Build a Python program that prints 'Hello, World!' with proper documentation",
+        "strategy": "Implement 'Build a Python program that prints 'Hello, World!' with proper documentation' following Python best practices",
+        "components": [
+          "main function",
+          "helper functions",
+          "documentation",
+          "error handling"
+        ],
+        "structure": {
+          "language": "python",
+          "pattern": "modular",
+          "requires_tests": true
+        },
+        "technical_approach": "Clean, readable code with proper documentation"
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:14:28.816405Z",
+      "completed_at": "2025-11-22T19:14:28.816841Z",
+      "duration_seconds": 0.000436
+    },
+    "builder": {
+      "stage_name": "builder",
+      "status": "completed",
+      "input_data": {
+        "mission": "Build a Python program that prints 'Hello, World!' with proper documentation",
+        "strategy": "Implement 'Build a Python program that prints 'Hello, World!' with proper documentation' following Python best practices",
+        "components": [
+          "main function",
+          "helper functions",
+          "documentation",
+          "error handling"
+        ],
+        "structure": {
+          "language": "python",
+          "pattern": "modular",
+          "requires_tests": true
+        },
+        "technical_approach": "Clean, readable code with proper documentation"
+      },
+      "output_data": {
+        "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python",
+        "files": [
+          "main.py"
+        ],
+        "status": "built",
+        "metadata": {
+          "lines_of_code": 14,
+          "functions": 1,
+          "classes": 0
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:14:28.817189Z",
+      "completed_at": "2025-11-22T19:14:28.817582Z",
+      "duration_seconds": 0.000393
+    },
+    "critic": {
+      "stage_name": "critic",
+      "status": "completed",
+      "input_data": {
+        "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python",
+        "files": [
+          "main.py"
+        ],
+        "status": "built",
+        "metadata": {
+          "lines_of_code": 14,
+          "functions": 1,
+          "classes": 0
+        }
+      },
+      "output_data": {
+        "quality_score": 30,
+        "issues": [],
+        "strengths": [
+          "Has main entry point",
+          "Includes documentation",
+          "Proper module structure"
+        ],
+        "recommendation": "needs_revision",
+        "details": {
+          "readability": "good",
+          "maintainability": "good",
+          "security": "no issues detected"
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:14:28.817855Z",
+      "completed_at": "2025-11-22T19:14:28.818237Z",
+      "duration_seconds": 0.000382
+    },
+    "governance": {
+      "stage_name": "governance",
+      "status": "completed",
+      "input_data": {
+        "quality_score": 30,
+        "issues": [],
+        "strengths": [
+          "Has main entry point",
+          "Includes documentation",
+          "Proper module structure"
+        ],
+        "recommendation": "needs_revision",
+        "details": {
+          "readability": "good",
+          "maintainability": "good",
+          "security": "no issues detected"
+        }
+      },
+      "output_data": {
+        "compliance_score": 80,
+        "decision": "conditional",
+        "violations": [
+          {
+            "policy": "minimum_quality",
+            "threshold": 70,
+            "actual": 30,
+            "severity": "high"
+          }
+        ],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation",
+          "testing"
+        ],
+        "requires_remediation": true
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:14:28.818562Z",
+      "completed_at": "2025-11-22T19:14:28.819023Z",
+      "duration_seconds": 0.000461
+    },
+    "recorder": {
+      "stage_name": "recorder",
+      "status": "completed",
+      "input_data": {
+        "compliance_score": 80,
+        "decision": "conditional",
+        "violations": [
+          {
+            "policy": "minimum_quality",
+            "threshold": 70,
+            "actual": 30,
+            "severity": "high"
+          }
+        ],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation",
+          "testing"
+        ],
+        "requires_remediation": true
+      },
+      "output_data": {
+        "workflow_id": "wf_20251122_111428",
+        "timestamp": "2025-11-22T19:14:28.840549Z",
+        "mission": "",
+        "signature": {
+          "hash": "9029ab2ee4ee43cdbabd44efe81e9d12373d908966231f6f68493f5606a1cf9f",
+          "algorithm": "sha256"
+        },
+        "composite_score": {
+          "overall": 0.0,
+          "quality": 0,
+          "compliance": 0
+        },
+        "status": "unknown",
+        "stages_completed": 5,
+        "metadata": {
+          "components": 0,
+          "issues_found": 0,
+          "violations": 0
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:14:28.819399Z",
+      "completed_at": "2025-11-22T19:14:28.840669Z",
+      "duration_seconds": 0.02127
+    }
+  },
+  "metadata": {}
+}
