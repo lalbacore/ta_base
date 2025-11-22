@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "team-agent"
+version = "0.1.0"
+description = "Modular AI agent system with composable teams and policy enforcement"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Team Agent Contributors"}
+]
+keywords = ["ai", "agents", "swarms", "governance", "policy"]
+
+dependencies = [
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "isort>=5.0",
+    "pylint>=2.0",
+    "mypy>=1.0",
+    "flake8>=6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["utils/tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 100
+py_version = 311
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111",  # Missing module docstring
+    "C0103",  # Invalid name
+    "R0913",  # Too many arguments
+]
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.design]
+max-attributes = 7
