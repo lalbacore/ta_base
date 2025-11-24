@@ -2,6 +2,7 @@
 Recorder Agent - Publishes artifacts and final record.
 """
 
+import json
 from typing import Dict, Any
 from datetime import datetime
 from pathlib import Path
@@ -18,51 +19,40 @@ class Recorder(BaseRole):
         self.output_dir = Path(output_dir)
         self.workflow_dir = self.output_dir / workflow_id
     
-    def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Create final record and publish artifacts."""
-        all_data = context.get("input", {})
-        architecture = all_data.get("architecture", {})
-        implementation = all_data.get("implementation", {})
-        review = all_data.get("review", {})
-        decision = all_data.get("decision", {})
+    def run(self, context):
+        """Record workflow data."""
+        # Normalize to dict
+        if not isinstance(context, dict):
+            try:
+                context = json.loads(context) if isinstance(context, str) else {"data": context}
+            except Exception:
+                context = {"data": str(context)}
         
-        self.logger.info("Starting stage: recorder", extra={
-            "stage": "recorder",
-            "event": "stage_start",
-            "input_size": len(str(all_data)),
-        })
+        # Extract fields safely
+        mission = context.get("mission", context.get("input", ""))
+        architecture = context.get("architecture", {})
+        implementation = context.get("implementation", {})
+        review = context.get("review", {})
+        artifacts = context.get("artifacts", {})
         
-        self.workflow_dir.mkdir(parents=True, exist_ok=True)
-        artifacts = self._publish_artifacts(implementation)
-        
-        record = {
-            "workflow_id": self.workflow_id,
-            "status": "approved" if decision.get("approved") else "rejected",
-            "composite_score": (
-                review.get("quality_score", 0) * 0.5 +
-                decision.get("compliance_score", 0) * 0.5
-            ),
-            "quality_score": review.get("quality_score", 0),
-            "compliance_score": decision.get("compliance_score", 0),
-            "published_artifacts": artifacts,
-            "requires_remediation": not decision.get("approved"),
-            "metadata": {
-                "architecture": architecture,
-                "implementation_metrics": review.get("metrics", {}),
-                "review_issues_count": len(review.get("issues", [])),
-                "risk_level": decision.get("risk_level", "unknown"),
-            },
+        # Build record
+        record_data = {
+            "mission": mission,
+            "architecture": architecture,
+            "implementation": implementation,
+            "review": review,
+            "artifacts": artifacts,
             "timestamp": datetime.now().isoformat(),
         }
         
-        self.logger.info("Completed stage: recorder", extra={
-            "stage": "recorder",
-            "event": "stage_complete",
-            "output_size": len(str(record)),
-            "duration_seconds": 0,
-        })
+        # Ensure output directory exists
+        self.output_dir.mkdir(parents=True, exist_ok=True)
         
-        return record
+        # Save to file
+        output_file = self.output_dir / f"{self.workflow_id}_record.json"
+        output_file.write_text(json.dumps(record_data, indent=2, default=str))
+        
+        return record_data
     
     def _publish_artifacts(self, implementation: Dict[str, Any]) -> Dict[str, str]:
         """Publish code and documentation artifacts."""

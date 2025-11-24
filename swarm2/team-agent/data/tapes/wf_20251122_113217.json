@@ -1,0 +1,452 @@
+{
+  "workflow_id": "wf_20251122_113217",
+  "mission": "Build a command-line calculator with basic arithmetic operations",
+  "team_id": "team_demo_001",
+  "created_at": "2025-11-22T19:32:17.269850Z",
+  "updated_at": "2025-11-22T19:32:17.289948Z",
+  "status": "completed",
+  "current_stage": "recorder",
+  "stages": {
+    "architect": {
+      "stage_name": "architect",
+      "status": "completed",
+      "input_data": {
+        "input": "Build a command-line calculator with basic arithmetic operations",
+        "instructions": {
+          "instructions": [
+            "Design for extensibility",
+            "Consider future calculator functions",
+            "Use object-oriented design"
+          ],
+          "constraints": [
+            "Must use Python 3.11+",
+            "No external dependencies"
+          ]
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "mission": "Build a command-line calculator with basic arithmetic operations",
+        "strategy": "Implement 'Build a command-line calculator with basic arithmetic operations' following Python best practices",
+        "components": [
+          "main function",
+          "documentation",
+          "error handling"
+        ],
+        "structure": {
+          "language": "python",
+          "pattern": "single_file",
+          "requires_tests": true,
+          "complexity": "simple"
+        },
+        "technical_approach": "Clean, readable code with proper documentation",
+        "constraints": [
+          "Must use Python 3.11+",
+          "No external dependencies"
+        ],
+        "estimated_files": 1
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:32:17.272527Z",
+      "completed_at": "2025-11-22T19:32:17.273027Z",
+      "duration_seconds": 0.0005
+    },
+    "builder": {
+      "stage_name": "builder",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "mission": "Build a command-line calculator with basic arithmetic operations",
+          "strategy": "Implement 'Build a command-line calculator with basic arithmetic operations' following Python best practices",
+          "components": [
+            "main function",
+            "documentation",
+            "error handling"
+          ],
+          "structure": {
+            "language": "python",
+            "pattern": "single_file",
+            "requires_tests": true,
+            "complexity": "simple"
+          },
+          "technical_approach": "Clean, readable code with proper documentation",
+          "constraints": [
+            "Must use Python 3.11+",
+            "No external dependencies"
+          ],
+          "estimated_files": 1
+        },
+        "instructions": {
+          "instructions": [
+            "Follow PEP 8 style guide",
+            "Add type hints",
+            "Include comprehensive docstrings",
+            "Implement robust error handling"
+          ],
+          "output_format": "python_package"
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python",
+        "files": [
+          "main.py"
+        ],
+        "status": "built",
+        "metadata": {
+          "lines_of_code": 13,
+          "functions": 1,
+          "classes": 0,
+          "imports": 0,
+          "docstrings": 4,
+          "complexity": "simple"
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:32:17.273482Z",
+      "completed_at": "2025-11-22T19:32:17.273988Z",
+      "duration_seconds": 0.000506
+    },
+    "critic": {
+      "stage_name": "critic",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\nif __name__ == \"__main__\":\n    main()\n",
+          "language": "python",
+          "files": [
+            "main.py"
+          ],
+          "status": "built",
+          "metadata": {
+            "lines_of_code": 13,
+            "functions": 1,
+            "classes": 0,
+            "imports": 0,
+            "docstrings": 4,
+            "complexity": "simple"
+          }
+        },
+        "instructions": {
+          "focus_areas": [
+            "code_quality",
+            "security",
+            "maintainability"
+          ],
+          "strictness": "high"
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "quality_score": 100,
+        "issues": [
+          "Missing module-level docstring"
+        ],
+        "strengths": [
+          "Has main entry point",
+          "Includes documentation",
+          "Proper module structure",
+          "No security issues detected",
+          "Low complexity, easy to maintain"
+        ],
+        "recommendation": "approved",
+        "details": {
+          "scores": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 100,
+            "performance": 100
+          },
+          "analysis": {
+            "structure": {
+              "has_main": true,
+              "has_main_guard": true,
+              "has_classes": false,
+              "proper_imports": true,
+              "line_length_ok": true
+            },
+            "documentation": {
+              "has_module_docstring": false,
+              "has_docstrings": true,
+              "docstring_count": 4,
+              "function_count": 1,
+              "class_count": 0,
+              "functions_documented": true
+            },
+            "security": {
+              "issues": [],
+              "safe": true
+            },
+            "maintainability": {
+              "total_lines": 13,
+              "blank_lines": 3,
+              "comment_lines": 1,
+              "code_lines": 9,
+              "average_line_length": 15.461538461538462,
+              "complexity": "low"
+            },
+            "performance": {
+              "issues": [],
+              "optimal": true
+            }
+          },
+          "focus_areas": [
+            "code_quality",
+            "security",
+            "maintainability"
+          ]
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:32:17.274458Z",
+      "completed_at": "2025-11-22T19:32:17.275079Z",
+      "duration_seconds": 0.000621
+    },
+    "governance": {
+      "stage_name": "governance",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "quality_score": 100,
+          "issues": [
+            "Missing module-level docstring"
+          ],
+          "strengths": [
+            "Has main entry point",
+            "Includes documentation",
+            "Proper module structure",
+            "No security issues detected",
+            "Low complexity, easy to maintain"
+          ],
+          "recommendation": "approved",
+          "details": {
+            "scores": {
+              "structure": 100,
+              "documentation": 100,
+              "security": 100,
+              "maintainability": 100,
+              "performance": 100
+            },
+            "analysis": {
+              "structure": {
+                "has_main": true,
+                "has_main_guard": true,
+                "has_classes": false,
+                "proper_imports": true,
+                "line_length_ok": true
+              },
+              "documentation": {
+                "has_module_docstring": false,
+                "has_docstrings": true,
+                "docstring_count": 4,
+                "function_count": 1,
+                "class_count": 0,
+                "functions_documented": true
+              },
+              "security": {
+                "issues": [],
+                "safe": true
+              },
+              "maintainability": {
+                "total_lines": 13,
+                "blank_lines": 3,
+                "comment_lines": 1,
+                "code_lines": 9,
+                "average_line_length": 15.461538461538462,
+                "complexity": "low"
+              },
+              "performance": {
+                "issues": [],
+                "optimal": true
+              }
+            },
+            "focus_areas": [
+              "code_quality",
+              "security",
+              "maintainability"
+            ]
+          }
+        },
+        "instructions": {
+          "policies": [
+            "code_quality",
+            "security",
+            "documentation"
+          ],
+          "auto_approve": false
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:32:17.275577Z",
+      "completed_at": "2025-11-22T19:32:17.276171Z",
+      "duration_seconds": 0.000594
+    },
+    "recorder": {
+      "stage_name": "recorder",
+      "status": "completed",
+      "input_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "output_data": {
+        "workflow_id": "wf_20251122_113217",
+        "timestamp": "2025-11-22T19:32:17.289857Z",
+        "mission": "Build a command-line calculator with basic arithmetic operations",
+        "signature": {
+          "hash": "407d52023001e4b0e214a1ff7ad97bacc4bf79358d1283b60bc01275aeae3deb",
+          "algorithm": "sha256"
+        },
+        "composite_score": {
+          "overall": 100.0,
+          "quality": 100,
+          "compliance": 100,
+          "breakdown": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 100,
+            "performance": 100
+          }
+        },
+        "status": "approved",
+        "stages_completed": 5,
+        "metadata": {
+          "components": 3,
+          "estimated_files": 1,
+          "complexity": "simple",
+          "issues_found": 1,
+          "strengths": 5,
+          "violations": 0,
+          "lines_of_code": 13,
+          "functions": 1,
+          "classes": 0
+        },
+        "recommendation": "approved",
+        "requires_remediation": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:32:17.276754Z",
+      "completed_at": "2025-11-22T19:32:17.289945Z",
+      "duration_seconds": 0.013191
+    }
+  },
+  "metadata": {
+    "mission": {
+      "mission": {
+        "id": "mission_calc_001",
+        "name": "Calculator Application",
+        "description": "Build a command-line calculator with basic arithmetic operations",
+        "created_at": "2025-11-22T19:00:00Z",
+        "created_by": "demo_user",
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ],
+        "acceptance_criteria": {
+          "quality_score": ">= 75",
+          "compliance_score": ">= 85"
+        },
+        "stages": {
+          "architect": {
+            "instructions": [
+              "Design for extensibility",
+              "Consider future calculator functions",
+              "Use object-oriented design"
+            ],
+            "constraints": [
+              "Must use Python 3.11+",
+              "No external dependencies"
+            ]
+          },
+          "builder": {
+            "instructions": [
+              "Follow PEP 8 style guide",
+              "Add type hints",
+              "Include comprehensive docstrings",
+              "Implement robust error handling"
+            ],
+            "output_format": "python_package"
+          },
+          "critic": {
+            "focus_areas": [
+              "code_quality",
+              "security",
+              "maintainability"
+            ],
+            "strictness": "high"
+          },
+          "governance": {
+            "policies": [
+              "code_quality",
+              "security",
+              "documentation"
+            ],
+            "auto_approve": false
+          }
+        },
+        "output": {
+          "type": "file",
+          "filename": "calculator.py"
+        },
+        "team": {
+          "id": "team_demo_001",
+          "name": "Demo Team"
+        }
+      }
+    },
+    "acceptance_met": {
+      "quality_score": true,
+      "compliance_score": true
+    }
+  }
+}

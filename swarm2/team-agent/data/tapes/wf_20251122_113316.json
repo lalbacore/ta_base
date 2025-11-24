@@ -1,0 +1,383 @@
+{
+  "workflow_id": "wf_20251122_113316",
+  "mission": "Build a hello world program",
+  "team_id": "test_team",
+  "created_at": "2025-11-22T19:33:16.079617Z",
+  "updated_at": "2025-11-22T19:33:16.084669Z",
+  "status": "completed",
+  "current_stage": "recorder",
+  "stages": {
+    "architect": {
+      "stage_name": "architect",
+      "status": "completed",
+      "input_data": {
+        "input": "Build a hello world program",
+        "instructions": {
+          "instructions": []
+        },
+        "requirements": [
+          "Build a hello world program"
+        ]
+      },
+      "output_data": {
+        "mission": "Build a hello world program",
+        "strategy": "Implement 'Build a hello world program' following Python best practices",
+        "components": [
+          "main function",
+          "documentation",
+          "error handling"
+        ],
+        "structure": {
+          "language": "python",
+          "pattern": "single_file",
+          "requires_tests": true,
+          "complexity": "simple"
+        },
+        "technical_approach": "Clean, readable code with proper documentation",
+        "constraints": [],
+        "estimated_files": 1
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:33:16.080912Z",
+      "completed_at": "2025-11-22T19:33:16.081242Z",
+      "duration_seconds": 0.00033
+    },
+    "builder": {
+      "stage_name": "builder",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "mission": "Build a hello world program",
+          "strategy": "Implement 'Build a hello world program' following Python best practices",
+          "components": [
+            "main function",
+            "documentation",
+            "error handling"
+          ],
+          "structure": {
+            "language": "python",
+            "pattern": "single_file",
+            "requires_tests": true,
+            "complexity": "simple"
+          },
+          "technical_approach": "Clean, readable code with proper documentation",
+          "constraints": [],
+          "estimated_files": 1
+        },
+        "instructions": {
+          "instructions": []
+        },
+        "requirements": [
+          "Build a hello world program"
+        ]
+      },
+      "output_data": {
+        "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python",
+        "files": [
+          "main.py"
+        ],
+        "status": "built",
+        "metadata": {
+          "lines_of_code": 13,
+          "functions": 1,
+          "classes": 0,
+          "imports": 0,
+          "docstrings": 4,
+          "complexity": "simple"
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:33:16.081533Z",
+      "completed_at": "2025-11-22T19:33:16.081914Z",
+      "duration_seconds": 0.000381
+    },
+    "critic": {
+      "stage_name": "critic",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "code": "#!/usr/bin/env python3\n\"\"\"\nHello World Program\nA simple demonstration of Python output.\n\"\"\"\n\ndef main():\n    \"\"\"Print Hello, World! to console.\"\"\"\n    print(\"Hello, World!\")\n\nif __name__ == \"__main__\":\n    main()\n",
+          "language": "python",
+          "files": [
+            "main.py"
+          ],
+          "status": "built",
+          "metadata": {
+            "lines_of_code": 13,
+            "functions": 1,
+            "classes": 0,
+            "imports": 0,
+            "docstrings": 4,
+            "complexity": "simple"
+          }
+        },
+        "instructions": {
+          "focus_areas": [
+            "code_quality",
+            "security"
+          ]
+        },
+        "requirements": [
+          "Build a hello world program"
+        ]
+      },
+      "output_data": {
+        "quality_score": 100,
+        "issues": [
+          "Missing module-level docstring"
+        ],
+        "strengths": [
+          "Has main entry point",
+          "Includes documentation",
+          "Proper module structure",
+          "No security issues detected",
+          "Low complexity, easy to maintain"
+        ],
+        "recommendation": "approved",
+        "details": {
+          "scores": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 100,
+            "performance": 100
+          },
+          "analysis": {
+            "structure": {
+              "has_main": true,
+              "has_main_guard": true,
+              "has_classes": false,
+              "proper_imports": true,
+              "line_length_ok": true
+            },
+            "documentation": {
+              "has_module_docstring": false,
+              "has_docstrings": true,
+              "docstring_count": 4,
+              "function_count": 1,
+              "class_count": 0,
+              "functions_documented": true
+            },
+            "security": {
+              "issues": [],
+              "safe": true
+            },
+            "maintainability": {
+              "total_lines": 13,
+              "blank_lines": 3,
+              "comment_lines": 1,
+              "code_lines": 9,
+              "average_line_length": 15.461538461538462,
+              "complexity": "low"
+            },
+            "performance": {
+              "issues": [],
+              "optimal": true
+            }
+          },
+          "focus_areas": [
+            "code_quality",
+            "security"
+          ]
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:33:16.082298Z",
+      "completed_at": "2025-11-22T19:33:16.082722Z",
+      "duration_seconds": 0.000424
+    },
+    "governance": {
+      "stage_name": "governance",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "quality_score": 100,
+          "issues": [
+            "Missing module-level docstring"
+          ],
+          "strengths": [
+            "Has main entry point",
+            "Includes documentation",
+            "Proper module structure",
+            "No security issues detected",
+            "Low complexity, easy to maintain"
+          ],
+          "recommendation": "approved",
+          "details": {
+            "scores": {
+              "structure": 100,
+              "documentation": 100,
+              "security": 100,
+              "maintainability": 100,
+              "performance": 100
+            },
+            "analysis": {
+              "structure": {
+                "has_main": true,
+                "has_main_guard": true,
+                "has_classes": false,
+                "proper_imports": true,
+                "line_length_ok": true
+              },
+              "documentation": {
+                "has_module_docstring": false,
+                "has_docstrings": true,
+                "docstring_count": 4,
+                "function_count": 1,
+                "class_count": 0,
+                "functions_documented": true
+              },
+              "security": {
+                "issues": [],
+                "safe": true
+              },
+              "maintainability": {
+                "total_lines": 13,
+                "blank_lines": 3,
+                "comment_lines": 1,
+                "code_lines": 9,
+                "average_line_length": 15.461538461538462,
+                "complexity": "low"
+              },
+              "performance": {
+                "issues": [],
+                "optimal": true
+              }
+            },
+            "focus_areas": [
+              "code_quality",
+              "security"
+            ]
+          }
+        },
+        "instructions": {
+          "policies": [
+            "code_quality"
+          ],
+          "auto_approve": false
+        },
+        "requirements": [
+          "Build a hello world program"
+        ]
+      },
+      "output_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:33:16.083135Z",
+      "completed_at": "2025-11-22T19:33:16.083640Z",
+      "duration_seconds": 0.000505
+    },
+    "recorder": {
+      "stage_name": "recorder",
+      "status": "completed",
+      "input_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "output_data": {
+        "workflow_id": "wf_20251122_113316",
+        "timestamp": "2025-11-22T19:33:16.084631Z",
+        "mission": "Build a hello world program",
+        "signature": {
+          "hash": "c9d27e9c4ea636e3aa26689f091bbde82cc393f59bace40811601abaa62cdb8e",
+          "algorithm": "sha256"
+        },
+        "composite_score": {
+          "overall": 100.0,
+          "quality": 100,
+          "compliance": 100,
+          "breakdown": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 100,
+            "performance": 100
+          }
+        },
+        "status": "approved",
+        "stages_completed": 5,
+        "metadata": {
+          "components": 3,
+          "estimated_files": 1,
+          "complexity": "simple",
+          "issues_found": 1,
+          "strengths": 5,
+          "violations": 0,
+          "lines_of_code": 13,
+          "functions": 1,
+          "classes": 0
+        },
+        "recommendation": "approved",
+        "requires_remediation": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:33:16.084120Z",
+      "completed_at": "2025-11-22T19:33:16.084667Z",
+      "duration_seconds": 0.000547
+    }
+  },
+  "metadata": {
+    "mission": {
+      "mission": {
+        "id": "mission_20251122_113316",
+        "name": "Build a hello world program",
+        "description": "Build a hello world program",
+        "created_at": "2025-11-22T19:33:16.079611Z",
+        "created_by": "unknown",
+        "requirements": [
+          "Build a hello world program"
+        ],
+        "acceptance_criteria": {
+          "quality_score": ">= 70",
+          "compliance_score": ">= 80"
+        },
+        "stages": {
+          "architect": {
+            "instructions": []
+          },
+          "builder": {
+            "instructions": []
+          },
+          "critic": {
+            "focus_areas": [
+              "code_quality",
+              "security"
+            ]
+          },
+          "governance": {
+            "policies": [
+              "code_quality"
+            ],
+            "auto_approve": false
+          }
+        },
+        "output": {
+          "type": "file"
+        },
+        "team": {
+          "id": "default_team",
+          "name": "Default Team"
+        }
+      }
+    },
+    "acceptance_met": {
+      "quality_score": true,
+      "compliance_score": true
+    }
+  }
+}

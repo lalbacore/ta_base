@@ -16,10 +16,19 @@ class Critic(BaseRole):
         """Initialize critic with workflow ID."""
         super().__init__(workflow_id)
     
-    def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Review the implementation for quality and issues."""
-        implementation = context.get("input", {})
-        code = implementation.get("code", "")
+    def run(self, context):
+        if not isinstance(context, dict):
+            context = {"input": str(context)}
+    
+        implementation = context.get("implementation", {})
+        if isinstance(implementation, str):
+            try:
+                import json as _json
+                implementation = _json.loads(implementation)
+            except Exception:
+                implementation = {}
+    
+        code = implementation.get("code", context.get("code", ""))
         
         self.logger.info("Starting stage: critic", extra={
             "stage": "critic",

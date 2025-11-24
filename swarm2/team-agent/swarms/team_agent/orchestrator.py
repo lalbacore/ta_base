@@ -1,127 +1,178 @@
 """
-Orchestrator - Coordinates the multi-agent workflow.
+Team Agent Orchestrator - Main coordination layer.
 """
-
-from typing import Dict, Any, Optional
+import json
+import os
 from datetime import datetime
-import sys
 from pathlib import Path
 
-# Add utils to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from utils.logging import get_logger
 from swarms.team_agent.roles import (
     Architect,
     Builder,
     Critic,
-    Governance,
     Recorder,
+    Governance,  # add if available
 )
+from utils.logging import get_logger
+
+# Correct capability imports
+from swarms.team_agent.capabilities.registry import CapabilityRegistry
+from utils.capabilities.dynamic_builder import DynamicBuilder
+try:
+    from utils.capabilities import HRTGuideCapability
+except ImportError:
+    try:
+        from swarms.team_agent.capabilities.medical.hrt_guide import HRTGuideCapability
+    except Exception:
+        HRTGuideCapability = None
 
 
 class Orchestrator:
     """
-    Orchestrator coordinates the entire workflow through multiple agents.
+    Orchestrator for coordinating multi-agent workflows with capability-aware building.
     """
-    
-    def __init__(self, workflow_id: Optional[str] = None, output_dir: str = "output"):
-        """Initialize orchestrator with workflow ID and output directory."""
-        self.workflow_id = workflow_id or self._generate_workflow_id()
+
+    def __init__(self, output_dir: str = "./team_output", max_iterations: int = 3):
         self.output_dir = output_dir
+        self.max_iterations = max_iterations
+        self.current_workflow_id = None
         self.logger = get_logger("orchestrator")
-        
-        # Initialize agents
-        self.architect = Architect(self.workflow_id)
-        self.builder = Builder(self.workflow_id)
-        self.critic = Critic(self.workflow_id)
-        self.governance = Governance(self.workflow_id)
-        self.recorder = Recorder(self.workflow_id, output_dir)
-        
-        self.logger.info(f"Created new workflow {self.workflow_id}")
-    
-    def _generate_workflow_id(self) -> str:
-        """Generate unique workflow ID."""
+        os.makedirs(self.output_dir, exist_ok=True)
+        self.capability_registry = CapabilityRegistry()
+        self._register_default_capabilities()
+        self.dynamic_builder = DynamicBuilder(registry=self.capability_registry)
+        self.logger.info("Orchestrator initialized with capability system")
+
+    def _register_default_capabilities(self):
+        if HRTGuideCapability:
+            try:
+                self.capability_registry.register(HRTGuideCapability())
+            except Exception:
+                pass
+        self.logger.info(f"Registered {len(self.capability_registry.list_capabilities())} capabilities")
+
+    def execute(self, mission: str) -> dict:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        return f"wf_{timestamp}"
-    
-    def execute(self, mission: str, instructions: Optional[Dict] = None) -> Dict[str, Any]:
-        """
-        Execute the complete workflow.
+        self.current_workflow_id = f"wf_{timestamp}"
+        self.logger.info(f"Created new workflow {self.current_workflow_id}")
+        architect = Architect(self.current_workflow_id)
+        builder = Builder(self.current_workflow_id)
+        critic = Critic(self.current_workflow_id)
+        recorder = Recorder(self.current_workflow_id)
+        governance = None
+        try:
+            governance = Governance(self.current_workflow_id)
+        except Exception:
+            pass
+        final_record = self._execute_workflow(mission, architect, critic, recorder, governance)
+        return {"workflow_id": self.current_workflow_id, "final_record": final_record}
+
+    def _prepare_context(self, base: dict | str) -> dict:
+        """Return normalized context for role agents."""
+        if isinstance(base, str):
+            return {"input": base, "raw_input": base}
+        if "input" not in base:
+            # Preserve original while providing input string form
+            base["input"] = json.dumps(base, default=str)
+        return base
+
+    def _run_agent(self, agent, payload):
+        ctx = self._prepare_context(payload)
+        return agent.run(ctx)
+
+    def _execute_workflow(self, mission: str, architect, critic, recorder, governance=None) -> dict:
+        self.logger.info(f"Starting workflow execution: {mission}")
+
+        # Phase 1
+        self.logger.info("Phase 1: Architecture")
+        architect_output = self._run_agent(architect, {"mission": mission})
+
+        # Optional governance pre-check
+        if governance:
+            try:
+                self._run_agent(governance, {"stage": "pre_build", "architecture": architect_output})
+            except Exception:
+                pass
+
+        # Phase 2
+        self.logger.info("Phase 2: Implementation")
+        builder_result = self.dynamic_builder.run(
+            mission=mission,
+            architecture=json.dumps(architect_output),
+        )
+
+        # Phase 3: Review
+        self.logger.info("Phase 3: Review")
         
-        Args:
-            mission: The user's mission/request
-            instructions: Optional stage-specific instructions
-            
-        Returns:
-            Complete workflow results including all stage outputs
-        """
-        instructions = instructions or {}
+        # Handle artifacts as either dict or list
+        artifacts = builder_result.get("artifacts", {})
+        if isinstance(artifacts, list):
+            # Convert list to dict, extract code from first artifact
+            code = artifacts[0].get("content", "") if artifacts else ""
+        else:
+            # Dict format
+            code = artifacts.get("primary_code", "")
         
-        # Track all outputs
-        all_outputs = {}
-        
-        # Stage 1: Architect
-        self.logger.info("Executing stage: architect")
-        architecture = self.architect.run({
-            'input': mission,
-            'instructions': instructions.get('architect', {})
-        })
-        all_outputs['architecture'] = architecture
-        self.logger.info("Completed stage: architect")
-        
-        # Stage 2: Builder
-        self.logger.info("Executing stage: builder")
-        implementation = self.builder.run({
-            'input': architecture,
-            'instructions': instructions.get('builder', {})
-        })
-        all_outputs['implementation'] = implementation
-        self.logger.info("Completed stage: builder")
-        
-        # Stage 3: Critic
-        self.logger.info("Executing stage: critic")
-        review = self.critic.run({
-            'input': implementation,
-            'instructions': instructions.get('critic', {})
-        })
-        all_outputs['review'] = review
-        self.logger.info("Completed stage: critic")
-        
-        # Stage 4: Governance
-        self.logger.info("Executing stage: governance")
-        decision = self.governance.run({
-            'input': review,
-            'instructions': instructions.get('governance', {})
-        })
-        all_outputs['decision'] = decision
-        self.logger.info("Completed stage: governance")
-        
-        # Stage 5: Recorder
-        self.logger.info("Executing stage: recorder")
-        final_record = self.recorder.run({
-            'input': {
-                'architecture': architecture,
-                'implementation': implementation,
-                'review': review,
-                'decision': decision
-            },
-            'instructions': instructions.get('recorder', {})
-        })
-        self.logger.info("Completed stage: recorder")
-        
-        return {
-            'workflow_id': self.workflow_id,
-            'mission': mission,
-            'stages': all_outputs,
-            'final_record': final_record
+        critic_payload = {
+            "mission": mission,
+            "architecture": architect_output,
+            "implementation": builder_result,
+            "code": code,
         }
-    
-    def get_progress(self) -> Dict[str, Any]:
-        """Get current workflow progress."""
+        critic_output = self._run_agent(critic, critic_payload)
+
+        # Optional governance post-review
+        if governance:
+            try:
+                self._run_agent(governance, {
+                    "stage": "post_review",
+                    "review": critic_output,
+                    "implementation": builder_result
+                })
+            except Exception:
+                pass
+
+        # Phase 4: Recording/Publishing
+        self.logger.info("Phase 4: Recording/Publishing")
+        workflow_dir = Path(self.output_dir) / self.current_workflow_id
+        workflow_dir.mkdir(parents=True, exist_ok=True)
+
+        artifacts = builder_result.get("artifacts", {})
+        published_artifacts = {}
+        
+        # Handle both dict and list formats
+        if isinstance(artifacts, list):
+            for idx, artifact in enumerate(artifacts):
+                name = artifact.get("name", f"artifact_{idx}")
+                content = artifact.get("content", "")
+                filename = artifact.get("filename", f"{name}.py")
+                path = workflow_dir / filename
+                path.write_text(content)
+                published_artifacts[name] = str(path)
+        else:
+            # Dict format
+            for name, content in artifacts.items():
+                suffix = ".py" if not any(name.endswith(ext) for ext in (".md", ".txt", ".json")) else ""
+                path = workflow_dir / f"{name}{suffix}"
+                path.write_text(content)
+                published_artifacts[name] = str(path)
+
+        recorder_payload = {
+            "mission": mission,
+            "architecture": architect_output,
+            "implementation": builder_result,
+            "review": critic_output,
+            "artifacts": published_artifacts
+        }
+        self._run_agent(recorder, recorder_payload)
+
         return {
-            'workflow_id': self.workflow_id,
-            'status': 'running',
-            'stages_completed': 0,
-            'total_stages': 5
+            "workflow_id": self.current_workflow_id,
+            "mission": mission,
+            "architecture": architect_output,
+            "implementation": builder_result,
+            "review": critic_output,
+            "published_artifacts": published_artifacts,
+            "capability_used": builder_result.get("capability_used", "default"),
+            "timestamp": datetime.now().isoformat(),
         }

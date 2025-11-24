@@ -1,0 +1,50 @@
+---
+mission:
+  id: "mission_hello_001"
+  name: "Hello World Program"
+  description: "Build a Python program that prints 'Hello, World!' with proper documentation"
+  created_at: "2025-11-22T19:00:00Z"
+  created_by: "demo_user"
+  
+  requirements:
+    - "Create a simple Python script"
+    - "Print 'Hello, World!' to console"
+    - "Include proper documentation"
+    - "Follow Python best practices"
+  
+  acceptance_criteria:
+    quality_score: ">= 80"
+    compliance_score: ">= 90"
+  
+  stages:
+    architect:
+      instructions:
+        - "Keep it simple and clean"
+        - "Single file implementation"
+      constraints:
+        - "Must use Python 3.11+"
+    
+    builder:
+      instructions:
+        - "Follow PEP 8 style guide"
+        - "Add comprehensive docstrings"
+    
+    critic:
+      focus_areas:
+        - "code_quality"
+        - "documentation"
+      strictness: "standard"
+    
+    governance:
+      policies:
+        - "code_quality"
+        - "documentation"
+      auto_approve: false
+  
+  output:
+    type: "file"
+    filename: "hello.py"
+  
+  team:
+    id: "team_demo_001"
+    name: "Demo Team"

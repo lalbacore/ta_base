@@ -1,0 +1,1 @@
+from swarms.team_agent.capabilities.registry import CapabilityRegistry

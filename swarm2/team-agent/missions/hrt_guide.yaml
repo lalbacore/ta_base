@@ -1,0 +1,177 @@
+---
+mission:
+  id: "mission_hrt_guide_001"
+  name: "Hormone Replacement Therapy Clinical Guide"
+  description: "Generate a comprehensive 20-page medical reference guide on hormone replacement therapy for women, suitable for healthcare professionals"
+  created_at: "2025-11-22T19:40:00Z"
+  created_by: "clinical_research_team"
+  
+  requirements:
+    - "Create a comprehensive HRT clinical guide (approximately 20 pages)"
+    - "Include evidence-based medical content with proper citations"
+    - "Cover indications, contraindications, dosing protocols, and monitoring"
+    - "Include risk-benefit analysis and patient counseling guidelines"
+    - "Provide differential diagnosis and treatment algorithms"
+    - "Add side effect management and follow-up protocols"
+    - "Include medication tables, dosage charts, and lab monitoring schedules"
+    - "Use professional medical terminology with clear explanations"
+    - "Structure with proper sections, subsections, and references"
+    - "Add safety warnings and contraindication alerts"
+  
+  acceptance_criteria:
+    quality_score: ">= 85"
+    compliance_score: ">= 90"
+    documentation_coverage: ">= 95"
+    content_depth: "doctoral_level"
+    
+  content_specifications:
+    target_length: "20 pages"
+    format: "markdown with HTML export capability"
+    audience: "healthcare professionals, physicians, nurse practitioners"
+    medical_level: "postgraduate/specialist"
+    
+    sections_required:
+      - "Executive Summary"
+      - "Introduction and Background"
+      - "Physiology of Menopause and Hormonal Changes"
+      - "Indications for HRT"
+      - "Contraindications (Absolute and Relative)"
+      - "Types of Hormone Therapy"
+      - "Dosing Protocols and Regimens"
+      - "Route of Administration Comparison"
+      - "Risk-Benefit Analysis"
+      - "Monitoring and Follow-up"
+      - "Side Effect Management"
+      - "Special Populations"
+      - "Patient Counseling Guidelines"
+      - "Treatment Algorithms"
+      - "Laboratory Reference Ranges"
+      - "Drug Interactions"
+      - "Case Studies"
+      - "Evidence Summary"
+      - "Clinical Pearls"
+      - "References"
+    
+    include_tables:
+      - "Hormone therapy formulations and dosages"
+      - "Contraindications checklist"
+      - "Monitoring schedule (baseline and follow-up)"
+      - "Risk comparison table"
+      - "Laboratory reference values"
+      - "Drug interaction matrix"
+    
+    include_algorithms:
+      - "Treatment initiation decision tree"
+      - "Route selection algorithm"
+      - "Side effect management flowchart"
+  
+  stages:
+    architect:
+      instructions:
+        - "Design a multi-section document architecture"
+        - "Plan for modular content generation"
+        - "Structure for medical reference standards"
+        - "Organize with clear hierarchy (chapters, sections, subsections)"
+      constraints:
+        - "Must use Python 3.11+"
+        - "Must generate markdown format"
+        - "Must be extensible for PDF/HTML export"
+        - "Must include proper medical disclaimers"
+      
+      architecture_pattern: "document_generator"
+      complexity: "complex"
+    
+    builder:
+      instructions:
+        - "Generate comprehensive medical content"
+        - "Include proper medical citations (simulated)"
+        - "Use professional medical terminology"
+        - "Create data structures for tables and algorithms"
+        - "Implement markdown formatting with headers, lists, tables"
+        - "Add disclaimer and legal notices"
+        - "Include metadata (version, date, authors)"
+      
+      code_requirements:
+        - "Class-based document generator"
+        - "Section-by-section content generation"
+        - "Table generation methods"
+        - "Algorithm/flowchart text generation"
+        - "Export to markdown file"
+        - "Proper docstrings and type hints"
+    
+    critic:
+      focus_areas:
+        - "code_quality"
+        - "documentation"
+        - "maintainability"
+        - "content_structure"
+      
+      quality_checks:
+        - "Verify all required sections present"
+        - "Check table formatting"
+        - "Validate content organization"
+        - "Ensure medical disclaimers included"
+      
+      strictness: "high"
+    
+    governance:
+      policies:
+        - "code_quality"
+        - "documentation"
+        - "medical_disclaimer"
+        - "content_completeness"
+      
+      compliance_requirements:
+        - "Must include disclaimer about educational purposes only"
+        - "Must not provide specific patient medical advice"
+        - "Must reference need for healthcare professional consultation"
+        - "Must include version and date metadata"
+      
+      auto_approve: false
+  
+  output:
+    type: "file"
+    filename: "hrt_clinical_guide.py"
+    generates: "hrt_guide.md"
+    
+    metadata:
+      version: "1.0.0"
+      classification: "educational_reference"
+      disclaimer: "For educational and testing purposes only. Not for clinical use."
+      target_pages: 20
+      estimated_words: 8000
+  
+  validation:
+    content_checks:
+      - "minimum_sections: 15"
+      - "minimum_tables: 4"
+      - "minimum_algorithms: 2"
+      - "includes_references: true"
+      - "includes_disclaimer: true"
+    
+    quality_metrics:
+      completeness_threshold: 90
+      organization_score: 85
+      professional_level: "doctoral"
+  
+  team:
+    id: "team_medical_content_001"
+    name: "Medical Content Generation Team"
+    
+  notes: |
+    This mission tests the system's ability to:
+    1. Generate complex, structured documents
+    2. Handle medical/technical content
+    3. Create tables and data structures
+    4. Organize multi-section content
+    5. Include proper disclaimers and metadata
+    
+    The generated content is for TESTING PURPOSES ONLY and should
+    not be used for actual medical care or patient treatment.
+    
+  legal_notice: |
+    DISCLAIMER: This is a software testing exercise. The generated
+    content is for educational and testing purposes only. It does not
+    constitute medical advice and should not be used for diagnosis,
+    treatment, or patient care. Always consult qualified healthcare
+    professionals for medical decisions.

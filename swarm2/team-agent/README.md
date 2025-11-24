@@ -1,243 +1,302 @@
-# Team Agent - Modular AI Agent System
+# Team Agent - Multi-Agent Orchestration Framework
 
 ## Overview
 
-**Team Agent** is a modular Python framework for building composable AI agent systems. It implements the **Intent → Capability → Governance** triangle as the core design principle.
+Team Agent is a capability-driven multi-agent orchestration framework that coordinates specialized AI agents to execute complex missions. It combines **role-based agents** (Architect, Builder, Critic, Recorder) with **domain-specific capabilities** to deliver high-quality, auditable software and documentation outputs.
 
-The system supports:
-- **Standalone agents** with specific roles and capabilities
-- **Composable teams** that orchestrate multi-agent workflows
-- **Policy enforcement** through governance agents
-- **Comprehensive logging** with cryptographic signing
-- **Multi-system integration** (SIEMs, A2A networks, MCP servers, blockchains)
+## Core Concept
+
+Instead of monolithic AI systems, Team Agent uses a **team of specialized agents** that collaborate through a structured workflow:
+
+```
+Mission → Architect → Builder (w/ Capabilities) → Critic → Recorder → Artifacts
+```
+
+### Key Innovation: **Capability System**
+
+Capabilities are domain-specific knowledge modules that the Builder dynamically selects based on mission requirements. This allows the system to:
+
+- **Specialize**: Medical guides, code generation, documentation, etc.
+- **Extend**: Add new capabilities without modifying core agents
+- **Route**: Automatically select the right capability for each mission
 
 ## Architecture
 
-### Core Components
+### 1. **Orchestrator** (`orchestrator.py`)
+- Coordinates the 4-phase workflow
+- Manages capability registry
+- Handles agent communication and artifact publishing
 
-#### Base Agent (`base/base_agent.py`)
-The foundation class for all agents. Provides:
-- `__init__(name, id, capabilities, policy)` - Agent initialization
-- `evaluate_intent(intent)` - Compliance checking
-- `act(intent)` - Action execution or refusal
-- `record(event)` - Event logging
-- `describe()` - Metadata about the agent
+### 2. **Role Agents** (`roles/`)
 
-#### Agent Roles (`swarms/team_agent/roles/`)
+#### **Architect**
+- Analyzes mission requirements
+- Designs system architecture
+- Defines technical specifications
 
-**Architect** (`architect.py`)
-- Designs system architecture based on requirements
-- Produces detailed architectural specifications
-- Tracks design artifacts and complexity
+#### **Builder** (`dynamic_builder.py`)
+- Selects appropriate capability based on mission
+- Executes code/document generation
+- Falls back to generic builder if no specialized capability matches
 
-**Builder** (`builder.py`)
-- Implements designs into buildable components
-- Generates code and deployment artifacts
-- Validates implementation feasibility
+#### **Critic**
+- Reviews generated code/documents
+- Identifies issues and improvements
+- Provides quality scores and feedback
 
-**Critic** (`critic.py`)
-- Reviews designs and implementations
-- Scores quality and compliance
-- Identifies risks and provides feedback
-- Pass/fail determination based on thresholds
+#### **Recorder**
+- Publishes final artifacts to disk
+- Creates comprehensive workflow records
+- Generates metadata and documentation
 
-**Governance** (`governance.py`)
-- Enforces organizational policies
-- Validates compliance across workflow stages
-- Creates audit trails
-- Makes final approval decisions
+### 3. **Capability System** (`capabilities/`)
 
-**Recorder** (`recorder.py`)
-- Logs complete workflow history
-- Calculates composite scores
-- Creates cryptographic signatures (SHA256)
-- Prepares exports for multiple systems:
-  - SIEM (Common Event Format)
-  - A2A (Agent-to-Agent networks)
-  - MCP (Model Context Protocol servers)
-  - Blockchain transactions
+#### **Base Capability** (`base_capability.py`)
+Abstract class defining:
+- `get_metadata()`: Describes capability (name, type, domains, version)
+- `matches(requirements)`: Determines if capability suits a mission
+- `execute(context)`: Performs the actual work
+- `validate_context(context)`: Ensures required inputs are present
 
-### Workflow
+#### **Example: HRT Guide Capability** (`medical/hrt_guide.py`)
+Specialized capability for generating hormone replacement therapy clinical guides:
+- **Domains**: `["medical", "hrt"]`
+- **Type**: `"document_generation"`
+- **Output**: Python code that generates structured medical documentation
 
-```
-Request
-  ↓
-[Architect] → Design
-  ↓
-[Builder] → Build
-  ↓
-[Critic] → Review
-  ↓
-[Governance] → Approve/Reject
-  ↓
-[Recorder] → Log & Sign
-  ↓
-Result (with signature and audit trail)
+#### **Registry** (`registry.py`)
+Central discovery system:
+- Indexes capabilities by type and domain
+- Supports keyword search and requirement matching
+- Handles both object and dict capability formats
+
+## Workflow Phases
+
+### **Phase 1: Architecture**
+```python
+architect_output = architect.run({"mission": mission})
+# Returns: {components, tech_stack, patterns, interfaces}
 ```
 
-## Directory Structure
-
-```
-team-agent/
-├── base/
-│   ├── __init__.py
-│   ├── base_agent.py          # Base agent class
-│   └── base_team.py           # Team orchestration (coming soon)
-├── swarms/
-│   └── team_agent/
-│       ├── __init__.py
-│       └── roles/
-│           ├── __init__.py
-│           ├── architect.py
-│           ├── builder.py
-│           ├── critic.py
-│           ├── governance.py
-│           └── recorder.py
-├── utils/
-│   ├── __init__.py
-│   └── tests/
-│       ├── __init__.py
-│       ├── test_base_agent.py
-│       ├── test_architect.py
-│       ├── test_builder.py
-│       ├── test_critic.py
-│       ├── test_governance.py
-│       └── test_recorder.py
-├── .env.example
-├── .gitignore
-├── .dockerignore
-├── pyproject.toml
-├── .pylintrc
-├── Makefile
-└── README.md
+### **Phase 2: Implementation**
+```python
+builder_result = dynamic_builder.run(
+    mission=mission,
+    architecture=json.dumps(architect_output)
+)
+# Selects capability → executes → returns artifacts
 ```
 
-## Getting Started
-
-### Prerequisites
-- Python 3.11+
-- pip or conda
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <repo>
-cd team-agent
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -e .
+### **Phase 3: Review**
+```python
+critic_output = critic.run({
+    "mission": mission,
+    "architecture": architect_output,
+    "implementation": builder_result,
+    "code": extracted_code
+})
+# Returns: {issues, score, suggestions}
 ```
 
-### Running Tests
-
-```bash
-# Run all tests
-make test
-
-# Run specific role tests
-python -m unittest utils.tests.test_architect -v
-python -m unittest utils.tests.test_builder -v
-python -m unittest utils.tests.test_critic -v
-python -m unittest utils.tests.test_governance -v
-python -m unittest utils.tests.test_recorder -v
-
-# Run with coverage
-make test-coverage
-
-# Lint the code
-make lint
-
-# Format the code
-make format
+### **Phase 4: Recording**
+```python
+recorder.run({
+    "mission": mission,
+    "architecture": architect_output,
+    "implementation": builder_result,
+    "review": critic_output,
+    "artifacts": published_paths
+})
+# Writes: workflow_record.json + all artifacts to disk
 ```
 
-## Design Principles
+## Usage
 
-### Intent → Capability → Governance Triangle
-- **Intent**: What is needed (from request/user)
-- **Capability**: What can be done (agent roles & abilities)
-- **Governance**: What is allowed (policies & compliance)
+### Basic Example
 
-This triangle guides all architectural decisions and agent behaviors.
+```python
+from swarms.team_agent.orchestrator import Orchestrator
 
-### Key Features
-- **Modular**: Each role is independently testable and replaceable
-- **Auditable**: Complete audit trails with cryptographic signatures
-- **Compliant**: Policy enforcement at every stage
-- **Scalable**: Designed for extension to SIEMs, A2A, MCP, blockchains
-- **Type-safe**: Strong typing with clear interfaces
+# Initialize with output directory
+o = Orchestrator(output_dir="./output")
+
+# Execute a mission
+result = o.execute("Generate hormone replacement therapy guide")
+
+print(f"Workflow ID: {result['workflow_id']}")
+print(f"Capability Used: {result['final_record']['capability_used']}")
+print(f"Artifacts: {result['final_record']['published_artifacts']}")
+```
+
+### Creating a Custom Capability
+
+```python
+from swarms.team_agent.capabilities.base_capability import BaseCapability
+
+class MyCapability(BaseCapability):
+    def get_metadata(self):
+        return {
+            "name": "my_capability",
+            "type": "code_generation",
+            "domains": ["web", "api"],
+            "description": "Generates REST API code",
+            "version": "1.0.0"
+        }
+    
+    def execute(self, context):
+        mission = context.get("mission", "")
+        architecture = context.get("architecture", "")
+        
+        # Generate code
+        code = f"# API for: {mission}\n..."
+        
+        return {
+            "content": code,
+            "artifacts": [{
+                "type": "python",
+                "name": "api",
+                "filename": "api.py",
+                "content": code
+            }],
+            "metadata": self.metadata
+        }
+
+# Register it
+from swarms.team_agent.capabilities.registry import CapabilityRegistry
+registry = CapabilityRegistry()
+registry.register(MyCapability())
+```
 
 ## Testing
 
-### Current Test Coverage
-- ✅ BaseAgent (5 tests)
-- ✅ Architect (7 tests)
-- ✅ Builder (9 tests)
-- ✅ Critic (12 tests)
-- ✅ Governance (13 tests)
-- ✅ Recorder (14 tests)
+The project includes comprehensive test coverage:
 
-**Total: 60+ tests passing**
+```bash
+# Run all capability tests
+python examples/run_capability_tests.py
 
-### Test Philosophy
-- One test file per role
-- Incremental testing as roles are developed
-- Integration tests for multi-agent workflows
-- End-to-end tests for complete workflows
+# Run specific test suites
+pytest utils/tests/test_capabilities.py -v
+pytest utils/tests/test_capability_registry.py -v
+pytest utils/tests/test_orchestrator_capabilities.py -v
+```
 
-## Development Roadmap
+### Test Structure
 
-### Phase 1: ✅ Core Agents (Complete)
-- [x] Base agent class
-- [x] All 5 role implementations
-- [x] Unit tests per role
-- [x] Integration tests (3-agent, 4-agent, 5-agent workflows)
+- **`test_capabilities.py`**: BaseCapability, DocumentGenerator, HRTGuideCapability
+- **`test_capability_registry.py`**: Registration, indexing, discovery
+- **`test_orchestrator_capabilities.py`**: End-to-end workflow integration
 
-### Phase 2: Team Orchestration (In Progress)
-- [ ] BaseTeam class for workflow coordination
-- [ ] End-to-end team tests
-- [ ] Error handling and recovery
-- [ ] Async/parallel agent execution
+## Project Structure
 
-### Phase 3: Integrations (Planned)
-- [ ] SIEM export adapters
-- [ ] A2A protocol implementation
-- [ ] MCP server compatibility
-- [ ] Blockchain transaction interface
+```
+team-agent/
+├── swarms/
+│   └── team_agent/
+│       ├── orchestrator.py          # Main coordinator
+│       ├── roles/
+│       │   ├── architect.py         # Architecture planning
+│       │   ├── builder.py           # Generic builder fallback
+│       │   ├── critic.py            # Code review
+│       │   └── recorder.py          # Artifact publishing
+│       └── capabilities/
+│           ├── base_capability.py   # Abstract base class
+│           ├── registry.py          # Capability discovery
+│           ├── document_generator.py # Generic doc generation
+│           └── medical/
+│               └── hrt_guide.py     # HRT guide specialist
+├── utils/
+│   ├── capabilities/
+│   │   ├── dynamic_builder.py      # Capability-aware builder
+│   │   └── __init__.py              # Exports HRTGuideCapability
+│   └── tests/                       # Test suites
+├── examples/
+│   └── run_capability_tests.py     # Test runner
+└── README.md                        # This file
+```
 
-### Phase 4: Enterprise Features (Planned)
-- [ ] Advanced policy engine
-- [ ] Multi-tenant support
-- [ ] Performance monitoring
-- [ ] Distributed tracing
+## Key Design Patterns
+
+### 1. **Strategy Pattern**
+Capabilities are interchangeable strategies selected at runtime based on mission requirements.
+
+### 2. **Registry Pattern**
+Central capability registry enables discovery without hard dependencies.
+
+### 3. **Template Method Pattern**
+BaseCapability defines workflow; subclasses implement domain logic.
+
+### 4. **Adapter Pattern**
+`_prepare_context()` normalizes agent inputs (string vs dict).
+
+## Extension Points
+
+### Add a New Capability
+1. Subclass `BaseCapability`
+2. Implement `get_metadata()` and `execute()`
+3. Register with `CapabilityRegistry`
+
+### Add a New Role
+1. Subclass `BaseRole`
+2. Implement `run(context)` method
+3. Add to `Orchestrator._execute_workflow()`
+
+### Add a New Phase
+Modify `Orchestrator._execute_workflow()` to insert new phase between existing ones.
+
+## Outputs
+
+Each workflow execution creates:
+
+```
+./output/
+└── wf_20251123_170918/
+    ├── hrt_guide_generator.py       # Generated code
+    ├── README.md                     # Documentation (if created)
+    └── wf_20251123_170918_record.json # Full workflow record
+```
+
+### Workflow Record Structure
+
+```json
+{
+  "mission": "Generate hormone replacement therapy guide",
+  "architecture": { ... },
+  "implementation": {
+    "artifacts": [ ... ],
+    "capability_used": "hrt_guide_generator"
+  },
+  "review": {
+    "issues": [ ... ],
+    "score": 8.5
+  },
+  "artifacts": {
+    "hrt_guide": "./output/wf_20251123_170918/hrt_guide_generator.py"
+  },
+  "timestamp": "2025-11-23T17:09:18.123456"
+}
+```
+
+## Future Enhancements
+
+1. **Tool System**: Extract role logic into reusable tools (see architectural discussion)
+2. **Governance Layer**: Policy enforcement and compliance checking
+3. **Parallel Execution**: Run independent capabilities concurrently
+4. **Capability Versioning**: Support multiple versions of same capability
+5. **Dynamic Agent Composition**: Select roles based on mission complexity
 
 ## Contributing
 
-### Code Style
-- Follow PEP 8
-- Use type hints
-- Docstring every class and method
-- Run `make lint` before committing
-
-### Adding New Roles
-1. Create `swarms/team_agent/roles/new_role.py`
-2. Extend `BaseAgent`
-3. Create `utils/tests/test_new_role.py`
-4. Implement role-specific logic
-5. Ensure 100% test coverage
-6. Update this README
+When adding capabilities:
+- Include comprehensive metadata
+- Provide clear domain/type specifications
+- Write unit tests covering `matches()` and `execute()`
+- Update registry tests if adding new discovery patterns
 
 ## License
 
-[License information here]
+[Your License Here]
 
-## Credits
+## Authors
 
-**Founding Idea**: Intent → Capability → Governance Triangle
-
-Built with the Team Agent framework for modular, composable AI systems.
+Team Agent Development Team

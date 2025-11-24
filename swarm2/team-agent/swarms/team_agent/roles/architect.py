@@ -15,9 +15,10 @@ class Architect(BaseRole):
         """Initialize architect with workflow ID."""
         super().__init__(workflow_id)
     
-    def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Design the architecture based on mission requirements."""
-        user_input = context.get("input", "")
+    def run(self, context):
+        if not isinstance(context, dict):
+            context = {"input": str(context)}
+        user_input = context.get("input", context.get("mission", ""))
         
         self.logger.info("Starting stage: architect", extra={
             "stage": "architect",

@@ -1,0 +1,456 @@
+{
+  "workflow_id": "wf_20251122_113703",
+  "mission": "Build a command-line calculator with basic arithmetic operations",
+  "team_id": "team_demo_001",
+  "created_at": "2025-11-22T19:37:03.403805Z",
+  "updated_at": "2025-11-22T19:37:03.422559Z",
+  "status": "completed",
+  "current_stage": "recorder",
+  "stages": {
+    "architect": {
+      "stage_name": "architect",
+      "status": "completed",
+      "input_data": {
+        "input": "Build a command-line calculator with basic arithmetic operations",
+        "instructions": {
+          "instructions": [
+            "Design for extensibility",
+            "Consider future calculator functions",
+            "Use object-oriented design"
+          ],
+          "constraints": [
+            "Must use Python 3.11+",
+            "No external dependencies"
+          ]
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "mission": "Build a command-line calculator with basic arithmetic operations",
+        "strategy": "Implement 'Build a command-line calculator with basic arithmetic operations' following Python best practices",
+        "components": [
+          "main function",
+          "documentation",
+          "calculator class",
+          "operations",
+          "input validation",
+          "error handling"
+        ],
+        "structure": {
+          "language": "python",
+          "pattern": "single_file",
+          "requires_tests": true,
+          "complexity": "simple"
+        },
+        "technical_approach": "Clean, readable code with proper documentation",
+        "constraints": [
+          "Must use Python 3.11+",
+          "No external dependencies"
+        ],
+        "estimated_files": 1
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:37:03.406086Z",
+      "completed_at": "2025-11-22T19:37:03.406623Z",
+      "duration_seconds": 0.000537
+    },
+    "builder": {
+      "stage_name": "builder",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "mission": "Build a command-line calculator with basic arithmetic operations",
+          "strategy": "Implement 'Build a command-line calculator with basic arithmetic operations' following Python best practices",
+          "components": [
+            "main function",
+            "documentation",
+            "calculator class",
+            "operations",
+            "input validation",
+            "error handling"
+          ],
+          "structure": {
+            "language": "python",
+            "pattern": "single_file",
+            "requires_tests": true,
+            "complexity": "simple"
+          },
+          "technical_approach": "Clean, readable code with proper documentation",
+          "constraints": [
+            "Must use Python 3.11+",
+            "No external dependencies"
+          ],
+          "estimated_files": 1
+        },
+        "instructions": {
+          "instructions": [
+            "Follow PEP 8 style guide",
+            "Add type hints",
+            "Include comprehensive docstrings",
+            "Implement robust error handling"
+          ],
+          "output_format": "python_package"
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "code": "#!/usr/bin/env python3\n\"\"\"\nCalculator Application\nA command-line calculator supporting basic arithmetic operations.\n\"\"\"\n\nimport sys\nfrom typing import Optional\n\nclass Calculator:\n    \"\"\"Calculator with basic arithmetic operations.\"\"\"\n    \n    def add(self, a: float, b: float) -> float:\n        \"\"\"Add two numbers.\"\"\"\n        return a + b\n    \n    def subtract(self, a: float, b: float) -> float:\n        \"\"\"Subtract b from a.\"\"\"\n        return a - b\n    \n    def multiply(self, a: float, b: float) -> float:\n        \"\"\"Multiply two numbers.\"\"\"\n        return a * b\n    \n    def divide(self, a: float, b: float) -> Optional[float]:\n        \"\"\"\n        Divide a by b.\n        \n        Args:\n            a: Numerator\n            b: Denominator\n            \n        Returns:\n            Result of division, or None if division by zero\n        \"\"\"\n        if b == 0:\n            print(\"Error: Division by zero!\")\n            return None\n        return a / b\n\ndef get_number(prompt: str) -> Optional[float]:\n    \"\"\"\n    Get a number from user input with validation.\n    \n    Args:\n        prompt: Prompt to display to user\n        \n    Returns:\n        Float value, or None if invalid input\n    \"\"\"\n    try:\n        return float(input(prompt))\n    except ValueError:\n        print(\"Error: Invalid number!\")\n        return None\n\ndef main():\n    \"\"\"Main calculator loop.\"\"\"\n    calc = Calculator()\n    \n    print(\"=\" * 50)\n    print(\"  Calculator Application\")\n    print(\"=\" * 50)\n    print()\n    print(\"Operations:\")\n    print(\"  1. Addition (+)\")\n    print(\"  2. Subtraction (-)\")\n    print(\"  3. Multiplication (*)\")\n    print(\"  4. Division (/)\")\n    print(\"  5. Exit\")\n    print()\n    \n    while True:\n        choice = input(\"Select operation (1-5): \").strip()\n        \n        if choice == \"5\":\n            print(\"Goodbye!\")\n            break\n        \n        if choice not in [\"1\", \"2\", \"3\", \"4\"]:\n            print(\"Invalid choice! Please select 1-5.\")\n            continue\n        \n        # Get numbers\n        num1 = get_number(\"Enter first number: \")\n        if num1 is None:\n            continue\n        \n        num2 = get_number(\"Enter second number: \")\n        if num2 is None:\n            continue\n        \n        # Perform calculation\n        result = None\n        if choice == \"1\":\n            result = calc.add(num1, num2)\n            op = \"+\"\n        elif choice == \"2\":\n            result = calc.subtract(num1, num2)\n            op = \"-\"\n        elif choice == \"3\":\n            result = calc.multiply(num1, num2)\n            op = \"*\"\n        elif choice == \"4\":\n            result = calc.divide(num1, num2)\n            op = \"/\"\n        \n        if result is not None:\n            print(f\"\\nResult: {num1} {op} {num2} = {result}\\n\")\n\nif __name__ == \"__main__\":\n    main()\n",
+        "language": "python",
+        "files": [
+          "main.py"
+        ],
+        "status": "built",
+        "metadata": {
+          "lines_of_code": 113,
+          "functions": 6,
+          "classes": 1,
+          "imports": 2,
+          "docstrings": 16,
+          "complexity": "simple"
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:37:03.406968Z",
+      "completed_at": "2025-11-22T19:37:03.407590Z",
+      "duration_seconds": 0.000622
+    },
+    "critic": {
+      "stage_name": "critic",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "code": "#!/usr/bin/env python3\n\"\"\"\nCalculator Application\nA command-line calculator supporting basic arithmetic operations.\n\"\"\"\n\nimport sys\nfrom typing import Optional\n\nclass Calculator:\n    \"\"\"Calculator with basic arithmetic operations.\"\"\"\n    \n    def add(self, a: float, b: float) -> float:\n        \"\"\"Add two numbers.\"\"\"\n        return a + b\n    \n    def subtract(self, a: float, b: float) -> float:\n        \"\"\"Subtract b from a.\"\"\"\n        return a - b\n    \n    def multiply(self, a: float, b: float) -> float:\n        \"\"\"Multiply two numbers.\"\"\"\n        return a * b\n    \n    def divide(self, a: float, b: float) -> Optional[float]:\n        \"\"\"\n        Divide a by b.\n        \n        Args:\n            a: Numerator\n            b: Denominator\n            \n        Returns:\n            Result of division, or None if division by zero\n        \"\"\"\n        if b == 0:\n            print(\"Error: Division by zero!\")\n            return None\n        return a / b\n\ndef get_number(prompt: str) -> Optional[float]:\n    \"\"\"\n    Get a number from user input with validation.\n    \n    Args:\n        prompt: Prompt to display to user\n        \n    Returns:\n        Float value, or None if invalid input\n    \"\"\"\n    try:\n        return float(input(prompt))\n    except ValueError:\n        print(\"Error: Invalid number!\")\n        return None\n\ndef main():\n    \"\"\"Main calculator loop.\"\"\"\n    calc = Calculator()\n    \n    print(\"=\" * 50)\n    print(\"  Calculator Application\")\n    print(\"=\" * 50)\n    print()\n    print(\"Operations:\")\n    print(\"  1. Addition (+)\")\n    print(\"  2. Subtraction (-)\")\n    print(\"  3. Multiplication (*)\")\n    print(\"  4. Division (/)\")\n    print(\"  5. Exit\")\n    print()\n    \n    while True:\n        choice = input(\"Select operation (1-5): \").strip()\n        \n        if choice == \"5\":\n            print(\"Goodbye!\")\n            break\n        \n        if choice not in [\"1\", \"2\", \"3\", \"4\"]:\n            print(\"Invalid choice! Please select 1-5.\")\n            continue\n        \n        # Get numbers\n        num1 = get_number(\"Enter first number: \")\n        if num1 is None:\n            continue\n        \n        num2 = get_number(\"Enter second number: \")\n        if num2 is None:\n            continue\n        \n        # Perform calculation\n        result = None\n        if choice == \"1\":\n            result = calc.add(num1, num2)\n            op = \"+\"\n        elif choice == \"2\":\n            result = calc.subtract(num1, num2)\n            op = \"-\"\n        elif choice == \"3\":\n            result = calc.multiply(num1, num2)\n            op = \"*\"\n        elif choice == \"4\":\n            result = calc.divide(num1, num2)\n            op = \"/\"\n        \n        if result is not None:\n            print(f\"\\nResult: {num1} {op} {num2} = {result}\\n\")\n\nif __name__ == \"__main__\":\n    main()\n",
+          "language": "python",
+          "files": [
+            "main.py"
+          ],
+          "status": "built",
+          "metadata": {
+            "lines_of_code": 113,
+            "functions": 6,
+            "classes": 1,
+            "imports": 2,
+            "docstrings": 16,
+            "complexity": "simple"
+          }
+        },
+        "instructions": {
+          "focus_areas": [
+            "code_quality",
+            "security",
+            "maintainability"
+          ],
+          "strictness": "high"
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "quality_score": 95,
+        "issues": [
+          "Missing module-level docstring"
+        ],
+        "strengths": [
+          "Has main entry point",
+          "Includes documentation",
+          "Proper module structure",
+          "No security issues detected"
+        ],
+        "recommendation": "approved",
+        "details": {
+          "scores": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 70,
+            "performance": 100
+          },
+          "analysis": {
+            "structure": {
+              "has_main": true,
+              "has_main_guard": true,
+              "has_classes": true,
+              "proper_imports": true,
+              "line_length_ok": true
+            },
+            "documentation": {
+              "has_module_docstring": false,
+              "has_docstrings": true,
+              "docstring_count": 16,
+              "function_count": 6,
+              "class_count": 1,
+              "functions_documented": true
+            },
+            "security": {
+              "issues": [],
+              "safe": true
+            },
+            "maintainability": {
+              "total_lines": 113,
+              "blank_lines": 22,
+              "comment_lines": 3,
+              "code_lines": 88,
+              "average_line_length": 23.672566371681416,
+              "complexity": "moderate"
+            },
+            "performance": {
+              "issues": [],
+              "optimal": true
+            }
+          },
+          "focus_areas": [
+            "code_quality",
+            "security",
+            "maintainability"
+          ]
+        }
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:37:03.408463Z",
+      "completed_at": "2025-11-22T19:37:03.409363Z",
+      "duration_seconds": 0.0009
+    },
+    "governance": {
+      "stage_name": "governance",
+      "status": "completed",
+      "input_data": {
+        "input": {
+          "quality_score": 95,
+          "issues": [
+            "Missing module-level docstring"
+          ],
+          "strengths": [
+            "Has main entry point",
+            "Includes documentation",
+            "Proper module structure",
+            "No security issues detected"
+          ],
+          "recommendation": "approved",
+          "details": {
+            "scores": {
+              "structure": 100,
+              "documentation": 100,
+              "security": 100,
+              "maintainability": 70,
+              "performance": 100
+            },
+            "analysis": {
+              "structure": {
+                "has_main": true,
+                "has_main_guard": true,
+                "has_classes": true,
+                "proper_imports": true,
+                "line_length_ok": true
+              },
+              "documentation": {
+                "has_module_docstring": false,
+                "has_docstrings": true,
+                "docstring_count": 16,
+                "function_count": 6,
+                "class_count": 1,
+                "functions_documented": true
+              },
+              "security": {
+                "issues": [],
+                "safe": true
+              },
+              "maintainability": {
+                "total_lines": 113,
+                "blank_lines": 22,
+                "comment_lines": 3,
+                "code_lines": 88,
+                "average_line_length": 23.672566371681416,
+                "complexity": "moderate"
+              },
+              "performance": {
+                "issues": [],
+                "optimal": true
+              }
+            },
+            "focus_areas": [
+              "code_quality",
+              "security",
+              "maintainability"
+            ]
+          }
+        },
+        "instructions": {
+          "policies": [
+            "code_quality",
+            "security",
+            "documentation"
+          ],
+          "auto_approve": false
+        },
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ]
+      },
+      "output_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:37:03.409886Z",
+      "completed_at": "2025-11-22T19:37:03.410646Z",
+      "duration_seconds": 0.00076
+    },
+    "recorder": {
+      "stage_name": "recorder",
+      "status": "completed",
+      "input_data": {
+        "compliance_score": 100,
+        "decision": "approved",
+        "violations": [],
+        "policies_checked": [
+          "code_quality",
+          "security",
+          "documentation"
+        ],
+        "requires_remediation": false,
+        "auto_approved": false
+      },
+      "output_data": {
+        "workflow_id": "wf_20251122_113703",
+        "timestamp": "2025-11-22T19:37:03.422463Z",
+        "mission": "Build a command-line calculator with basic arithmetic operations",
+        "signature": {
+          "hash": "7ec7e123c023835d9a892499171e64fbba8bf52339407cb24ef9329ff2dc154f",
+          "algorithm": "sha256"
+        },
+        "composite_score": {
+          "overall": 97.5,
+          "quality": 95,
+          "compliance": 100,
+          "breakdown": {
+            "structure": 100,
+            "documentation": 100,
+            "security": 100,
+            "maintainability": 70,
+            "performance": 100
+          }
+        },
+        "status": "approved",
+        "stages_completed": 5,
+        "metadata": {
+          "components": 6,
+          "estimated_files": 1,
+          "complexity": "simple",
+          "issues_found": 1,
+          "strengths": 4,
+          "violations": 0,
+          "lines_of_code": 113,
+          "functions": 6,
+          "classes": 1
+        },
+        "recommendation": "approved",
+        "requires_remediation": false
+      },
+      "error": null,
+      "started_at": "2025-11-22T19:37:03.411186Z",
+      "completed_at": "2025-11-22T19:37:03.422556Z",
+      "duration_seconds": 0.01137
+    }
+  },
+  "metadata": {
+    "mission": {
+      "mission": {
+        "id": "mission_calc_001",
+        "name": "Calculator Application",
+        "description": "Build a command-line calculator with basic arithmetic operations",
+        "created_at": "2025-11-22T19:00:00Z",
+        "created_by": "demo_user",
+        "requirements": [
+          "Support addition, subtraction, multiplication, division",
+          "Handle user input validation",
+          "Include error handling for division by zero",
+          "Provide a clean command-line interface",
+          "Add comprehensive documentation"
+        ],
+        "acceptance_criteria": {
+          "quality_score": ">= 75",
+          "compliance_score": ">= 85"
+        },
+        "stages": {
+          "architect": {
+            "instructions": [
+              "Design for extensibility",
+              "Consider future calculator functions",
+              "Use object-oriented design"
+            ],
+            "constraints": [
+              "Must use Python 3.11+",
+              "No external dependencies"
+            ]
+          },
+          "builder": {
+            "instructions": [
+              "Follow PEP 8 style guide",
+              "Add type hints",
+              "Include comprehensive docstrings",
+              "Implement robust error handling"
+            ],
+            "output_format": "python_package"
+          },
+          "critic": {
+            "focus_areas": [
+              "code_quality",
+              "security",
+              "maintainability"
+            ],
+            "strictness": "high"
+          },
+          "governance": {
+            "policies": [
+              "code_quality",
+              "security",
+              "documentation"
+            ],
+            "auto_approve": false
+          }
+        },
+        "output": {
+          "type": "file",
+          "filename": "calculator.py"
+        },
+        "team": {
+          "id": "team_demo_001",
+          "name": "Demo Team"
+        }
+      }
+    },
+    "acceptance_met": {
+      "quality_score": true,
+      "compliance_score": true
+    }
+  }
+}

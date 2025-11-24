@@ -1,0 +1,58 @@
+---
+mission:
+  id: "mission_calc_001"
+  name: "Calculator Application"
+  description: "Build a command-line calculator with basic arithmetic operations"
+  created_at: "2025-11-22T19:00:00Z"
+  created_by: "demo_user"
+  
+  requirements:
+    - "Support addition, subtraction, multiplication, division"
+    - "Handle user input validation"
+    - "Include error handling for division by zero"
+    - "Provide a clean command-line interface"
+    - "Add comprehensive documentation"
+  
+  acceptance_criteria:
+    quality_score: ">= 75"
+    compliance_score: ">= 85"
+  
+  stages:
+    architect:
+      instructions:
+        - "Design for extensibility"
+        - "Consider future calculator functions"
+        - "Use object-oriented design"
+      constraints:
+        - "Must use Python 3.11+"
+        - "No external dependencies"
+    
+    builder:
+      instructions:
+        - "Follow PEP 8 style guide"
+        - "Add type hints"
+        - "Include comprehensive docstrings"
+        - "Implement robust error handling"
+      output_format: "python_package"
+    
+    critic:
+      focus_areas:
+        - "code_quality"
+        - "security"
+        - "maintainability"
+      strictness: "high"
+    
+    governance:
+      policies:
+        - "code_quality"
+        - "security"
+        - "documentation"
+      auto_approve: false
+  
+  output:
+    type: "file"
+    filename: "calculator.py"
+  
+  team:
+    id: "team_demo_001"
+    name: "Demo Team"
