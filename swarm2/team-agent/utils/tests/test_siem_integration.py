@@ -2,8 +2,77 @@ import unittest
 import socket
 import time
 import requests
-from storage.models import WorkflowRecord
+import sqlite3
+import hashlib
+import json
+import os
+from typing import Optional, Dict, Any, List
+from swarms.team_agent.registry import Registry
 from integrations.siem.cef_formatter import CEFFormatter
+
+
+DB_PATH = os.getenv("TEAM_AGENT_REGISTRY_DB", "team_agent_registry.sqlite3")
+
+class Registry:
+    def __init__(self, db_path: str = DB_PATH):
+        self.conn = sqlite3.connect(db_path)
+        self._init_tables()
+
+    def _init_tables(self):
+        c = self.conn.cursor()
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS workflows (
+            id TEXT PRIMARY KEY,
+            name TEXT,
+            version TEXT,
+            metadata TEXT
+        )""")
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS audit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            hash TEXT,
+            prev_hash TEXT,
+            entry TEXT
+        )""")
+        self.conn.commit()
+
+    def publish_workflow(self, workflow: Dict[str, Any]):
+        workflow_id = workflow.get("workflow_id")
+        name = workflow.get("name")
+        version = workflow.get("version", "1.0.0")
+        metadata = json.dumps(workflow)
+        c = self.conn.cursor()
+        c.execute("INSERT OR REPLACE INTO workflows (id, name, version, metadata) VALUES (?, ?, ?, ?)",
+                  (workflow_id, name, version, metadata))
+        self.conn.commit()
+
+    def list_workflows(self) -> List[Dict[str, Any]]:
+        c = self.conn.cursor()
+        c.execute("SELECT metadata FROM workflows")
+        return [json.loads(row[0]) for row in c.fetchall()]
+
+    def add_audit_entry(self, entry: Dict[str, Any]):
+        c = self.conn.cursor()
+        c.execute("SELECT hash FROM audit_log ORDER BY id DESC LIMIT 1")
+        prev = c.fetchone()
+        prev_hash = prev[0] if prev else ""
+        entry_json = json.dumps(entry)
+        hash_val = hashlib.sha256((prev_hash + entry_json).encode()).hexdigest()
+        c.execute("INSERT INTO audit_log (hash, prev_hash, entry) VALUES (?, ?, ?)",
+                  (hash_val, prev_hash, entry_json))
+        self.conn.commit()
+        return hash_val
+
+    def verify_chain(self) -> bool:
+        c = self.conn.cursor()
+        c.execute("SELECT hash, prev_hash, entry FROM audit_log ORDER BY id ASC")
+        prev_hash = ""
+        for row in c.fetchall():
+            expected_hash = hashlib.sha256((prev_hash + row[2]).encode()).hexdigest()
+            if row[0] != expected_hash:
+                return False
+            prev_hash = row[0]
+        return True
 
 
 class TestSIEMIntegration(unittest.TestCase):
@@ -145,4 +214,25 @@ class TestSIEMIntegration(unittest.TestCase):
             self.assertEqual(len(cef_events), 5)
         except Exception as e:
             self.fail(f"Failed to send batch: {e}")
+
+def test_workflow_publish_and_list():
+    db_fd, db_path = tempfile.mkstemp()
+    reg = Registry(db_path)
+    wf = {"workflow_id": "wf1", "name": "Test Workflow", "version": "1.0.0"}
+    reg.publish_workflow(wf)
+    workflows = reg.list_workflows()
+    assert any(w["workflow_id"] == "wf1" for w in workflows)
+    os.close(db_fd)
+    os.remove(db_path)
+
+def test_audit_chain():
+    db_fd, db_path = tempfile.mkstemp()
+    reg = Registry(db_path)
+    e1 = {"action": "create", "target": "wf1"}
+    h1 = reg.add_audit_entry(e1)
+    e2 = {"action": "update", "target": "wf1"}
+    h2 = reg.add_audit_entry(e2)
+    assert reg.verify_chain()
+    os.close(db_fd)
+    os.remove(db_path)
 
