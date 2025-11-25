@@ -1,34 +1,33 @@
 """
-Code generation and validation tools.
+Code generation and validation tools with LLM integration.
 """
 
 from typing import Any, Dict, Optional
 from .base import BaseTool, ToolMetadata, ToolResult, ToolStatus
+from .llm import LLMClient, LLMConfig, get_llm_client
 
 
 class CodeGeneratorTool(BaseTool):
-    """Generate code from specifications."""
+    """Generate code from specifications using LLM."""
+    
+    def __init__(self, llm_client: Optional[LLMClient] = None):
+        self._llm = llm_client
+    
+    @property
+    def llm(self) -> LLMClient:
+        if self._llm is None:
+            self._llm = get_llm_client()
+        return self._llm
     
     @property
     def metadata(self) -> ToolMetadata:
         return ToolMetadata(
             name="code_generator",
-            description="Generate code from a specification or description",
-            version="1.0.0",
-            input_schema={
-                "specification": {"type": "string", "description": "Code specification"},
-                "language": {"type": "string", "default": "python"},
-                "style": {"type": "string", "default": "standard"}
-            },
-            output_schema={
-                "code": {"type": "string"},
-                "language": {"type": "string"},
-                "explanation": {"type": "string"}
-            },
-            requires_governance=False,
-            trust_domain="execution",
-            tags=["code", "generation", "builder"]
-        )
+            description="Generate code from a specification using LLM",
+            version="2.0.0",
+            input_schema={"specification": {"type": "string"}, "language": {"type": "string", "default": "python"}},
+            output_schema={"code": {"type": "string"}, "language": {"type": "string"}},
+            requires_governance=False, trust_domain="execution", tags=["code", "generation", "llm"])
     
     def validate_input(self, **kwargs) -> Optional[str]:
         if "specification" not in kwargs:
@@ -38,28 +37,27 @@ class CodeGeneratorTool(BaseTool):
         return None
     
     def execute(self, **kwargs) -> ToolResult:
-        specification = kwargs["specification"]
-        language = kwargs.get("language", "python")
-        style = kwargs.get("style", "standard")
+        spec = kwargs["specification"]
+        lang = kwargs.get("language", "python")
+        style = kwargs.get("style", "clean, well-documented")
         
-        # TODO: Replace with LLM call
-        code = self._generate_mock_code(specification, language, style)
+        llm_response = self.llm.generate_code(specification=spec, language=lang, style=style)
         
-        return ToolResult(
-            status=ToolStatus.SUCCESS,
-            output={
-                "code": code,
-                "language": language,
-                "explanation": f"Generated {language} code for: {specification[:50]}..."
-            },
-            metadata={"lines": len(code.split("\n")), "style": style}
-        )
+        if llm_response.success:
+            return ToolResult(status=ToolStatus.SUCCESS,
+                output={"code": llm_response.content, "language": lang,
+                       "explanation": f"Generated using {llm_response.model}", "llm_used": True},
+                metadata={"model": llm_response.model, "tokens_used": llm_response.tokens_used})
+        
+        code = self._generate_fallback_code(spec, lang, style)
+        return ToolResult(status=ToolStatus.SUCCESS,
+            output={"code": code, "language": lang, "explanation": f"Fallback: {llm_response.error}", "llm_used": False},
+            metadata={"fallback_reason": llm_response.error})
     
-    def _generate_mock_code(self, spec: str, language: str, style: str) -> str:
-        """Mock code generation - will be replaced with LLM."""
-        if language == "python":
-            return f'"""\nGenerated code for: {spec[:50]}...\nStyle: {style}\n"""\n\ndef main():\n    # TODO: Implement based on specification\n    print("Implementation pending")\n    \nif __name__ == "__main__":\n    main()\n'
-        return f"// Generated {language} code for: {spec[:50]}...\n// TODO: Implement"
+    def _generate_fallback_code(self, spec: str, lang: str, style: str) -> str:
+        if lang == "python":
+            return f"\"\"\"\"Generated for: {spec[:80]}...\nFallback mode.\"\"\"\n\ndef main():\n    pass\n\nif __name__ == \"__main__\":\n    main()\n"
+        return f"// Generated {lang} code for: {spec[:50]}..."
 
 
 class CodeValidatorTool(BaseTool):
@@ -67,24 +65,10 @@ class CodeValidatorTool(BaseTool):
     
     @property
     def metadata(self) -> ToolMetadata:
-        return ToolMetadata(
-            name="code_validator",
-            description="Validate code syntax and check for common issues",
-            version="1.0.0",
-            input_schema={
-                "code": {"type": "string", "description": "Code to validate"},
-                "language": {"type": "string", "default": "python"},
-                "strict": {"type": "boolean", "default": False}
-            },
-            output_schema={
-                "valid": {"type": "boolean"},
-                "errors": {"type": "array"},
-                "warnings": {"type": "array"}
-            },
-            requires_governance=False,
-            trust_domain="execution",
-            tags=["code", "validation", "critic"]
-        )
+        return ToolMetadata(name="code_validator", description="Validate code syntax",
+            version="1.0.0", input_schema={"code": {"type": "string"}, "language": {"type": "string", "default": "python"}},
+            output_schema={"valid": {"type": "boolean"}, "errors": {"type": "array"}},
+            requires_governance=False, trust_domain="execution", tags=["code", "validation"])
     
     def validate_input(self, **kwargs) -> Optional[str]:
         if "code" not in kwargs:
@@ -93,29 +77,22 @@ class CodeValidatorTool(BaseTool):
     
     def execute(self, **kwargs) -> ToolResult:
         code = kwargs["code"]
-        language = kwargs.get("language", "python")
+        lang = kwargs.get("language", "python")
         strict = kwargs.get("strict", False)
-        
-        errors = []
-        warnings = []
-        
-        if language == "python":
+        errors, warnings = [], []
+        if lang == "python":
             try:
                 compile(code, "<string>", "exec")
             except SyntaxError as e:
-                errors.append(f"Syntax error at line {e.lineno}: {e.msg}")
-            
+                errors.append(f"Syntax error line {e.lineno}: {e.msg}")
             if strict:
                 if "import *" in code:
-                    warnings.append("Avoid 'import *' - use explicit imports")
+                    warnings.append("Avoid import *")
                 if "eval(" in code or "exec(" in code:
-                    warnings.append("Use of eval/exec detected - potential security risk")
-        
-        return ToolResult(
-            status=ToolStatus.SUCCESS,
+                    warnings.append("eval/exec detected - security risk")
+        return ToolResult(status=ToolStatus.SUCCESS,
             output={"valid": len(errors) == 0, "errors": errors, "warnings": warnings},
-            metadata={"language": language, "strict": strict}
-        )
+            metadata={"language": lang, "strict": strict})
 
 
 class CodeFormatterTool(BaseTool):
@@ -123,29 +100,13 @@ class CodeFormatterTool(BaseTool):
     
     @property
     def metadata(self) -> ToolMetadata:
-        return ToolMetadata(
-            name="code_formatter",
-            description="Format code according to language style guidelines",
-            version="1.0.0",
-            input_schema={
-                "code": {"type": "string"},
-                "language": {"type": "string", "default": "python"},
-                "style_guide": {"type": "string", "default": "pep8"}
-            },
-            output_schema={
-                "formatted_code": {"type": "string"},
-                "changes_made": {"type": "integer"}
-            },
-            requires_governance=False,
-            trust_domain="execution",
-            tags=["code", "formatting", "builder"]
-        )
+        return ToolMetadata(name="code_formatter", description="Format code",
+            version="1.0.0", input_schema={"code": {"type": "string"}},
+            output_schema={"formatted_code": {"type": "string"}},
+            requires_governance=False, trust_domain="execution", tags=["code", "formatting"])
     
     def execute(self, **kwargs) -> ToolResult:
         code = kwargs.get("code", "")
         formatted = code.strip() + "\n"
-        
-        return ToolResult(
-            status=ToolStatus.SUCCESS,
-            output={"formatted_code": formatted, "changes_made": 1 if formatted != code else 0}
-        )
+        return ToolResult(status=ToolStatus.SUCCESS,
+            output={"formatted_code": formatted, "changes_made": 1 if formatted != code else 0})
