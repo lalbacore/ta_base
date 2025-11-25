@@ -1,155 +1,162 @@
 """
-Dynamic Builder - Uses capabilities instead of hardcoded methods.
+Dynamic Builder - Capability-aware builder agent.
 """
-
-from typing import Dict, Any, List
-from datetime import datetime
-
-from .base import BaseRole
-from ..capabilities import BaseCapability
+from typing import Dict, Any, Optional, List
+from swarms.team_agent.roles.base_role import BaseRole
+from swarms.team_agent.capabilities.registry import CapabilityRegistry
+from swarms.team_agent.roles.builder import Builder
 
 
 class DynamicBuilder(BaseRole):
-    """Builder that uses pluggable capabilities."""
+    """Builder that dynamically selects capabilities."""
     
-    def __init__(self, workflow_id: str, capabilities: List[BaseCapability] = None):
-        """Initialize dynamic builder with capabilities."""
+    def __init__(
+        self,
+        workflow_id: str = "unknown",
+        capability_registry = None,  # Can be CapabilityRegistry or List
+        capabilities: Optional[List] = None
+    ):
+        """
+        Initialize dynamic builder.
+        
+        Args:
+            workflow_id: Current workflow ID
+            capability_registry: Registry OR list of capabilities
+            capabilities: Alternative way to pass list of capabilities
+        """
         super().__init__(workflow_id)
-        self.capabilities = capabilities or []
+        
+        # Handle capability_registry being a list (for tests)
+        if isinstance(capability_registry, list):
+            self.capabilities = capability_registry
+            self.capability_registry = CapabilityRegistry()
+            for cap in capability_registry:
+                self.capability_registry.register(cap)
+        elif capability_registry is not None:
+            self.capability_registry = capability_registry
+            self.capabilities = []
+        else:
+            self.capability_registry = CapabilityRegistry()
+            self.capabilities = []
+        
+        # Support direct capabilities list parameter
+        if capabilities:
+            self.capabilities = capabilities
+            for cap in capabilities:
+                self.capability_registry.register(cap)
+        
+        self.fallback_builder = Builder(workflow_id)
     
     def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Build implementation using available capabilities."""
-        architecture = context.get("input", {})
-        mission = architecture.get("mission", "")
+        """
+        Build implementation using capabilities or fallback.
         
-        self.logger.info("Starting stage: builder (dynamic)", extra={
-            "stage": "builder",
-            "event": "stage_start",
-            "capabilities_count": len(self.capabilities),
-        })
+        Args:
+            context: Dict with 'mission' and optionally 'architecture'
         
-        # Find matching capability
+        Returns:
+            Implementation dict with artifacts
+        """
+        import time
+        start_time = time.time()
+        
+        # Extract mission - handle both string and dict inputs
+        if isinstance(context, str):
+            mission = context
+            architecture = {}
+        else:
+            mission = context.get("mission", "") or context.get("input", "")
+            architecture = context.get("architecture", {})
+        
+        self._log_stage_start("dynamic_builder", mission)
+        
+        # Try to find matching capability
         capability = self._select_capability(mission, architecture)
         
         if capability:
-            # Use capability to generate
-            result = capability.execute({
-                "mission": mission,
-                "parameters": architecture,
-            })
+            self.logger.info(f"Using capability: {capability.metadata.get('name')}")
             
-            implementation = {
-                "code": result.get("content", ""),
-                "filename": result.get("artifacts", [{}])[0].get("filename", "output.py"),
-                "artifacts": result.get("artifacts", []),
-                "tests": self._generate_tests(result),
-                "documentation": self._generate_docs(architecture, result),
-                "capability_used": capability.metadata,
-                "timestamp": datetime.now().isoformat(),
+            # Prepare context for capability
+            cap_context = {
+                "mission": mission,
+                "architecture": architecture,
+                "input": mission
             }
+            
+            # Execute capability
+            result = capability.execute(cap_context)
+            result["capability_used"] = capability.metadata.get("name")
+            
+            self._log_stage_complete("dynamic_builder", result, start_time)
+            return result
+        
         else:
-            # Fallback to simple implementation
-            implementation = self._fallback_implementation(mission, architecture)
-        
-        self.logger.info("Completed stage: builder (dynamic)", extra={
-            "stage": "builder",
-            "event": "stage_complete",
-            "capability": capability.metadata.get("type") if capability else "fallback",
-        })
-        
-        return implementation
+            self.logger.info("No matching capability, using fallback")
+            
+            # Use fallback implementation
+            result = self._fallback_implementation(mission, architecture)
+            
+            self._log_stage_complete("dynamic_builder", result, start_time)
+            return result
     
-    def _select_capability(self, mission: str, architecture: Dict) -> BaseCapability:
-        """Select best capability for the mission."""
-        if not self.capabilities:
+    def _select_capability(self, mission: str, architecture: Dict[str, Any] = None) -> Optional[Any]:
+        """
+        Select best capability for mission.
+        
+        Args:
+            mission: The mission string
+            architecture: Optional architecture dict
+        
+        Returns:
+            Capability instance or None
+        """
+        if not mission:
             return None
+        
+        # Ensure mission is a string
+        if isinstance(mission, dict):
+            mission = mission.get("input", mission.get("mission", ""))
         
         mission_lower = mission.lower()
         
-        # Score each capability
-        scored_capabilities = []
+        # Check for HRT/hormone therapy
+        if any(keyword in mission_lower for keyword in ["hormone", "hrt", "replacement therapy"]):
+            cap = self.capability_registry.find("hrt")
+            if cap:
+                return cap
         
-        for cap in self.capabilities:
-            score = self._score_capability(cap, mission_lower)
-            scored_capabilities.append((score, cap))
+        # Check for general document generation
+        if any(keyword in mission_lower for keyword in ["document", "guide", "documentation"]):
+            cap = self.capability_registry.find("document")
+            if cap:
+                return cap
         
-        # Sort by score (highest first)
-        scored_capabilities.sort(key=lambda x: x[0], reverse=True)
-        
-        # Return highest scoring capability (if score > 0)
-        if scored_capabilities and scored_capabilities[0][0] > 0:
-            return scored_capabilities[0][1]
-        
-        # Fallback to first capability if no good match
-        return self.capabilities[0] if self.capabilities else None
+        # Try general registry search
+        return self.capability_registry.find(mission)
     
-    def _score_capability(self, cap: BaseCapability, mission_lower: str) -> int:
-        """Score how well a capability matches the mission."""
-        score = 0
-        meta = cap.metadata
+    def _fallback_implementation(self, mission: str, architecture: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate fallback implementation when no capability matches.
         
-        # Medical/HRT keywords - high priority
-        medical_keywords = ["hrt", "hormone", "replacement", "therapy", "medical", "clinical"]
-        if any(keyword in mission_lower for keyword in medical_keywords):
-            if meta.get("domain") == "medical":
-                score += 100  # Strong match
-            if meta.get("specialty") == "endocrinology":
-                score += 50
-            if meta.get("subdomain") == "hormone_replacement_therapy":
-                score += 50
+        Args:
+            mission: The mission string
+            architecture: Architecture dict
         
-        # Document generation keywords
-        doc_keywords = ["guide", "document", "reference", "manual"]
-        if any(keyword in mission_lower for keyword in doc_keywords):
-            if meta.get("type") == "document_generation":
-                score += 10
+        Returns:
+            Implementation dict with basic code
+        """
+        # Ensure architecture is a dict
+        if isinstance(architecture, str):
+            architecture = {}
         
-        # General vs specific domain
-        if meta.get("domain") == "general":
-            score += 1  # Lowest priority - general catch-all
-        
-        return score
-    
-    def _fallback_implementation(self, mission: str, architecture: Dict) -> Dict[str, Any]:
-        """Fallback implementation when no capability matches."""
-        code = f'''#!/usr/bin/env python3
-"""
-Generated implementation for: {mission}
-"""
-
-def main():
-    print("Implementation for: {mission}")
-
-if __name__ == "__main__":
-    main()
-'''
-        
-        return {
-            "code": code,
-            "filename": "main.py",
-            "tests": "",
-            "documentation": f"# {mission}\n\nFallback implementation.",
-            "timestamp": datetime.now().isoformat(),
+        # Use the fallback builder
+        context = {
+            "mission": mission,
+            "architecture": architecture,
+            "input": mission
         }
-    
-    def _generate_tests(self, result: Dict) -> str:
-        """Generate tests for the implementation."""
-        return '''"""Tests for generated code."""
-
-def test_basic():
-    assert True
-'''
-    
-    def _generate_docs(self, architecture: Dict, result: Dict) -> str:
-        """Generate documentation."""
-        return f'''# Generated Implementation
-
-## Capability Used
-{result.get("metadata", {}).get("generator", "Unknown")}
-
-## Mission
-{architecture.get("mission", "No mission specified")}
-
-## Usage
-See generated files.
-'''
+        
+        result = self.fallback_builder.run(context)
+        result["capability_used"] = "fallback_builder"
+        
+        return result

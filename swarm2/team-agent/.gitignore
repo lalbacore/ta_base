@@ -78,3 +78,17 @@ temp/
 .DS_Store
 .AppleDouble
 .LSOverrideoutput/wf_*/
+
+# Generated output
+output/
+data/tapes/
+
+# Logs (keep structure, not content)
+logs/*.jsonl
+
+# Temp files
+1
+.team_agent/
+
+# External directories
+../../target_test1/

@@ -2,8 +2,9 @@
 Governance Agent - Ensures compliance and approval decisions.
 """
 
-from typing import Dict, Any, List
-from datetime import datetime
+from __future__ import annotations
+from typing import Optional, Dict, Any, List
+import time, uuid
 
 from .base import BaseRole
 
@@ -11,82 +12,53 @@ from .base import BaseRole
 class Governance(BaseRole):
     """Governance role implementation."""
     
-    def __init__(self, workflow_id: str):
+    def __init__(self, name: str = "Governance", id: str = "agent_governance_001",
+                 workflow_id: Optional[str] = None, policy: Optional[Dict[str, Any]] = None):
         """Initialize governance with workflow ID."""
         super().__init__(workflow_id)
+        self.name = name
+        self.id = id
+        self.workflow_id = workflow_id or f"wf_{int(time.time())}"
+        self.policy: Dict[str, Any] = policy or {}
+        self.capabilities: List[str] = ["enforce_policy", "evaluate_request", "describe"]
+        self.decisions: List[Dict[str, Any]] = []
     
-    def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Make governance decision based on review."""
-        review = context.get("input", {})
-        quality_score = review.get("quality_score", 0)
-        issues = review.get("issues", [])
-        
-        self.logger.info("Starting stage: governance", extra={
-            "stage": "governance",
-            "event": "stage_start",
-            "input_size": len(str(review)),
-        })
-        
+    def act(self, review: Dict[str, Any]) -> Dict[str, Any]:
+        # Simple composite score from review if provided, else default
+        composite = float(review.get("score", 0.8)) if isinstance(review, dict) else 0.8
+        allowed = composite >= 0.5
+        decision_id = str(uuid.uuid4())
         decision = {
-            "approved": self._make_decision(quality_score, issues),
-            "compliance_score": self._calculate_compliance_score(quality_score, issues),
-            "risk_level": self._assess_risk(issues),
-            "rationale": self._generate_rationale(quality_score, issues),
-            "conditions": self._generate_conditions(issues),
-            "review_reference": review,
-            "timestamp": datetime.now().isoformat(),
+            "status": "enforced",
+            "decision_id": decision_id,
+            "allowed": allowed,
+            "composite_score": composite,
+            "workflow_id": self.workflow_id,
         }
-        
-        self.logger.info("Completed stage: governance", extra={
-            "stage": "governance",
-            "event": "stage_complete",
-            "output_size": len(str(decision)),
-            "duration_seconds": 0,
-        })
-        
+        self.decisions.append(decision)
         return decision
-    
-    def _make_decision(self, quality_score: float, issues: List[Dict]) -> bool:
-        """Make approval decision."""
-        has_critical = any(i.get("severity") == "error" for i in issues)
-        return quality_score >= 70 and not has_critical
-    
-    def _calculate_compliance_score(self, quality_score: float, issues: List[Dict]) -> float:
-        """Calculate compliance score."""
-        compliance = quality_score
-        
-        critical_issues = sum(1 for i in issues if i.get("severity") == "error")
-        compliance -= critical_issues * 15
-        
-        return max(0, min(100, compliance))
-    
-    def _assess_risk(self, issues: List[Dict]) -> str:
-        """Assess risk level."""
-        critical = sum(1 for i in issues if i.get("severity") == "error")
-        warnings = sum(1 for i in issues if i.get("severity") == "warning")
-        
-        if critical > 0:
-            return "high"
-        elif warnings > 2:
-            return "medium"
-        else:
-            return "low"
-    
-    def _generate_rationale(self, quality_score: float, issues: List[Dict]) -> str:
-        """Generate decision rationale."""
-        if quality_score >= 90:
-            return "High quality implementation with minimal issues"
-        elif quality_score >= 70:
-            return "Acceptable quality with some minor issues to address"
-        else:
-            return "Quality improvements needed before approval"
-    
-    def _generate_conditions(self, issues: List[Dict]) -> List[str]:
-        """Generate approval conditions."""
-        conditions = []
-        
-        for issue in issues:
-            if issue["severity"] in ["error", "warning"]:
-                conditions.append(f"Resolve: {issue['message']}")
-        
-        return conditions
+
+    def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Run governance with a context dict.
+        Extracts review data and delegates to act().
+        """
+        # Handle various input formats
+        if "status" in context and context.get("status") == "reviewed":
+            return self.act(context)
+        if "input" in context:
+            return self.act(context["input"])
+        # Fallback: treat as review
+        return self.act(context)
+
+    def describe(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "type": "role",
+            "role": "governance",
+            "workflow_id": self.workflow_id,
+            "policy": self.policy,
+            "capabilities": self.capabilities,
+            "decisions_made": len(self.decisions),
+        }

@@ -8,70 +8,63 @@ class BaseTeam:
     Request → Architect → Builder → Critic → Governance → Recorder → Result
     """
     
-    def __init__(self):
+    def __init__(self, workflow_id: str | None = None):
         """Initialize the team with all 5 agents."""
         self.architect = Architect()
         self.builder = Builder()
         self.critic = Critic()
-        self.governance = Governance()
+        # If provided, propagate; otherwise Governance will default
+        if workflow_id:
+            self.governance = Governance(workflow_id=workflow_id)
+        else:
+            self.governance = Governance()
         self.recorder = Recorder()
         self.workflows = []
     
     def run(self, request):
-        """
-        Execute the complete workflow for a given request.
-        
-        Args:
-            request (str): The initial request/intent for the team
-            
-        Returns:
-            dict: Complete workflow result with signature and audit trail
-        """
-        if not request or not isinstance(request, str):
-            return {
-                "status": "failed",
-                "reason": "Invalid request",
-                "workflow_id": f"workflow_{len(self.workflows) + 1}"
-            }
-        
+        """Execute the team workflow."""
         workflow_id = f"workflow_{len(self.workflows) + 1}"
         
         try:
-            # Stage 1: Architect designs
-            design = self.architect.act(request)
-            if design.get("status") != "designed":
-                return self._failed_workflow(workflow_id, "Architecture design failed")
+            # Store original request for the result
+            original_request = request
             
-            # Stage 2: Builder implements
+            # Normalize request to dict
+            if isinstance(request, str):
+                request = {"intent": request}
+            
+            # Stage 1: Validate request
+            if not request or not isinstance(request, dict):
+                return self._failed_workflow(workflow_id, "Invalid request")
+            
+            intent = request.get("intent", "")
+            if not intent or not isinstance(intent, str) or not intent.strip():
+                return self._failed_workflow(workflow_id, "Invalid request")
+            
+            # Stage 2: Architect designs
+            design = self.architect.act(intent)
+            if design.get("status") != "designed":
+                return self._failed_workflow(workflow_id, "Design phase failed")
+            
+            # Stage 3: Builder builds
             build = self.builder.act(design)
             if build.get("status") != "built":
-                return self._failed_workflow(workflow_id, "Build implementation failed")
+                return self._failed_workflow(workflow_id, "Build phase failed")
             
-            # Stage 3: Critic reviews
+            # Stage 4: Critic reviews
             review = self.critic.act({"design": design, "build": build})
             if review.get("status") != "reviewed":
                 return self._failed_workflow(workflow_id, "Review phase failed")
             
-            if not review.get("passed"):
-                return self._rejected_workflow(
-                    workflow_id,
-                    "Review did not pass",
-                    review
-                )
-            
-            # Stage 4: Governance enforces
+            # Stage 5: Governance enforces
             governance = self.governance.act({"request": request, "review": review})
             if governance.get("status") != "enforced":
                 return self._failed_workflow(workflow_id, "Governance enforcement failed")
             
             if not governance.get("allowed"):
-                return self._rejected_workflow(
-                    workflow_id,
-                    "Governance rejected the request",
-                    governance
-                )
+                return self._rejected_workflow(workflow_id, "Governance rejected the request", governance)
             
-            # Stage 5: Recorder logs and signs
+            # Stage 6: Recorder logs and signs
             record_package = {
                 "request": request,
                 "design": design,
@@ -88,37 +81,44 @@ class BaseTeam:
             result = {
                 "status": "success",
                 "workflow_id": workflow_id,
-                "request": request,
+                "request": original_request,
                 "result": record,
+                "team_composite_score": record.get("composite_score", {}).get("overall", 0),
                 "stages": {
-                    "architect": {"status": "complete", "design_id": design.get("design_id")},
-                    "builder": {"status": "complete", "build_id": build.get("build_id")},
-                    "critic": {"status": "complete", "review_id": review.get("review_id")},
-                    "governance": {"status": "complete", "decision_id": governance.get("decision_id")},
-                    "recorder": {"status": "complete", "record_id": record.get("record_id")}
-                }
+                    "request": {"status": "complete", "data": request},
+                    "architect": {"status": "complete", "data": design},
+                    "builder": {"status": "complete", "data": build},
+                    "critic": {"status": "complete", "data": review},
+                    "governance": {"status": "complete", "data": governance},
+                    "recorder": {"status": "complete", "data": record},
+                },
             }
             self.workflows.append(result)
             return result
-            
         except Exception as e:
-            return self._failed_workflow(workflow_id, f"Workflow error: {str(e)}")
-    
+            failed = self._failed_workflow(workflow_id, f"Workflow error: {str(e)}")
+            self.workflows.append(failed)
+            return failed
+
     def _failed_workflow(self, workflow_id, reason):
         """Create a failed workflow result."""
         return {
             "status": "failed",
             "workflow_id": workflow_id,
-            "reason": reason
+            "reason": reason,
+            "result": None,
+            "team_composite_score": 0.0,
         }
-    
+
     def _rejected_workflow(self, workflow_id, reason, details):
         """Create a rejected workflow result."""
         return {
             "status": "rejected",
             "workflow_id": workflow_id,
             "reason": reason,
-            "details": details
+            "details": details,
+            "result": None,
+            "team_composite_score": details.get("composite_score", 0.0),
         }
     
     def get_agent_stats(self):

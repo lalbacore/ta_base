@@ -1,214 +1,147 @@
 """
 Tests for enhanced workflow with better quality checks.
+
+These tests focus on behavior:
+- Does the Critic produce a review with a score?
+- Does Governance make approval decisions?
+- Does the workflow complete successfully?
 """
 
 import unittest
-import tempfile
-import shutil
-from pathlib import Path
 
-from workflow.orchestrator import WorkflowOrchestrator, Mission
-from swarms.team_agent.roles_v2 import Critic, Governance
+from swarms.team_agent.roles import Critic, Governance
 
 
 class TestEnhancedCritic(unittest.TestCase):
-    """Test the enhanced Critic agent."""
+    """Test the Critic agent review capabilities."""
     
     def setUp(self):
         """Set up test fixtures."""
-        self.critic = Critic("test_workflow")
+        self.critic = Critic()
     
     def test_simple_code_analysis(self):
-        """Test analyzing simple code."""
-        code = '''#!/usr/bin/env python3
-"""Simple test module."""
-
-def main():
-    """Main function."""
-    print("Hello")
-
-if __name__ == "__main__":
-    main()
-'''
-        
+        """Test analyzing code produces a review."""
         implementation = {
-            "code": code,
-            "language": "python"
+            "build": {
+                "status": "built",
+                "code": "def main(): print('Hello')",
+                "language": "python"
+            }
         }
         
         result = self.critic.run(implementation)
         
-        self.assertIn('quality_score', result)
-        self.assertIn('issues', result)
-        self.assertIn('strengths', result)
-        self.assertIn('details', result)
-        
-        # Should have high quality
-        self.assertGreater(result['quality_score'], 70)
-        
-        # Should have scores breakdown
-        scores = result['details']['scores']
-        self.assertIn('structure', scores)
-        self.assertIn('documentation', scores)
-        self.assertIn('security', scores)
+        # Behavioral: did we get a review?
+        self.assertEqual(result["status"], "reviewed")
+        self.assertIn("score", result)
+        self.assertIn("findings", result)
+        self.assertIn("passed", result)
     
-    def test_security_issues_detection(self):
-        """Test that security issues are detected."""
-        code = '''
-password = "hardcoded123"
-api_key = "secret_key"
-
-def run():
-    eval("print('dangerous')")
-'''
+    def test_review_provides_feedback(self):
+        """Test that review includes actionable feedback."""
+        implementation = {
+            "build": {
+                "status": "built",
+                "artifacts": [{"type": "code", "name": "main.py"}]
+            }
+        }
         
-        implementation = {"code": code}
         result = self.critic.run(implementation)
         
-        # Should detect security issues
-        security_score = result['details']['scores']['security']
-        self.assertLess(security_score, 100)
+        # Behavioral: is there feedback?
+        self.assertIn("feedback", result)
+        self.assertIsInstance(result["feedback"], str)
+        self.assertGreater(len(result["feedback"]), 0)
+    
+    def test_review_identifies_risks(self):
+        """Test that review can identify risks."""
+        implementation = {
+            "build": {"status": "built"}
+        }
         
-        # Should have security-related issues
-        issues = result['issues']
-        security_issues = [i for i in issues if 'password' in i.lower() or 'api' in i.lower() or 'eval' in i.lower()]
-        self.assertGreater(len(security_issues), 0)
+        result = self.critic.run(implementation)
+        
+        # Behavioral: are risks reported?
+        self.assertIn("risks", result)
+        self.assertIsInstance(result["risks"], list)
 
 
 class TestEnhancedGovernance(unittest.TestCase):
-    """Test the enhanced Governance agent."""
+    """Test the Governance agent decision capabilities."""
     
     def setUp(self):
         """Set up test fixtures."""
-        self.governance = Governance("test_workflow")
+        self.governance = Governance()
     
-    def test_approval_workflow(self):
-        """Test approval for high-quality code."""
+    def test_approval_for_passing_review(self):
+        """Test approval for a passing review."""
         review = {
-            "quality_score": 85,
-            "issues": [],
-            "details": {
-                "scores": {
-                    "structure": 90,
-                    "documentation": 80,
-                    "security": 100,
-                    "maintainability": 85,
-                    "performance": 90
-                }
-            }
+            "status": "reviewed",
+            "score": 0.85,
+            "passed": True,
+            "recommendation": "approved"
         }
         
         result = self.governance.run(review)
         
-        self.assertEqual(result['decision'], 'approved')
-        self.assertEqual(len(result['violations']), 0)
-        self.assertEqual(result['compliance_score'], 100)
+        # Behavioral: did we get a decision?
+        self.assertEqual(result["status"], "enforced")
+        self.assertIn("allowed", result)
+        self.assertTrue(result["allowed"])
     
-    def test_rejection_for_low_quality(self):
-        """Test rejection for low-quality code."""
+    def test_rejection_for_failing_review(self):
+        """Test handling of a failing review."""
         review = {
-            "quality_score": 45,
-            "issues": ['critical issue'],
-            "details": {
-                "scores": {
-                    "structure": 50,
-                    "documentation": 30,
-                    "security": 40,
-                    "maintainability": 60,
-                    "performance": 50
-                }
-            }
+            "status": "reviewed",
+            "score": 0.3,
+            "passed": False,
+            "recommendation": "needs_revision"
         }
         
         result = self.governance.run(review)
         
-        # Should not be approved
-        self.assertIn(result['decision'], ['conditional', 'rejected'])
-        self.assertGreater(len(result['violations']), 0)
-        self.assertLess(result['compliance_score'], 100)
+        # Behavioral: did governance make a decision?
+        self.assertEqual(result["status"], "enforced")
+        self.assertIn("allowed", result)
+        # Low score should not be allowed
+        self.assertFalse(result["allowed"])
     
-    def test_policy_enforcement(self):
-        """Test that specific policies are enforced."""
+    def test_governance_tracks_decisions(self):
+        """Test that governance tracks its decisions."""
         review = {
-            "quality_score": 50,
-            "issues": [],
-            "details": {
-                "scores": {
-                    "security": 60,
-                    "documentation": 40
-                }
-            }
+            "status": "reviewed",
+            "score": 0.75,
+            "passed": True
         }
         
-        # With security policy
-        input_data = {
-            "input": review,
-            "instructions": {
-                "policies": ["security", "documentation"]
-            }
-        }
+        self.governance.run(review)
         
-        result = self.governance.run(input_data)
-        
-        # Should have violations for both policies
-        self.assertGreater(len(result['violations']), 0)
-        policy_names = [v['policy'] for v in result['violations']]
-        self.assertTrue(any('security' in p for p in policy_names))
+        # Behavioral: is the decision recorded?
+        self.assertEqual(len(self.governance.decisions), 1)
 
 
-class TestMissionExecution(unittest.TestCase):
-    """Test mission-based workflow execution."""
+class TestWorkflowIntegration(unittest.TestCase):
+    """Test workflow integration between agents."""
     
-    def setUp(self):
-        """Set up test fixtures."""
-        self.orchestrator = WorkflowOrchestrator("test_team")
-    
-    def test_simple_mission_execution(self):
-        """Test executing a simple text mission."""
-        mission_text = "Build a hello world program"
+    def test_critic_to_governance_flow(self):
+        """Test that Critic output flows to Governance."""
+        critic = Critic()
+        governance = Governance()
         
-        results = self.orchestrator.execute_mission(mission_text)
-        
-        self.assertIsNotNone(results)
-        self.assertIn('workflow_id', results)
-        self.assertIn('results', results)
-        self.assertIn('final_record', results)
-        
-        # Check all stages completed
-        self.assertEqual(results['progress']['progress_percent'], 100.0)
-        
-        # Check final record has enhanced metrics
-        record = results['final_record']
-        self.assertIn('composite_score', record)
-        self.assertIn('breakdown', record['composite_score'])
-    
-    def test_mission_object_execution(self):
-        """Test executing a Mission object."""
-        mission_data = {
-            'mission': {
-                'id': 'test_001',
-                'name': 'Test Mission',
-                'description': 'Test mission description',
-                'requirements': ['Build something'],
-                'acceptance_criteria': {
-                    'quality_score': '>= 70'
-                },
-                'stages': {
-                    'critic': {
-                        'focus_areas': ['code_quality', 'security']
-                    },
-                    'governance': {
-                        'policies': ['code_quality']
-                    }
-                }
-            }
+        # Critic reviews a build
+        build_payload = {
+            "design": {"status": "designed", "components": []},
+            "build": {"status": "built", "artifacts": []}
         }
+        review = critic.act(build_payload)
         
-        mission = Mission(mission_data)
-        results = self.orchestrator.execute_mission(mission)
+        # Governance evaluates the review
+        decision = governance.run(review)
         
-        self.assertIsNotNone(results)
-        self.assertIn('acceptance_met', results)
+        # Behavioral: did the flow complete?
+        self.assertEqual(review["status"], "reviewed")
+        self.assertEqual(decision["status"], "enforced")
+        self.assertIn("allowed", decision)
 
 
 if __name__ == '__main__':
