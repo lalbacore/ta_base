@@ -721,3 +721,340 @@
 {"timestamp": "2025-11-24T01:14:23.171121Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
 {"timestamp": "2025-11-24T01:14:23.171165Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
 {"timestamp": "2025-11-24T01:14:23.171359Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T05:16:53.359792Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:16:53.360275Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:16:53.360337Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211653"}
+{"timestamp": "2025-11-24T05:16:53.361038Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:16:53.361116Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:16:53.373675Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:16:53.373773Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:16:53.373821Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211653"}
+{"timestamp": "2025-11-24T05:16:53.374298Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:16:53.374357Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:18:17.739765Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:18:17.748763Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:18:17.748849Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211817"}
+{"timestamp": "2025-11-24T05:18:17.749686Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:18:17.749762Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:18:17.764141Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:18:17.764239Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:18:17.764287Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211817"}
+{"timestamp": "2025-11-24T05:18:17.764754Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:18:17.764821Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:19:35.235317Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:19:35.235795Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:19:35.235873Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211935"}
+{"timestamp": "2025-11-24T05:19:35.236433Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:19:35.236499Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:19:35.250022Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:19:35.250126Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:19:35.250174Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_211935"}
+{"timestamp": "2025-11-24T05:19:35.250640Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:19:35.250693Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:20:36.385561Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:20:36.386023Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:20:36.386083Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212036"}
+{"timestamp": "2025-11-24T05:20:36.386824Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:20:36.386874Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:20:36.399407Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:20:36.399517Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:20:36.399570Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212036"}
+{"timestamp": "2025-11-24T05:20:36.400111Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:20:36.400172Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:21:28.040123Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:21:28.040598Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:21:28.040674Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212128"}
+{"timestamp": "2025-11-24T05:21:28.041235Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:21:28.041311Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:21:28.058830Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:21:28.058974Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:21:28.059039Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212128"}
+{"timestamp": "2025-11-24T05:21:28.059717Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:21:28.059778Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:23:13.421729Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:23:13.422181Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:23:13.422258Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212313"}
+{"timestamp": "2025-11-24T05:23:13.423145Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:23:13.423223Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:23:13.437341Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:23:13.437467Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:23:13.437531Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212313"}
+{"timestamp": "2025-11-24T05:23:13.438229Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:23:13.438302Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:25:31.583444Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:25:31.583892Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:25:31.583962Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212531"}
+{"timestamp": "2025-11-24T05:25:31.584549Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:25:31.584627Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:25:31.597416Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:25:31.597508Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:25:31.597557Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212531"}
+{"timestamp": "2025-11-24T05:25:31.598044Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:25:31.598111Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:28:54.370902Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:28:54.381304Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:28:54.381379Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212854"}
+{"timestamp": "2025-11-24T05:28:54.382350Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:28:54.382461Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:28:54.397590Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:28:54.397724Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:28:54.397788Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212854"}
+{"timestamp": "2025-11-24T05:28:54.398504Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:28:54.398590Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:29:50.080724Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:29:50.081206Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:29:50.081326Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212950"}
+{"timestamp": "2025-11-24T05:29:50.081927Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:29:50.081984Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:29:50.082433Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T05:29:50.082498Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T05:29:50.082910Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T05:29:50.084765Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T05:29:50.084836Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T05:29:50.084882Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251123_212950"}
+{"timestamp": "2025-11-24T05:29:50.085301Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T05:29:50.085352Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T05:29:50.085486Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T05:29:50.085527Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T05:29:50.085656Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:45:41.328162Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:45:41.328407Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:45:41.328463Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154541"}
+{"timestamp": "2025-11-24T23:45:41.328576Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:45:41.328621Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:46:39.259865Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:46:39.260098Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:46:39.260151Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154639"}
+{"timestamp": "2025-11-24T23:46:39.260263Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:46:39.260316Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:46:39.260388Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:46:39.260441Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:46:39.260526Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:46:39.261353Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:46:39.261404Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:46:39.261441Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154639"}
+{"timestamp": "2025-11-24T23:46:39.261550Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:46:39.261582Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:46:39.261648Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:46:39.261698Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:46:39.261781Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:48:38.017936Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:48:38.018219Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:48:38.018277Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154838"}
+{"timestamp": "2025-11-24T23:48:38.018427Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:48:38.018485Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:48:38.018561Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:48:38.018615Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:48:38.018701Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:48:38.019515Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:48:38.019561Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:48:38.019594Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154838"}
+{"timestamp": "2025-11-24T23:48:38.019710Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:48:38.019737Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:48:38.019790Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:48:38.019831Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:48:38.019901Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:48:38.021849Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:48:38.021905Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:49:17.429525Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:49:17.429762Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:49:17.429818Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154917"}
+{"timestamp": "2025-11-24T23:49:17.429965Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:49:17.429999Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:49:17.430065Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:49:17.430110Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:49:17.430195Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:49:17.430991Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:49:17.431035Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:49:17.431070Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_154917"}
+{"timestamp": "2025-11-24T23:49:17.431183Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:49:17.431212Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:49:17.431265Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:49:17.431307Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:49:17.431383Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:49:17.433222Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:49:17.433264Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:50:23.226427Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:50:23.226669Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:50:23.226728Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155023"}
+{"timestamp": "2025-11-24T23:50:23.226891Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:50:23.226931Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:50:23.226998Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:50:23.227046Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:50:23.227129Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:50:23.228006Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:50:23.228050Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:50:23.228083Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155023"}
+{"timestamp": "2025-11-24T23:50:23.228230Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:50:23.228261Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:50:23.228316Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:50:23.228360Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:50:23.228443Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:51:55.554827Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:51:55.555078Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:51:55.555136Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155155"}
+{"timestamp": "2025-11-24T23:51:55.555285Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:51:55.555321Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:51:55.555389Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:51:55.555438Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:51:55.555520Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:51:55.556325Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:51:55.556372Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:51:55.556406Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155155"}
+{"timestamp": "2025-11-24T23:51:55.556564Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:51:55.559554Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:51:55.559620Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:51:55.559666Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:51:55.559742Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:53:39.702712Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:53:39.702961Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:53:39.703024Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155339"}
+{"timestamp": "2025-11-24T23:53:39.703191Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:53:39.703232Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:53:39.703307Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:53:39.703368Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:53:39.703453Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:53:39.704611Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:53:39.704676Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:53:39.704721Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155339"}
+{"timestamp": "2025-11-24T23:53:39.704903Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:53:39.704934Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:53:39.704992Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:53:39.705038Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:53:39.705115Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:53:39.764620Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155339"}
+{"timestamp": "2025-11-24T23:53:39.764825Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-24T23:53:39.765390Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-24T23:53:39.765433Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-24T23:53:39.766524Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-24T23:53:39.766572Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-24T23:53:39.767535Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-24T23:53:39.767578Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-24T23:53:39.768775Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-24T23:53:39.768816Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-24T23:53:39.770605Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-24T23:53:39.772114Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155339"}
+{"timestamp": "2025-11-24T23:53:39.772277Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-24T23:53:39.773105Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-24T23:53:39.773155Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-24T23:53:39.774627Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-24T23:53:39.774673Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-24T23:53:39.775771Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-24T23:53:39.775813Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-24T23:53:39.776939Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-24T23:53:39.776983Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-24T23:53:39.778353Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-24T23:54:22.345437Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:54:22.345694Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:54:22.345752Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155422"}
+{"timestamp": "2025-11-24T23:54:22.345876Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:54:22.345937Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:54:22.346016Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:54:22.346071Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:54:22.346159Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:54:22.347045Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-24T23:54:22.347099Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-24T23:54:22.347135Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155422"}
+{"timestamp": "2025-11-24T23:54:22.347235Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-24T23:54:22.347269Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-24T23:54:22.347329Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-24T23:54:22.347377Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-24T23:54:22.347455Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-24T23:54:22.394802Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155422"}
+{"timestamp": "2025-11-24T23:54:22.395015Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-24T23:54:22.395702Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-24T23:54:22.395757Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-24T23:54:22.397002Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-24T23:54:22.397042Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-24T23:54:22.398124Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-24T23:54:22.398190Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-24T23:54:22.399662Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-24T23:54:22.399733Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-24T23:54:22.401064Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-24T23:54:22.402791Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_155422"}
+{"timestamp": "2025-11-24T23:54:22.402967Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-24T23:54:22.403708Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-24T23:54:22.403756Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-24T23:54:22.405055Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-24T23:54:22.405104Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-24T23:54:22.406420Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-24T23:54:22.406459Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-24T23:54:22.407518Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-24T23:54:22.407555Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-24T23:54:22.408745Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-25T00:08:49.060738Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-25T00:08:49.060990Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-25T00:08:49.061055Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_160849"}
+{"timestamp": "2025-11-25T00:08:49.061197Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-25T00:08:49.061263Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-25T00:08:49.061346Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-25T00:08:49.061404Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-25T00:08:49.061495Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-25T00:08:49.062491Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-25T00:08:49.062570Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-25T00:08:49.062617Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_160849"}
+{"timestamp": "2025-11-25T00:08:49.062779Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-25T00:08:49.062818Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-25T00:08:49.062889Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-25T00:08:49.062940Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-25T00:08:49.063024Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-25T00:08:49.108033Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_160849"}
+{"timestamp": "2025-11-25T00:08:49.108230Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-25T00:08:49.108844Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-25T00:08:49.108883Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-25T00:08:49.109770Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-25T00:08:49.109824Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-25T00:08:49.110783Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-25T00:08:49.110822Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-25T00:08:49.111887Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-25T00:08:49.111941Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-25T00:08:49.113176Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-25T00:08:49.114451Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_160849"}
+{"timestamp": "2025-11-25T00:08:49.114588Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-25T00:08:49.115084Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-25T00:08:49.115123Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-25T00:08:49.116037Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-25T00:08:49.116075Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-25T00:08:49.117021Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-25T00:08:49.117062Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-25T00:08:49.118432Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-25T00:08:49.118470Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-25T00:08:49.119676Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-25T01:32:03.755859Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-25T01:32:03.756133Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-25T01:32:03.756197Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_173203"}
+{"timestamp": "2025-11-25T01:32:03.756407Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-25T01:32:03.756448Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-25T01:32:03.756523Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-25T01:32:03.756573Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-25T01:32:03.756653Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-25T01:32:03.757777Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 capabilities"}
+{"timestamp": "2025-11-25T01:32:03.757834Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with capability system"}
+{"timestamp": "2025-11-25T01:32:03.757870Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_173203"}
+{"timestamp": "2025-11-25T01:32:03.758062Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-11-25T01:32:03.758096Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-11-25T01:32:03.758159Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-11-25T01:32:03.758208Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-11-25T01:32:03.758280Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-11-25T01:32:03.819065Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_173203"}
+{"timestamp": "2025-11-25T01:32:03.819348Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-25T01:32:03.820116Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-25T01:32:03.820163Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-25T01:32:03.821317Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-25T01:32:03.821359Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-25T01:32:03.822462Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-25T01:32:03.822517Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-25T01:32:03.823616Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-25T01:32:03.823656Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-25T01:32:03.824842Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-11-25T01:32:03.826540Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251124_173203"}
+{"timestamp": "2025-11-25T01:32:03.826737Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-11-25T01:32:03.827320Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-11-25T01:32:03.827365Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-11-25T01:32:03.828401Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-11-25T01:32:03.828444Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-11-25T01:32:03.829491Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-11-25T01:32:03.829533Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-11-25T01:32:03.830667Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-11-25T01:32:03.830791Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-11-25T01:32:03.832287Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}

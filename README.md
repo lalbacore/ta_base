@@ -16,206 +16,7 @@ Every workflow follows three principles:
 
 ---
 
-## 🔒 Air Gap Architecture
-
-The system enforces **cryptographic air gaps** between trust domains. Agents in the Execution Plane cannot access or tamper with the Control Plane, and vice versa. This enables true security isolation and audit integrity.
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                                                                              │
-│  ╔═══════════════════════════════════════════════════════════════════════╗  │
-│  ║                      CONTROL PLANE (Trust Domain A)                   ║  │
-│  ║                        Cryptographic Air Gap                          ║  │
-│  ║                                                                       ║  │
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ║  │
-│  ║  │ GOVERNANCE  │  │   POLICY    │  │  TURING     │  │    KEY      │  ║  │
-│  ║  │   AGENT     │  │   ENGINE    │  │   TAPE      │  │  CUSTODIAN  │  ║  │
-│  ║  │             │  │             │  │  (Audit)    │  │             │  ║  │
-│  ║  │ • Approve   │  │ • Rules     │  │ • Immutable │  │ • Signing   │  ║  │
-│  ║  │ • Veto      │  │ • Policies  │  │ • Signed    │  │ • Verify    │  ║  │
-│  ║  │ • Escalate  │  │ • Triggers  │  │ • Chained   │  │ • Rotate    │  ║  │
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  ║  │
-│  ║                                                                       ║  │
-│  ║  Keys: Control Plane keys NEVER cross the air gap                    ║  │
-│  ║  Auth: Mutual TLS / SPIFFE-SPIRE / Hardware attestation              ║  │
-│  ╚═══════════════════════════════════════════════════════════════════════╝  │
-│                                                                              │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                    ░░░░░░░░░  AIR GAP #1  ░░░░░░░░░░░░                       │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                    ░  • Signed Request/Response Only  ░                      │
-│                    ░  • No Direct Memory Access       ░                      │
-│                    ░  • No Shared Keys                ░                      │
-│                    ░  • Rate Limited                  ░                      │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                                                                              │
-│  ╔═══════════════════════════════════════════════════════════════════════╗  │
-│  ║                    EXECUTION PLANE (Trust Domain B)                   ║  │
-│  ║                        Cryptographic Air Gap                          ║  │
-│  ║                                                                       ║  │
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ║  │
-│  ║  │  ARCHITECT  │  │   BUILDER   │  │   CRITIC    │  │  RECORDER   │  ║  │
-│  ║  │             │  │             │  │             │  │             │  ║  │
-│  ║  │ • Design    │  │ • Code      │  │ • Review    │  │ • Log       │  ║  │
-│  ║  │ • Plan      │  │ • Generate  │  │ • Score     │  │ • Forward   │  ║  │
-│  ║  │ • Specify   │  │ • Execute   │  │ • Flag      │  │ • Sign*     │  ║  │
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  ║  │
-│  ║                                                                       ║  │
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                   ║  │
-│  ║  │ CAPABILITY  │  │    MCP      │  │    A2A      │                   ║  │
-│  ║  │  REGISTRY   │  │   SERVER    │  │    BUS      │                   ║  │
-│  ║  │             │  │             │  │             │                   ║  │
-│  ║  │ • Tools     │  │ • Expose    │  │ • Messages  │                   ║  │
-│  ║  │ • Domains   │  │ • External  │  │ • Route     │                   ║  │
-│  ║  │ • Route     │  │ • Clients   │  │ • Federate  │                   ║  │
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘                   ║  │
-│  ║                                                                       ║  │
-│  ║  Keys: Execution Plane has LIMITED signing (counter-sign only)       ║  │
-│  ║  Auth: Service mesh / Workload identity / Scoped tokens              ║  │
-│  ╚═══════════════════════════════════════════════════════════════════════╝  │
-│                                                                              │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                    ░░░░░░░░░  AIR GAP #2  ░░░░░░░░░░░░                       │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                    ░  • One-Way Data Flow Only        ░                      │
-│                    ░  • Append-Only Access            ░                      │
-│                    ░  • No Write-Back Channel         ░                      │
-│                    ░  • Verification Keys Only        ░                      │
-│                    ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░                       │
-│                                                                              │
-│  ╔═══════════════════════════════════════════════════════════════════════╗  │
-│  ║                   OBSERVATION PLANE (Trust Domain C)                  ║  │
-│  ║                      Read-Only / Append-Only Access                   ║  │
-│  ║                                                                       ║  │
-│  ║  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ║  │
-│  ║  │    SIEM     │  │   METRICS   │  │   ALERTS    │  │  FORENSICS  │  ║  │
-│  ║  │             │  │             │  │             │  │             │  ║  │
-│  ║  │ • Splunk    │  │ • Datadog   │  │ • PagerDuty │  │ • Replay    │  ║  │
-│  ║  │ • Sentinel  │  │ • Prometheus│  │ • OpsGenie  │  │ • Analysis  │  ║  │
-│  ║  │ • QRadar    │  │ • Grafana   │  │ • Slack     │  │ • Evidence  │  ║  │
-│  ║  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘  ║  │
-│  ║                                                                       ║  │
-│  ║  Keys: Read-only verification keys / No signing authority            ║  │
-│  ║  Auth: One-way data flow / Append-only / No write-back               ║  │
-│  ╚═══════════════════════════════════════════════════════════════════════╝  │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🛡️ Air Gap Enforcement
-
-### Cross-Domain Communication
-
-All communication across air gaps requires cryptographic signing and verification. No direct access is permitted.
-
-```
-EXECUTION → CONTROL (Approval Request) [Crosses Air Gap #1]
-┌────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌────────────┐
-│  Builder   │───▶│ Sign Request    │───▶│    AIR GAP      │───▶│ Governance │
-│  (action)  │    │ (Exec Key)      │    │ • Verify sig    │    │  (approve) │
-│            │    │                 │    │ • Check policy  │    │            │
-│            │    │                 │    │ • Rate limit    │    │            │
-└────────────┘    └─────────────────┘    └─────────────────┘    └────────────┘
-                                                                       │
-                                                                       ▼
-┌────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌────────────┐
-│  Builder   │◀───│ Verify Response │◀───│    AIR GAP      │◀───│ Governance │
-│ (continue) │    │ (Control sig)   │    │ • Sign response │    │ (decision) │
-│            │    │                 │    │ • Log to Tape   │    │            │
-└────────────┘    └─────────────────┘    └─────────────────┘    └────────────┘
-
-
-CONTROL → OBSERVATION (Audit Append) [Crosses Air Gap #2]
-┌────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌────────────┐
-│  Turing    │───▶│ Sign + Chain    │───▶│    AIR GAP      │───▶│    SIEM    │
-│   Tape     │    │ (Control Key)   │    │ • One-way only  │    │  (ingest)  │
-│            │    │                 │    │ • No write-back │    │            │
-└────────────┘    └─────────────────┘    └─────────────────┘    └────────────┘
-```
-
-### Key Hierarchy & Air Gap Separation
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           KEY HIERARCHY                                      │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ROOT OF TRUST (Hardware Security Module / Offline)                         │
-│  └── Never exposed, used only for key ceremony                              │
-│                                                                              │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │ CONTROL PLANE KEYS (Behind Air Gap #1)                              │   │
-│  │   ├── Governance Signing Key (approve/deny decisions)               │   │
-│  │   ├── Policy Engine Key (rule attestation)                          │   │
-│  │   ├── Turing Tape Key (audit chain integrity)                       │   │
-│  │   └── Key Custodian Key (key operations, rotation)                  │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-│                    ░░░░░░░░░░ AIR GAP #1 ░░░░░░░░░░░                         │
-│                                                                              │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │ EXECUTION PLANE KEYS (Between Air Gaps)                             │   │
-│  │   ├── Agent Identity Keys (per-agent authentication)                │   │
-│  │   ├── Session Keys (short-lived, scoped)                            │   │
-│  │   └── Counter-Sign Keys (attest to own actions only)                │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-│                    ░░░░░░░░░░ AIR GAP #2 ░░░░░░░░░░░                         │
-│                                                                              │
-│  ┌─────────────────────────────────────────────────────────────────────┐   │
-│  │ OBSERVATION PLANE KEYS (Behind Air Gap #2)                          │   │
-│  │   └── Verification Keys Only (public keys, no signing)              │   │
-│  └─────────────────────────────────────────────────────────────────────┘   │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-
-KEY PROPERTIES BY DOMAIN:
-
-| Domain      | Can Sign        | Can Verify      | Can Encrypt     | Can Decrypt     |
-|-------------|-----------------|-----------------|-----------------|-----------------|
-| Control     | ✅ All          | ✅ All          | ✅ All          | ✅ All          |
-| Execution   | ⚠️ Own actions  | ✅ Control sigs | ✅ To Control   | ❌ No           |
-| Observation | ❌ No           | ✅ All          | ❌ No           | ❌ No           |
-```
-
----
-
-## 🔐 Air Gap Security Guarantees
-
-### What Execution Plane Agents CANNOT Do:
-
-| Action | Blocked By |
-|--------|-----------|
-| Forge governance approval | Air Gap #1 - No access to Control Plane signing keys |
-| Modify audit trail | Air Gap #1 - Turing Tape signed by Control Plane |
-| Bypass policy checks | Air Gap #1 - All actions require Control Plane counter-signature |
-| Access other agent's data | Scoped session keys, no cross-agent access |
-| Exfiltrate keys | Keys bound to hardware/TEE, non-exportable |
-| Replay old approvals | Nonce + timestamp + chain linking |
-
-### What Control Plane CANNOT Do:
-
-| Action | Blocked By |
-|--------|-----------|
-| Execute agent code | Air Gap #1 - No execution capabilities, policy only |
-| Access raw data | Only sees metadata, hashes, requests |
-| Modify agent behavior | Can only approve/deny, not instruct |
-| Hide decisions | Air Gap #2 - All decisions logged to Observation Plane |
-
-### What Observation Plane CANNOT Do:
-
-| Action | Blocked By |
-|--------|-----------|
-| Modify logs | Air Gap #2 - Append-only, signed by Control Plane |
-| Inject false data | Air Gap #2 - No signing authority |
-| Influence decisions | Air Gap #2 - One-way data flow, no write-back |
-| Access decrypted data | Verification keys only |
-
----
-
-## 🏗️ System Architecture Overview
+## 🏗️ Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -224,6 +25,7 @@ KEY PROPERTIES BY DOMAIN:
 │  │   MCP    │  │   A2A    │  │  SIEM/   │  │   Key    │  │  Policy  │      │
 │  │ Clients  │  │  Agents  │  │   SOC    │  │  Vault   │  │  Engine  │      │
 │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘      │
+│       │             │             │             │             │             │
 └───────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┘
         │             │             │             │             │
         ▼             ▼             ▼             ▼             ▼
@@ -232,10 +34,11 @@ KEY PROPERTIES BY DOMAIN:
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
 │  │ MCP Server  │  │  A2A Bus    │  │ Log Router  │  │ Crypto Svc  │        │
 │  │ (Tools API) │  │ (Agent Msg) │  │ (SIEM/CEF)  │  │ (Sign/Enc)  │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘        │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
+│         │                │                │                │                │
+└─────────┼────────────────┼────────────────┼────────────────┼────────────────┘
+          │                │                │                │
+          ▼                ▼                ▼                ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                            ORCHESTRATOR                                      │
 │         Coordinates workflow: Design → Build → Review → Record               │
@@ -312,6 +115,42 @@ ENCRYPTION FLOW:
 
 ## 📊 Logging & Observability
 
+### Log Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      AGENT OPERATIONS                            │
+│  Architect │ Builder │ Critic │ Governance │ Recorder           │
+└──────┬─────┴────┬────┴───┬────┴─────┬──────┴────┬───────────────┘
+       │          │        │          │           │
+       ▼          ▼        ▼          ▼           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    STRUCTURED LOG EMITTER                        │
+│  • JSON-structured events                                        │
+│  • Correlation IDs (workflow_id, trace_id, span_id)             │
+│  • Timestamp (ISO 8601 UTC)                                      │
+│  • Classification tags                                           │
+└──────────────────────────────┬──────────────────────────────────┘
+                               │
+          ┌────────────────────┼────────────────────┐
+          ▼                    ▼                    ▼
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│   LOCAL LOGS    │  │   LOG ROUTER    │  │  TURING TAPE    │
+│  (JSONL files)  │  │   (Fluentd/     │  │ (Immutable      │
+│                 │  │    Vector)      │  │  Audit Trail)   │
+└─────────────────┘  └────────┬────────┘  └─────────────────┘
+                              │
+       ┌──────────────────────┼──────────────────────┐
+       ▼                      ▼                      ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│    SIEM     │      │  METRICS    │      │   ALERTS    │
+│  Splunk     │      │  Datadog    │      │  PagerDuty  │
+│  Sentinel   │      │  Prometheus │      │  OpsGenie   │
+│  QRadar     │      │  Grafana    │      │  Slack      │
+│  Elastic    │      │  CloudWatch │      │  Teams      │
+└─────────────┘      └─────────────┘      └─────────────┘
+```
+
 ### Log Event Schema
 
 ```json
@@ -321,7 +160,6 @@ ENCRYPTION FLOW:
   "workflow_id": "wf_20241124_153000",
   "trace_id": "abc123",
   "span_id": "def456",
-  "trust_domain": "execution",
   "agent": "builder",
   "action": "code_generation",
   "capability": "hrt_guide_generator",
@@ -331,11 +169,9 @@ ENCRYPTION FLOW:
   "governance": {
     "policy_checked": true,
     "approved": true,
-    "approver": "governance_agent",
-    "control_plane_sig": "sha256:def789..."
+    "approver": "governance_agent"
   },
-  "execution_sig": "sha256:abc123...",
-  "chain_prev": "sha256:xyz456..."
+  "signature": "sha256:abc123..."
 }
 ```
 
@@ -369,13 +205,47 @@ ENCRYPTION FLOW:
 │  │ • get_audit_trail(workflow_id) → TuringTape                │ │
 │  └────────────────────────────────────────────────────────────┘ │
 │                                                                  │
-│  TRUST: MCP clients connect through Air Gap (external boundary) │
+│  RESOURCES:                                                      │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │ • missions:// - Available mission templates                │ │
+│  │ • capabilities:// - Registered capabilities                │ │
+│  │ • workflows:// - Running/completed workflows               │ │
+│  │ • policies:// - Governance policies                        │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                       MCP CLIENTS                                │
+│  • Claude Desktop    • VS Code Copilot    • Custom Agents       │
+│  • Cursor            • Continue           • Automation Scripts  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Agent-to-Agent (A2A) Protocol
 
 ```
+┌─────────────────────────────────────────────────────────────────┐
+│                    A2A MESSAGE BUS                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  MESSAGE TYPES:                                                  │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │   REQUEST   │  │  RESPONSE   │  │   EVENT     │              │
+│  │  (Task Req) │  │ (Task Resp) │  │ (Broadcast) │              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│                                                                  │
+│  ROUTING:                                                        │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │ • Direct: agent://architect/design                         │ │
+│  │ • Broadcast: agent://*/notify                              │ │
+│  │ • Capability: capability://medical/generate                │ │
+│  │ • External: a2a://external-system/endpoint                 │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+
 A2A MESSAGE SCHEMA:
 ┌─────────────────────────────────────────────────────────────────┐
 │ {                                                                │
@@ -383,12 +253,10 @@ A2A MESSAGE SCHEMA:
 │   "type": "request|response|event",                             │
 │   "from": "agent://builder",                                    │
 │   "to": "agent://critic",                                       │
-│   "trust_domain": "execution",                                  │
 │   "correlation_id": "workflow_123",                             │
 │   "timestamp": "2024-11-24T15:30:00Z",                          │
 │   "payload": { ... },                                           │
 │   "signature": "sha256:...",                                    │
-│   "requires_governance": true,                                  │
 │   "ttl": 300                                                    │
 │ }                                                                │
 └─────────────────────────────────────────────────────────────────┘
@@ -420,7 +288,7 @@ ta_base/
 │   ├── missions/               # YAML mission definitions
 │   └── output/                 # Generated artifacts
 ├── base/                       # Base agent classes
-├── governance/                 # Policy framework (Control Plane)
+├── governance/                 # Policy framework
 └── workflows/                  # Workflow definitions
 ```
 
@@ -446,15 +314,14 @@ ta_base/
 
 | Component | Status |
 |-----------|--------|
-| Core Agents (Execution Plane) | ✅ 5 roles implemented |
+| Core Agents | ✅ 5 roles implemented |
 | Test Suite | ✅ 171 passed, 6 skipped |
 | Capability Registry | ✅ Domain routing |
 | PDF Generation | ✅ Working |
-| Governance (Control Plane) | ✅ Policy enforcement |
-| Air Gap Enforcement | 🔲 Design complete, implementation pending |
+| Governance | ✅ Policy enforcement |
 | MCP Server | 🔲 Stub only |
 | A2A Protocol | 🔲 Stub only |
-| SIEM Integration (Observation Plane) | 🔲 Planned |
+| SIEM Integration | 🔲 Planned |
 | Key Vault | 🔲 Planned |
 
 ## 🔮 Roadmap
@@ -471,33 +338,24 @@ ta_base/
 - [ ] Prompt management
 - [ ] Cost tracking
 
-### Phase 3: Air Gap Implementation
-- [ ] Cryptographic separation of planes
-- [ ] Control Plane key hierarchy
-- [ ] Execution Plane scoped keys
-- [ ] Air gap enforcement layer
-- [ ] Cross-domain signing protocol
-
-### Phase 4: Interoperability
+### Phase 3: Interoperability
 - [ ] MCP server implementation
 - [ ] A2A protocol implementation
 - [ ] External agent federation
 - [ ] Webhook integrations
 
-### Phase 5: Enterprise Security
-- [ ] Key vault integration (HashiCorp, AWS KMS, Azure Key Vault)
-- [ ] Hardware Security Module (HSM) support
+### Phase 4: Enterprise Security
+- [ ] Key vault integration (HashiCorp, AWS KMS)
 - [ ] Field-level encryption
-- [ ] SIEM log shipping (Observation Plane)
+- [ ] SIEM log shipping
 - [ ] SOC alert integration
-- [ ] Compliance reporting (SOC2, HIPAA, FedRAMP)
+- [ ] Compliance reporting (SOC2, HIPAA)
 
-### Phase 6: Scale
+### Phase 5: Scale
 - [ ] Kubernetes deployment
 - [ ] Horizontal scaling
 - [ ] Multi-region support
 - [ ] Workflow persistence
-- [ ] Cross-region trust federation
 
 ---
 
@@ -509,4 +367,4 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 *Founded on the Intent → Capability → Governance triangle concept.*
 
-*Enterprise-ready AI orchestration with cryptographically-enforced air gaps.*
+*Enterprise-ready AI orchestration with security, auditability, and interoperability built-in.*
