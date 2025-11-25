@@ -1,37 +1,53 @@
 """
 Architect Agent - Design system architecture.
+Uses ToolRegistry for design validation and documentation.
 """
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import uuid
+
+from ..tools import ToolRegistry, ScoringTool
 
 
 class Architect:
     """
     Generates a simple high-level architecture plan from a mission/intent.
+    Uses tools for design scoring and validation.
     """
 
-    def __init__(self, name: str = "Architect", id: str = "agent_architect_001"):
+    def __init__(
+        self, 
+        name: str = "Architect", 
+        id: str = "agent_architect_001",
+        registry: Optional[ToolRegistry] = None
+    ):
         self.name = name
-        self.id = id  # added stable id
+        self.id = id
         self.metadata = {
             "id": self.id,
-            "name": self.name,  # keep in sync with self.name
+            "name": self.name,
             "description": "Designs high-level system architecture from intent.",
         }
-        # Policy flags for this role
         self.policy: Dict[str, Any] = {
             "can_design": True,
             "require_approval": False,
         }
-        self.designs_created = 0  # track successful designs
-        self.designs: List[Dict[str, Any]] = []  # track design records
-        # Capabilities this role exposes
+        self.designs_created = 0
+        self.designs: List[Dict[str, Any]] = []
         self.capabilities: List[str] = [
-            "design_system",     # required by tests
+            "design_system",
             "evaluate_intent",
             "describe",
             "act",
         ]
+        
+        # Initialize tool registry
+        self._registry = registry or ToolRegistry()
+        self._register_default_tools()
+    
+    def _register_default_tools(self) -> None:
+        """Register default tools if not already present."""
+        if "content_scorer" not in self._registry:
+            self._registry.register(ScoringTool())
 
     def act(self, intent: str) -> Dict[str, Any]:
         """
@@ -52,7 +68,6 @@ class Architect:
         intent_lower = intent.lower()
         components = []
         
-        # Default components for any system
         if "microservice" in intent_lower or "api" in intent_lower or "rest" in intent_lower:
             components = [
                 {"name": "frontend", "responsibilities": ["presentation", "client routes"]},
@@ -61,7 +76,6 @@ class Architect:
                 {"name": "api", "responsibilities": ["REST endpoints", "authentication"]},
             ]
         else:
-            # Generic system components
             components = [
                 {"name": "frontend", "responsibilities": ["presentation", "client routes"]},
                 {"name": "backend", "responsibilities": ["business logic", "orchestration"]},
@@ -79,7 +93,24 @@ class Architect:
         }
         
         doc = self._document(architecture, intent.strip())
-        # record the design
+        
+        # Use scoring tool to evaluate design quality
+        design_text = f"Intent: {intent}\nComponents: {', '.join(c['name'] for c in components)}\n{doc}"
+        score_result = self._registry.invoke(
+            "content_scorer",
+            content=design_text,
+            rubric={
+                "completeness": {"weight": 0.4},
+                "clarity": {"weight": 0.3},
+                "feasibility": {"weight": 0.3},
+            }
+        )
+        
+        design_score = None
+        if score_result.success:
+            design_score = score_result.output
+        
+        # Record the design
         self.designs.append({
             "design_id": design_id,
             "intent": intent.strip(),
@@ -90,14 +121,14 @@ class Architect:
         return {
             "status": "designed",
             "intent": intent.strip(),
-            "design_id": design_id,  # added
+            "design_id": design_id,
             "architecture": architecture,
             "documentation": doc,
-            # expose key plan fields at top-level for tests
             "components": architecture.get("components", []),
             "interfaces": architecture.get("interfaces", []),
             "risks": architecture.get("risks", []),
             "decisions": architecture.get("decisions", []),
+            "design_score": design_score,
             "artifacts": [
                 {
                     "type": "architecture",
@@ -105,6 +136,7 @@ class Architect:
                     "data": architecture,
                 }
             ],
+            "tools_used": ["content_scorer"],
         }
 
     def _design_architecture(self, intent: str) -> Dict[str, Any]:
@@ -115,7 +147,6 @@ class Architect:
 
         components: List[Dict[str, Any]] = []
 
-        # Heuristics for common components
         if any(w in intent_l for w in ("ui", "frontend", "front end", "react", "view")):
             components.append({"name": "frontend_ui", "responsibilities": ["presentation", "client routes"]})
 
@@ -132,14 +163,12 @@ class Architect:
         if "queue" in intent_l or "event" in intent_l or "kafka" in intent_l:
             components.append({"name": "message_bus", "responsibilities": ["async events", "decoupling"]})
 
-        # Default components if heuristics found nothing
         if not components:
             components.extend([
                 {"name": "application_service", "responsibilities": ["business logic"]},
                 {"name": "database", "responsibilities": ["persistence"]},
             ])
 
-        # Deduplicate by name
         seen = set()
         components = [c for c in components if not (c["name"] in seen or seen.add(c["name"]))]
 
@@ -201,14 +230,15 @@ class Architect:
         Return metadata and simple I/O schema for this role.
         """
         return {
-            "id": self.id,  # expose id
+            "id": self.id,
             "name": self.metadata.get("name", self.name),
             "description": self.metadata.get("description", ""),
             "type": "role",
             "role": "architect",
             "designs_created": self.designs_created,
             "capabilities": self.capabilities,
-            "policy": self.policy,  # expose policy
+            "policy": self.policy,
+            "tools_available": [t.name for t in self._registry.list_tools()],
             "inputs": {
                 "intent": {"type": "string", "required": True, "description": "User intent or mission"}
             },

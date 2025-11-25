@@ -1,17 +1,26 @@
 """
 Builder Agent - Builds implementations from architecture designs.
+Uses ToolRegistry for code generation and validation.
 """
 from __future__ import annotations
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import uuid
+
+from ..tools import ToolRegistry, CodeGeneratorTool, CodeValidatorTool, CodeFormatterTool
 
 
 class Builder:
     """
     Builds implementation artifacts from architecture designs.
+    Uses tools for code generation and validation.
     """
 
-    def __init__(self, name: str = "Builder", id: str = "agent_builder_001"):
+    def __init__(
+        self, 
+        name: str = "Builder", 
+        id: str = "agent_builder_001",
+        registry: Optional[ToolRegistry] = None
+    ):
         self.name = name
         self.id = id
         self.metadata = {
@@ -31,6 +40,19 @@ class Builder:
             "describe",
             "act",
         ]
+        
+        # Initialize tool registry
+        self._registry = registry or ToolRegistry()
+        self._register_default_tools()
+    
+    def _register_default_tools(self) -> None:
+        """Register default tools if not already present."""
+        if "code_generator" not in self._registry:
+            self._registry.register(CodeGeneratorTool())
+        if "code_validator" not in self._registry:
+            self._registry.register(CodeValidatorTool())
+        if "code_formatter" not in self._registry:
+            self._registry.register(CodeFormatterTool())
 
     def evaluate_design(self, design: Any) -> bool:
         """
@@ -59,7 +81,7 @@ class Builder:
     def act(self, design: Dict[str, Any]) -> Dict[str, Any]:
         """
         Build implementation from a design.
-        Returns an error dict when the design is invalid.
+        Uses tools for code generation and validation.
         """
         if not self.evaluate_design(design):
             return {
@@ -75,14 +97,35 @@ class Builder:
         raw_components = design.get("components", [])
         artifacts = []
         component_names = []
+        generated_code = []
+        
         for comp in raw_components:
             comp_name = comp.get("name", "unknown") if isinstance(comp, dict) else str(comp)
             component_names.append(comp_name)
+            
+            # Use code generator tool
+            responsibilities = comp.get("responsibilities", []) if isinstance(comp, dict) else []
+            spec = f"Component: {comp_name}\nResponsibilities: {', '.join(responsibilities)}"
+            
+            gen_result = self._registry.invoke("code_generator", specification=spec)
+            code = gen_result.output.get("code", "") if gen_result.success else f"# {comp_name} placeholder"
+            
+            # Validate generated code
+            val_result = self._registry.invoke("code_validator", code=code)
+            is_valid = val_result.output.get("valid", False) if val_result.success else False
+            
+            generated_code.append({
+                "component": comp_name,
+                "code": code,
+                "valid": is_valid,
+            })
+            
             artifacts.append({
                 "type": "implementation",
                 "component": comp_name,
                 "status": "built",
                 "files": [f"{comp_name}.py", f"test_{comp_name}.py"],
+                "validated": is_valid,
             })
 
         build = {
@@ -90,15 +133,17 @@ class Builder:
             "build_id": build_id,
             "design_id": design.get("design_id"),
             "artifacts": artifacts,
-            "components": component_names,  # list of strings
+            "components": component_names,
             "components_built": len(component_names),
             "summary": f"Built {len(component_names)} components from design.",
             "code_quality": "high",
+            "generated_code": generated_code,
             "implementation": {
                 "language": "python",
                 "framework": "standard",
                 "artifacts": artifacts,
             },
+            "tools_used": ["code_generator", "code_validator"],
         }
 
         self.builds.append(build)
@@ -108,7 +153,6 @@ class Builder:
         """
         Run the builder with a context dict.
         Extracts design from context and delegates to act().
-        For fallback scenarios, generates minimal code output.
         """
         design = context.get("architecture") or context.get("design")
         
@@ -116,15 +160,22 @@ class Builder:
         if design and isinstance(design, dict) and design.get("status") == "designed":
             return self.act(design)
         
-        # Fallback: generate minimal code output
+        # Fallback: generate minimal code output using tools
         mission = context.get("mission", "unknown")
+        
+        gen_result = self._registry.invoke(
+            "code_generator", 
+            specification=f"Main module for: {mission}"
+        )
+        code = gen_result.output.get("code", f"# Generated for: {mission}\npass") if gen_result.success else f"# {mission}\npass"
+        
         return {
             "status": "built",
             "build_id": str(uuid.uuid4()),
-            "code": f"# Generated code for: {mission}\npass",
+            "code": code,
             "filename": "main.py",
             "tests": "# Generated tests\nimport unittest\n\nclass TestMain(unittest.TestCase):\n    pass",
-            "documentation": f"# Documentation\n\nGenerated for: {mission}",  # added
+            "documentation": f"# Documentation\n\nGenerated for: {mission}",
             "components": [],
             "artifacts": [],
             "implementation": {
@@ -132,6 +183,7 @@ class Builder:
                 "framework": "standard",
                 "artifacts": [],
             },
+            "tools_used": ["code_generator"],
         }
 
     def describe(self) -> Dict[str, Any]:
@@ -147,6 +199,7 @@ class Builder:
             "builds_created": self.builds_created,
             "capabilities": self.capabilities,
             "policy": self.policy,
+            "tools_available": [t.name for t in self._registry.list_tools()],
             "inputs": {
                 "design": {"type": "object", "required": True, "description": "Architecture design to build"}
             },

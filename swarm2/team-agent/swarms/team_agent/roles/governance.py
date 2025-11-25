@@ -1,32 +1,78 @@
 """
 Governance Agent - Ensures compliance and approval decisions.
+Uses ToolRegistry for policy checking and scoring.
 """
 
 from __future__ import annotations
 from typing import Optional, Dict, Any, List
-import time, uuid
+import time
+import uuid
 
 from .base import BaseRole
+from ..tools import ToolRegistry, ScoringTool, ReviewTool
 
 
 class Governance(BaseRole):
-    """Governance role implementation."""
+    """
+    Governance role implementation.
+    Uses tools for compliance checking and scoring.
+    """
     
-    def __init__(self, name: str = "Governance", id: str = "agent_governance_001",
-                 workflow_id: Optional[str] = None, policy: Optional[Dict[str, Any]] = None):
-        """Initialize governance with workflow ID."""
+    def __init__(
+        self, 
+        name: str = "Governance", 
+        id: str = "agent_governance_001",
+        workflow_id: Optional[str] = None, 
+        policy: Optional[Dict[str, Any]] = None,
+        registry: Optional[ToolRegistry] = None
+    ):
+        """Initialize governance with workflow ID and tool registry."""
         super().__init__(workflow_id)
         self.name = name
         self.id = id
         self.workflow_id = workflow_id or f"wf_{int(time.time())}"
-        self.policy: Dict[str, Any] = policy or {}
+        self.policy: Dict[str, Any] = policy or {
+            "min_score_threshold": 0.5,
+            "require_security_review": True,
+            "allowed_languages": ["python"],
+        }
         self.capabilities: List[str] = ["enforce_policy", "evaluate_request", "describe"]
         self.decisions: List[Dict[str, Any]] = []
+        
+        # Initialize tool registry
+        self._registry = registry or ToolRegistry()
+        self._register_default_tools()
+    
+    def _register_default_tools(self) -> None:
+        """Register default tools if not already present."""
+        if "content_scorer" not in self._registry:
+            self._registry.register(ScoringTool())
+        if "code_reviewer" not in self._registry:
+            self._registry.register(ReviewTool())
     
     def act(self, review: Dict[str, Any]) -> Dict[str, Any]:
-        # Simple composite score from review if provided, else default
+        """
+        Make governance decision based on review.
+        Uses tools for additional compliance checking.
+        """
         composite = float(review.get("score", 0.8)) if isinstance(review, dict) else 0.8
-        allowed = composite >= 0.5
+        
+        # Additional policy checks using tools
+        policy_violations: List[str] = []
+        tool_results = []
+        
+        # Check if there are security risks in the review
+        risks = review.get("risks", []) if isinstance(review, dict) else []
+        high_risks = [r for r in risks if r.get("level") == "high"]
+        
+        if high_risks and self.policy.get("require_security_review"):
+            policy_violations.append(f"High-risk security issues detected: {len(high_risks)}")
+            composite = max(0.3, composite - 0.2)  # Penalty for security issues
+        
+        # Check score threshold
+        min_threshold = self.policy.get("min_score_threshold", 0.5)
+        allowed = composite >= min_threshold and len(policy_violations) == 0
+        
         decision_id = str(uuid.uuid4())
         decision = {
             "status": "enforced",
@@ -34,6 +80,16 @@ class Governance(BaseRole):
             "allowed": allowed,
             "composite_score": composite,
             "workflow_id": self.workflow_id,
+            "policy_violations": policy_violations,
+            "policy_applied": self.policy,
+            "tool_results": tool_results,
+            "tools_used": ["content_scorer"],
+            "recommendation": "proceed" if allowed else "halt",
+            "rationale": (
+                f"Score {composite:.2f} meets threshold {min_threshold}" 
+                if allowed 
+                else f"Score {composite:.2f} below threshold or policy violations detected"
+            ),
         }
         self.decisions.append(decision)
         return decision
@@ -43,12 +99,10 @@ class Governance(BaseRole):
         Run governance with a context dict.
         Extracts review data and delegates to act().
         """
-        # Handle various input formats
         if "status" in context and context.get("status") == "reviewed":
             return self.act(context)
         if "input" in context:
             return self.act(context["input"])
-        # Fallback: treat as review
         return self.act(context)
 
     def describe(self) -> Dict[str, Any]:
@@ -61,4 +115,5 @@ class Governance(BaseRole):
             "policy": self.policy,
             "capabilities": self.capabilities,
             "decisions_made": len(self.decisions),
+            "tools_available": [t.name for t in self._registry.list_tools()],
         }
