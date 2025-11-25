@@ -1,32 +1,105 @@
-# Instructions for VS Code Agent
+# Team Agent - Modular AI Agent System
 
-## Mission
-Scaffold the core framework of `team-agent`, a modular AI agent system using Python. The system should support standalone agents and composable teams.
+A multi-agent orchestration framework implementing the **Intent → Capability → Governance** triangle for AI/Human collaborative workflows.
 
-## Step 1: Create Base Agent Class
-- File: `base/base_agent.py`
-- Class: `BaseAgent`
-- Include:
-  - `__init__()` with name, ID, capabilities, policy
-  - `evaluate_intent(intent)` for compliance checks
-  - `act(intent)` for executing or refusing
-  - `record(event)` to log actions
-  - `describe()` for agent metadata
-- Support hooks for future integrations (e.g., Autogen, LangChain)
+## 🎯 Core Concept
 
-## Step 2: Create Role Map in Swarm Template
-- File: `swarms/team_agent/roles.py`
-- Define agent roles: architect, builder, critic, compliance, recorder
-- Each should contain `intent`, `capabilities`, and `policy` example
+Every workflow follows three principles:
 
-## Step 3: Create README
-- File: `README.md`
-- Summary of mission, architecture, directory structure
-- Credit founding idea: Intent → Capability → Governance triangle
+| Principle | Description |
+|-----------|-------------|
+| **Intent** | What the user/system wants to accomplish |
+| **Capability** | What agents can do to fulfill the intent |
+| **Governance** | Policy checks ensuring compliance and safety |
 
-## Bonus: Setup Dev Tools
-- Create `.gitignore`, `.env.example`
-- Add stub test under `utils/tests/test_base_agent.py`
+## 🏗️ Architecture Overview
 
-## Output
-File structure, working class in `base/base_agent.py`, and role map in `swarms/team_agent/roles.py`.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      ORCHESTRATOR                           │
+│  Coordinates workflow: Design → Build → Review → Record     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+┌───────────────┐    ┌───────────────┐    ┌───────────────┐
+│   ARCHITECT   │    │    BUILDER    │    │    CRITIC     │
+│  Designs the  │───▶│  Implements   │───▶│   Reviews     │
+│   solution    │    │   the code    │    │   quality     │
+└───────────────┘    └───────────────┘    └───────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        ▼                     ▼                     ▼
+┌───────────────┐    ┌───────────────┐    ┌───────────────┐
+│  GOVERNANCE   │    │   RECORDER    │    │  CAPABILITY   │
+│ Policy checks │    │  Audit trail  │    │   Registry    │
+│  & approval   │    │  & signing    │    │   & routing   │
+└───────────────┘    └───────────────┘    └───────────────┘
+```
+
+## 🚀 Quick Start
+
+```bash
+cd swarm2/team-agent
+python examples/simple_demo.py
+```
+
+## 📁 Project Structure
+
+```
+ta_base/
+├── swarm2/team-agent/          # Main implementation
+│   ├── swarms/team_agent/      # Agent roles & orchestrator
+│   │   ├── roles/              # Architect, Builder, Critic, etc.
+│   │   ├── capabilities/       # Domain-specific generators
+│   │   └── orchestrator.py     # Workflow coordinator
+│   ├── examples/               # Demo scripts
+│   ├── scripts/                # Utility scripts (HRT guide, etc.)
+│   ├── missions/               # YAML mission definitions
+│   └── output/                 # Generated artifacts
+├── base/                       # Base agent classes
+├── governance/                 # Policy framework
+└── workflows/                  # Workflow definitions
+```
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Team Agent README](swarm2/team-agent/README.md) | Detailed usage & API |
+| [Architecture](swarm2/team-agent/ARCHITECTURE.md) | System design |
+| [Development Guide](swarm2/team-agent/DEVELOPMENT.md) | Contributing |
+| [Changelog](swarm2/team-agent/CHANGELOG.md) | Version history |
+
+## 🧪 Example Workflows
+
+| Mission | Command | Output |
+|---------|---------|--------|
+| Hello World | `python examples/quick_test.py` | Basic workflow |
+| Calculator | `python examples/simple_demo.py` | Code generation |
+| HRT Guide | `python scripts/generate_hrt_guide.py` | 20-page PDF |
+| Interactive | `python examples/interactive_demo.py` | REPL mode |
+
+## ✅ Current Status
+
+- **171 tests passing**, 6 skipped
+- 5 core agent roles implemented
+- Capability registry with domain routing
+- PDF document generation working
+- Governance policy enforcement active
+
+## 🔮 Roadmap
+
+- [ ] LLM integration (replace mock responses)
+- [ ] MCP server implementation
+- [ ] Agent-to-agent communication
+- [ ] Parallel capability execution
+- [ ] Additional domain capabilities
+
+## 📄 License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+*Founded on the Intent → Capability → Governance triangle concept.*
