@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "team-agent-tools": {
+      "command": "python",
+      "args": ["-m", "swarms.team_agent.tools.mcp_server"],
+      "cwd": "/Users/lesdunston/Dropbox/Team Agent/Projects/ta_base/swarm2/team-agent"
+    }
+  }
+}
