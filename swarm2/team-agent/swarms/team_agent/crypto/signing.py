@@ -135,12 +135,13 @@ class Verifier:
     Used to verify data signed by agents.
     """
 
-    def __init__(self, chain_pem: bytes):
+    def __init__(self, chain_pem: bytes, crl_manager: Optional['CRLManager'] = None):
         """
         Initialize verifier with certificate chain.
 
         Args:
             chain_pem: Certificate chain in PEM format (intermediate + root)
+            crl_manager: Optional CRLManager for revocation checking
         """
         # Load all certificates from chain
         self.certificates = []
@@ -156,6 +157,9 @@ class Verifier:
         # First cert is the signing cert
         self.signing_cert = self.certificates[0]
 
+        # Store CRL manager for revocation checking
+        self.crl_manager = crl_manager
+
     def verify(self, signed_data: SignedData) -> bool:
         """
         Verify signed data.
@@ -167,6 +171,12 @@ class Verifier:
             True if signature is valid, False otherwise
         """
         try:
+            # Check revocation status if CRL manager is available
+            if self.crl_manager:
+                serial_hex = format(self.signing_cert.serial_number, 'x')
+                if self.crl_manager.is_revoked(serial_hex):
+                    return False
+
             # Serialize data to canonical JSON (same as signing)
             data = signed_data.data
             if isinstance(data, (dict, list)):
