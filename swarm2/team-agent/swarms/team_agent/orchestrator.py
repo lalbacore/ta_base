@@ -18,6 +18,10 @@ from utils.logging import get_logger
 # Correct capability imports
 from swarms.team_agent.capabilities.registry import CapabilityRegistry
 from utils.capabilities.dynamic_builder import DynamicBuilder
+
+# PKI imports
+from swarms.team_agent.crypto import PKIManager, TrustDomain
+
 try:
     from utils.capabilities import HRTGuideCapability
 except ImportError:
@@ -38,10 +42,23 @@ class Orchestrator:
         self.current_workflow_id = None
         self.logger = get_logger("orchestrator")
         os.makedirs(self.output_dir, exist_ok=True)
+
+        # Initialize PKI infrastructure
+        self.pki_manager = PKIManager()
+        self.pki_manager.initialize_pki()
+        self.logger.info("PKI infrastructure initialized")
+
+        # Load certificate chains for each trust domain
+        self.cert_chains = {
+            TrustDomain.GOVERNMENT: self.pki_manager.get_certificate_chain(TrustDomain.GOVERNMENT),
+            TrustDomain.EXECUTION: self.pki_manager.get_certificate_chain(TrustDomain.EXECUTION),
+            TrustDomain.LOGGING: self.pki_manager.get_certificate_chain(TrustDomain.LOGGING),
+        }
+
         self.capability_registry = CapabilityRegistry()
         self._register_default_capabilities()
         self.dynamic_builder = DynamicBuilder(registry=self.capability_registry)
-        self.logger.info("Orchestrator initialized with capability system")
+        self.logger.info("Orchestrator initialized with capability system and PKI")
 
     def _register_default_capabilities(self):
         if HRTGuideCapability:
@@ -55,15 +72,33 @@ class Orchestrator:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.current_workflow_id = f"wf_{timestamp}"
         self.logger.info(f"Created new workflow {self.current_workflow_id}")
-        architect = Architect(self.current_workflow_id)
-        builder = Builder(self.current_workflow_id)
-        critic = Critic(self.current_workflow_id)
-        recorder = Recorder(self.current_workflow_id)
+
+        # Create agents with their respective certificate chains
+        architect = Architect(
+            self.current_workflow_id,
+            cert_chain=self.cert_chains[TrustDomain.EXECUTION]
+        )
+        builder = Builder(
+            self.current_workflow_id,
+            cert_chain=self.cert_chains[TrustDomain.EXECUTION]
+        )
+        critic = Critic(
+            self.current_workflow_id,
+            cert_chain=self.cert_chains[TrustDomain.EXECUTION]
+        )
+        recorder = Recorder(
+            self.current_workflow_id,
+            cert_chain=self.cert_chains[TrustDomain.LOGGING]
+        )
         governance = None
         try:
-            governance = Governance(self.current_workflow_id)
+            governance = Governance(
+                self.current_workflow_id,
+                cert_chain=self.cert_chains[TrustDomain.GOVERNMENT]
+            )
         except Exception:
             pass
+
         final_record = self._execute_workflow(mission, architect, critic, recorder, governance)
         return {"workflow_id": self.current_workflow_id, "final_record": final_record}
 
