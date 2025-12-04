@@ -292,6 +292,18 @@ class RoutedOrchestrator:
                 return cp.get("id")
         return None
 
+    def _get_capability_by_name(self, name: str) -> Optional[Any]:
+        """Look up a capability by name from the registry."""
+        # If registry is a CapabilityRegistry with a get method
+        if hasattr(self.registry, 'get') and callable(getattr(self.registry, 'get')):
+            return self.registry.get(name)
+        # If registry is an Orchestrator with capability_registry attribute
+        if hasattr(self.registry, 'capability_registry'):
+            cap_reg = self.registry.capability_registry
+            if hasattr(cap_reg, 'get') and callable(getattr(cap_reg, 'get')):
+                return cap_reg.get(name)
+        return None
+
     def execute(self, mission: str | Dict[str, Any]) -> Dict[str, Any]:
         # Support mission as dict with optional checkpoints
         mission_text = mission.get("text") if isinstance(mission, dict) else str(mission)
