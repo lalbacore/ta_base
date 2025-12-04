@@ -13,12 +13,21 @@ import os
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, List, Any
 from cryptography import x509
 from cryptography.x509.oid import NameOID, ExtendedKeyUsageOID
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.backends import default_backend
+
+# Import CRL manager
+try:
+    from .crl import CRLManager, RevocationReason
+    CRL_AVAILABLE = True
+except ImportError:
+    CRLManager = None
+    RevocationReason = None
+    CRL_AVAILABLE = False
 
 
 class TrustDomain(Enum):
@@ -69,6 +78,13 @@ class PKIManager:
         for dir_path in [self.root_dir, self.government_dir,
                          self.execution_dir, self.logging_dir]:
             dir_path.mkdir(exist_ok=True)
+
+        # Initialize CRL manager
+        if CRL_AVAILABLE:
+            crl_db_path = self.base_dir / "crl.db"
+            self.crl_manager = CRLManager(db_path=crl_db_path)
+        else:
+            self.crl_manager = None
 
     def initialize_pki(self, force: bool = False) -> None:
         """
@@ -311,7 +327,7 @@ class PKIManager:
             domain: Trust domain
 
         Returns:
-            Dict with certificate details
+            Dict with certificate details (serial in hex format)
         """
         domain_dir = getattr(self, f"{domain.value}_dir")
 
@@ -321,7 +337,163 @@ class PKIManager:
         return {
             "subject": cert.subject.rfc4514_string(),
             "issuer": cert.issuer.rfc4514_string(),
-            "serial": str(cert.serial_number),
+            "serial": format(cert.serial_number, 'x'),  # Hex format for consistency
             "not_before": cert.not_valid_before.isoformat(),
             "not_after": cert.not_valid_after.isoformat(),
         }
+
+    # Certificate Revocation Methods
+
+    def revoke_certificate(
+        self,
+        serial_number: str,
+        reason: 'RevocationReason',
+        revoked_by: str,
+        trust_domain: TrustDomain,
+        cert_subject: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> bool:
+        """
+        Revoke a certificate.
+
+        Args:
+            serial_number: Certificate serial number (hex string)
+            reason: Revocation reason (from RevocationReason enum)
+            revoked_by: Who revoked the certificate
+            trust_domain: Trust domain (government, execution, logging)
+            cert_subject: Certificate subject (optional)
+            metadata: Additional metadata (optional)
+
+        Returns:
+            True if revoked, False if already revoked or CRL unavailable
+        """
+        if not self.crl_manager:
+            return False
+
+        return self.crl_manager.revoke_certificate(
+            serial_number=serial_number,
+            reason=reason,
+            revoked_by=revoked_by,
+            trust_domain=trust_domain.value,
+            cert_subject=cert_subject,
+            metadata=metadata
+        )
+
+    def is_revoked(self, serial_number: str) -> bool:
+        """
+        Check if certificate is revoked.
+
+        Args:
+            serial_number: Certificate serial number
+
+        Returns:
+            True if revoked, False otherwise
+        """
+        if not self.crl_manager:
+            return False
+
+        return self.crl_manager.is_revoked(serial_number)
+
+    def get_revocation_info(self, serial_number: str) -> Optional[Dict[str, Any]]:
+        """
+        Get revocation information for a certificate.
+
+        Args:
+            serial_number: Certificate serial number
+
+        Returns:
+            Dict with revocation info, or None if not revoked
+        """
+        if not self.crl_manager:
+            return None
+
+        return self.crl_manager.get_revocation_info(serial_number)
+
+    def generate_crl(
+        self,
+        domain: TrustDomain,
+        validity_days: int = 7
+    ) -> Optional[bytes]:
+        """
+        Generate CRL for a trust domain.
+
+        Args:
+            domain: Trust domain to generate CRL for
+            validity_days: CRL validity period in days (default: 7)
+
+        Returns:
+            CRL in PEM format, or None if CRL unavailable
+        """
+        if not self.crl_manager:
+            return None
+
+        # Get certificate chain for the domain
+        cert_chain = self.get_certificate_chain(domain)
+
+        # Generate CRL
+        crl_pem = self.crl_manager.generate_crl(
+            issuer_key_pem=cert_chain['key'],
+            issuer_cert_pem=cert_chain['cert'],
+            validity_days=validity_days
+        )
+
+        # Save CRL to file
+        domain_dir = getattr(self, f"{domain.value}_dir")
+        crl_path = domain_dir / "crl.pem"
+        with open(crl_path, "wb") as f:
+            f.write(crl_pem)
+
+        return crl_pem
+
+    def generate_all_crls(self, validity_days: int = 7) -> Dict[str, bytes]:
+        """
+        Generate CRLs for all trust domains.
+
+        Args:
+            validity_days: CRL validity period in days (default: 7)
+
+        Returns:
+            Dict mapping trust domain to CRL PEM bytes
+        """
+        crls = {}
+        for domain in TrustDomain:
+            crl = self.generate_crl(domain, validity_days)
+            if crl:
+                crls[domain.value] = crl
+        return crls
+
+    def get_crl_statistics(self) -> Optional[Dict[str, Any]]:
+        """
+        Get CRL statistics.
+
+        Returns:
+            Dict with statistics, or None if CRL unavailable
+        """
+        if not self.crl_manager:
+            return None
+
+        return self.crl_manager.get_statistics()
+
+    def list_revoked_certificates(
+        self,
+        trust_domain: Optional[TrustDomain] = None,
+        limit: int = 100
+    ) -> List[Dict[str, Any]]:
+        """
+        List revoked certificates.
+
+        Args:
+            trust_domain: Filter by trust domain (optional)
+            limit: Maximum number to return
+
+        Returns:
+            List of revoked certificate records
+        """
+        if not self.crl_manager:
+            return []
+
+        domain_str = trust_domain.value if trust_domain else None
+        return self.crl_manager.list_revoked_certificates(
+            trust_domain=domain_str,
+            limit=limit
+        )
