@@ -49,7 +49,59 @@ Capabilities are domain-specific knowledge modules that the Builder dynamically 
 - Creates comprehensive workflow records
 - Generates metadata and documentation
 
-### 3. **Capability System** (`capabilities/`)
+### 3. **PKI Cryptography Layer** (`crypto/`)
+
+Team Agent includes a comprehensive Public Key Infrastructure (PKI) for securing agent communications and workflow artifacts.
+
+#### **Three-Tier Certificate Authority**
+```
+Root CA (air-gapped)
+├── Government CA (policy & governance)
+├── Execution CA (runtime operations)
+└── Logging CA (audit trail)
+```
+
+#### **Trust Domains**
+- **Government**: Policy enforcement, governance, and compliance
+- **Execution**: Runtime agent operations and capability execution
+- **Logging**: Audit trail and forensic analysis
+
+#### **Core Components**
+
+**PKIManager** (`pki.py`)
+- Initializes three-tier CA hierarchy
+- Issues certificates for each trust domain
+- Manages certificate lifecycle and rotation
+
+**Signer** (`signing.py`)
+- Signs dictionaries and JSON artifacts with private keys
+- Embeds certificates in signature metadata
+- Supports detached and embedded signature formats
+
+**Verifier** (`signing.py`)
+- Verifies cryptographic signatures
+- Validates certificate chains to root CA
+- Checks certificate revocation status (CRL and OCSP)
+
+**CRL Manager** (`crl.py`)
+- Maintains Certificate Revocation Lists
+- Supports standard revocation reasons (key compromise, superseded, etc.)
+- Provides delta CRL support for incremental updates
+
+**OCSP Responder** (`ocsp.py`, `ocsp_api.py`)
+- Real-time certificate status checking
+- Response caching for performance (configurable TTL)
+- REST API endpoints for remote queries
+- Automatic fallback to CRL when OCSP unavailable
+
+#### **Security Features**
+- **End-to-End Encryption**: All workflow artifacts can be signed
+- **Certificate Revocation**: Immediate invalidation via CRL and OCSP
+- **Chain of Trust**: All certificates trace to air-gapped root CA
+- **Audit Trail**: Cryptographically signed logging plane
+- **Role Separation**: Government, execution, and logging domains isolated
+
+### 4. **Capability System** (`capabilities/`)
 
 #### **Base Capability** (`base_capability.py`)
 Abstract class defining:
@@ -169,20 +221,34 @@ registry.register(MyCapability())
 
 ## Testing
 
-The project includes comprehensive test coverage:
+The project includes comprehensive test coverage across all subsystems:
 
 ```bash
 # Run all capability tests
 python examples/run_capability_tests.py
 
-# Run specific test suites
+# Run PKI and crypto tests
+pytest utils/tests/test_pki.py -v          # 17 tests: PKI, signing, verification
+pytest utils/tests/test_crl.py -v          # 20 tests: CRL, revocation
+pytest utils/tests/test_ocsp.py -v         # 15 tests: OCSP, caching, API
+
+# Run capability tests
 pytest utils/tests/test_capabilities.py -v
 pytest utils/tests/test_capability_registry.py -v
 pytest utils/tests/test_orchestrator_capabilities.py -v
+
+# Run all tests with coverage
+pytest utils/tests/ --cov=swarms.team_agent --cov-report=html
 ```
 
 ### Test Structure
 
+**Cryptography Tests (52 tests total)**
+- **`test_pki.py`**: PKI initialization, certificate issuance, signing, verification
+- **`test_crl.py`**: Certificate revocation, CRL generation, delta CRLs, persistence
+- **`test_ocsp.py`**: OCSP responder, caching, verifier integration, performance
+
+**Capability Tests**
 - **`test_capabilities.py`**: BaseCapability, DocumentGenerator, HRTGuideCapability
 - **`test_capability_registry.py`**: Registration, indexing, discovery
 - **`test_orchestrator_capabilities.py`**: End-to-end workflow integration
@@ -199,19 +265,32 @@ team-agent/
 │       │   ├── builder.py           # Generic builder fallback
 │       │   ├── critic.py            # Code review
 │       │   └── recorder.py          # Artifact publishing
-│       └── capabilities/
-│           ├── base_capability.py   # Abstract base class
-│           ├── registry.py          # Capability discovery
-│           ├── document_generator.py # Generic doc generation
-│           └── medical/
-│               └── hrt_guide.py     # HRT guide specialist
+│       ├── capabilities/
+│       │   ├── base_capability.py   # Abstract base class
+│       │   ├── registry.py          # Capability discovery
+│       │   ├── document_generator.py # Generic doc generation
+│       │   └── medical/
+│       │       └── hrt_guide.py     # HRT guide specialist
+│       └── crypto/
+│           ├── pki.py               # PKI manager and CA hierarchy
+│           ├── signing.py           # Signer and Verifier classes
+│           ├── crl.py               # Certificate revocation lists
+│           ├── ocsp.py              # OCSP responder
+│           ├── ocsp_api.py          # OCSP REST API
+│           └── __init__.py          # Crypto exports
 ├── utils/
 │   ├── capabilities/
 │   │   ├── dynamic_builder.py      # Capability-aware builder
 │   │   └── __init__.py              # Exports HRTGuideCapability
 │   └── tests/                       # Test suites
+│       ├── test_pki.py              # PKI and signing tests
+│       ├── test_crl.py              # CRL tests
+│       ├── test_ocsp.py             # OCSP tests
+│       ├── test_capabilities.py     # Capability tests
+│       └── ...
 ├── examples/
 │   └── run_capability_tests.py     # Test runner
+├── PKI_FEATURE_SUMMARY.md           # Detailed PKI documentation
 └── README.md                        # This file
 ```
 
