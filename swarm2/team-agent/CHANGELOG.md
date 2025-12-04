@@ -5,6 +5,55 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2024-12-04
+
+### Added - PKI & Cryptography Infrastructure
+- **PKI Manager** (`crypto/pki.py`): Complete 3-tier CA hierarchy
+  - Root CA (air-gapped) with self-signed certificate
+  - Three intermediate CAs: Government, Execution, Logging
+  - Certificate issuance for each trust domain
+  - Certificate chain validation and export
+- **Signing & Verification** (`crypto/signing.py`): Cryptographic signatures
+  - Signer class for signing dictionaries and JSON artifacts
+  - Verifier class with certificate chain validation
+  - Support for embedded and detached signature formats
+  - SHA-256/SHA-512 hashing with RSA-2048 signing
+- **Certificate Revocation Lists** (`crypto/crl.py`): CRL system
+  - CRLManager for maintaining revocation lists
+  - Support for all standard revocation reasons (RFC 5280)
+  - Delta CRL support for incremental updates
+  - CRL persistence and reloading
+- **OCSP Responder** (`crypto/ocsp.py`, `crypto/ocsp_api.py`): Real-time status
+  - OCSPResponder for certificate status checking
+  - Response caching with configurable TTL (default: 5 minutes)
+  - Flask REST API with JSON and binary endpoints
+  - Automatic integration with Verifier (OCSP → CRL → Allow fallback)
+  - Cache management endpoints (stats, clear)
+
+### Added - Testing
+- 52 comprehensive crypto tests (100% passing):
+  - 17 PKI tests: Initialization, signing, verification, chain validation
+  - 20 CRL tests: Revocation, delta CRLs, persistence, integration
+  - 15 OCSP tests: Responder, caching, verifier integration, performance
+- Test coverage for all trust domains and revocation scenarios
+
+### Added - Documentation
+- `PKI_FEATURE_SUMMARY.md`: Complete PKI system documentation (800+ lines)
+  - Architecture overview and component descriptions
+  - Usage examples and integration guides
+  - API reference for all crypto classes
+  - OCSP vs CRL comparison and workflows
+- Updated README files with PKI infrastructure sections
+- Updated project structure to show crypto/ directory
+
+### Changed
+- Added `flask==2.3.3` to requirements.txt for OCSP REST API
+- Verifier now supports OCSP-first or CRL-first revocation checking
+- Test suite expanded to 223+ tests (171 core + 52 crypto)
+
+### Fixed
+- OCSP response building now properly sets responder_id before signing
+
 ## [0.2.0] - 2024-11-24
 
 ### Added

@@ -76,26 +76,36 @@ Every workflow follows three principles:
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
-│  │   Signing    │    │  Encryption  │    │    Key       │       │
-│  │   Service    │    │   Service    │    │  Management  │       │
+│  │   Signing    │    │  Encryption  │    │    PKI       │       │
+│  │   Service    │    │   Service    │    │  Manager     │       │
+│  │  ✅ ACTIVE   │    │  🔲 PLANNED  │    │  ✅ ACTIVE   │       │
 │  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘       │
 │         │                   │                   │                │
 │         ▼                   ▼                   ▼                │
 │  ┌─────────────────────────────────────────────────────────┐    │
-│  │                    KEY VAULT INTEGRATION                 │    │
+│  │                    3-TIER CA HIERARCHY                   │    │
+│  │  Root CA (air-gapped) → Intermediate CAs → End Certs    │    │
+│  │  • Government CA  • Execution CA  • Logging CA          │    │
+│  │  • CRL System     • OCSP Responder                      │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                               │                                  │
+│                               ▼                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │               KEY VAULT INTEGRATION (Future)             │    │
 │  │  • HashiCorp Vault    • AWS KMS    • Azure Key Vault    │    │
 │  │  • GCP KMS            • HSM        • Local Dev Keys     │    │
 │  └─────────────────────────────────────────────────────────┘    │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 
-SIGNING FLOW:
-┌────────┐    ┌────────────┐    ┌─────────┐    ┌──────────┐
-│ Action │───▶│ Hash (SHA) │───▶│  Sign   │───▶│  Record  │
-│ Output │    │  256/512   │    │ (ECDSA) │    │ to Tape  │
-└────────┘    └────────────┘    └─────────┘    └──────────┘
+SIGNING FLOW (Implemented):
+┌────────┐    ┌────────────┐    ┌─────────┐    ┌──────────┐    ┌──────────┐
+│ Action │───▶│ Hash (SHA) │───▶│  Sign   │───▶│  Verify  │───▶│  Record  │
+│ Output │    │  256/512   │    │ (RSA-   │    │  + CRL/  │    │ to Tape  │
+│        │    │            │    │  2048)  │    │  OCSP    │    │          │
+└────────┘    └────────────┘    └─────────┘    └──────────┘    └──────────┘
 
-ENCRYPTION FLOW:
+ENCRYPTION FLOW (Planned):
 ┌────────┐    ┌────────────┐    ┌─────────┐    ┌──────────┐
 │  Data  │───▶│  Classify  │───▶│ Encrypt │───▶│  Store   │
 │ Input  │    │  (PII/PHI) │    │(AES-256)│    │ Secure   │
@@ -279,6 +289,7 @@ ta_base/
 │   ├── swarms/team_agent/      # Agent roles & orchestrator
 │   │   ├── roles/              # Architect, Builder, Critic, etc.
 │   │   ├── capabilities/       # Domain-specific generators
+│   │   ├── crypto/             # PKI, signing, CRL, OCSP ✅
 │   │   ├── mcp/                # MCP server & client
 │   │   ├── agents/             # A2A communication
 │   │   ├── state/              # HITL, Turing tape
@@ -286,7 +297,9 @@ ta_base/
 │   ├── examples/               # Demo scripts
 │   ├── scripts/                # Utility scripts
 │   ├── missions/               # YAML mission definitions
-│   └── output/                 # Generated artifacts
+│   ├── utils/tests/            # Test suites (52 crypto tests)
+│   ├── output/                 # Generated artifacts
+│   └── PKI_FEATURE_SUMMARY.md  # Detailed PKI documentation
 ├── base/                       # Base agent classes
 ├── governance/                 # Policy framework
 └── workflows/                  # Workflow definitions
@@ -310,15 +323,19 @@ ta_base/
 | HRT Guide | `python scripts/generate_hrt_guide.py` | 20-page PDF |
 | Interactive | `python examples/interactive_demo.py` | REPL mode |
 
-## ✅ Current Status (v0.2.0)
+## ✅ Current Status (v0.3.0)
 
 | Component | Status |
 |-----------|--------|
 | Core Agents | ✅ 5 roles implemented |
-| Test Suite | ✅ 171 passed, 6 skipped |
+| Test Suite | ✅ 223+ tests (171 core + 52 crypto) |
 | Capability Registry | ✅ Domain routing |
 | PDF Generation | ✅ Working |
 | Governance | ✅ Policy enforcement |
+| **PKI Infrastructure** | ✅ 3-tier CA hierarchy |
+| **Certificate Signing** | ✅ Signer/Verifier with chain validation |
+| **CRL System** | ✅ Certificate revocation + delta CRLs |
+| **OCSP Responder** | ✅ Real-time status + REST API |
 | MCP Server | 🔲 Stub only |
 | A2A Protocol | 🔲 Stub only |
 | SIEM Integration | 🔲 Planned |
@@ -344,7 +361,11 @@ ta_base/
 - [ ] External agent federation
 - [ ] Webhook integrations
 
-### Phase 4: Enterprise Security
+### Phase 4: Enterprise Security (In Progress)
+- [x] **PKI infrastructure** (3-tier CA hierarchy)
+- [x] **Certificate signing & verification**
+- [x] **Certificate revocation lists (CRL)**
+- [x] **OCSP responder** (real-time status checking)
 - [ ] Key vault integration (HashiCorp, AWS KMS)
 - [ ] Field-level encryption
 - [ ] SIEM log shipping
