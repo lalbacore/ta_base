@@ -29,6 +29,14 @@ except ImportError:
     RevocationReason = None
     CRL_AVAILABLE = False
 
+# Import OCSP responder
+try:
+    from .ocsp import OCSPResponder
+    OCSP_AVAILABLE = True
+except ImportError:
+    OCSPResponder = None
+    OCSP_AVAILABLE = False
+
 
 class TrustDomain(Enum):
     """Trust domains corresponding to agent planes."""
@@ -497,3 +505,55 @@ class PKIManager:
             trust_domain=domain_str,
             limit=limit
         )
+
+    # OCSP Methods
+
+    def create_ocsp_responder(
+        self,
+        domain: TrustDomain,
+        cache_duration: int = 300
+    ) -> Optional['OCSPResponder']:
+        """
+        Create OCSP responder for a trust domain.
+
+        Args:
+            domain: Trust domain to create responder for
+            cache_duration: Response cache duration in seconds (default: 300)
+
+        Returns:
+            OCSPResponder instance, or None if OCSP unavailable
+        """
+        if not OCSP_AVAILABLE:
+            return None
+
+        # Get certificate chain for the domain
+        cert_chain = self.get_certificate_chain(domain)
+
+        # Create OCSP responder
+        responder = OCSPResponder(
+            responder_cert_pem=cert_chain['cert'],
+            responder_key_pem=cert_chain['key'],
+            crl_manager=self.crl_manager,
+            cache_duration=cache_duration
+        )
+
+        return responder
+
+    def get_ocsp_responder(
+        self,
+        domain: TrustDomain,
+        cache_duration: int = 300
+    ) -> Optional['OCSPResponder']:
+        """
+        Get or create OCSP responder for a trust domain.
+
+        This is an alias for create_ocsp_responder for consistency.
+
+        Args:
+            domain: Trust domain
+            cache_duration: Response cache duration in seconds (default: 300)
+
+        Returns:
+            OCSPResponder instance, or None if OCSP unavailable
+        """
+        return self.create_ocsp_responder(domain, cache_duration)

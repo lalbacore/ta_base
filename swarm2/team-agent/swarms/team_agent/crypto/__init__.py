@@ -5,6 +5,7 @@ Cryptography layer for Team Agent - PKI infrastructure.
 from .pki import PKIManager, TrustDomain
 from .signing import Signer, Verifier, SignedData
 from .crl import CRLManager, RevocationReason
+from .ocsp import OCSPResponder, OCSPStatus
 
 __all__ = [
     "PKIManager",
@@ -14,4 +15,6 @@ __all__ = [
     "SignedData",
     "CRLManager",
     "RevocationReason",
+    "OCSPResponder",
+    "OCSPStatus",
 ]
