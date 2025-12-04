@@ -295,13 +295,15 @@ class RoutedOrchestrator:
     def _get_capability_by_name(self, name: str) -> Optional[Any]:
         """Look up a capability by name from the registry."""
         # If registry is a CapabilityRegistry with a get method
-        if hasattr(self.registry, 'get') and callable(getattr(self.registry, 'get')):
-            return self.registry.get(name)
+        get_method = getattr(self.registry, 'get', None)
+        if callable(get_method):
+            return get_method(name)
         # If registry is an Orchestrator with capability_registry attribute
-        if hasattr(self.registry, 'capability_registry'):
-            cap_reg = self.registry.capability_registry
-            if hasattr(cap_reg, 'get') and callable(getattr(cap_reg, 'get')):
-                return cap_reg.get(name)
+        cap_reg = getattr(self.registry, 'capability_registry', None)
+        if cap_reg:
+            get_method = getattr(cap_reg, 'get', None)
+            if callable(get_method):
+                return get_method(name)
         return None
 
     def execute(self, mission: str | Dict[str, Any]) -> Dict[str, Any]:
