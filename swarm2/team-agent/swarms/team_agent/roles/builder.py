@@ -8,6 +8,14 @@ import uuid
 
 from ..tools import ToolRegistry, CodeGeneratorTool, CodeValidatorTool, CodeFormatterTool
 
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
 
 class Builder:
     """
@@ -16,11 +24,14 @@ class Builder:
     """
 
     def __init__(
-        self, 
-        name: str = "Builder", 
+        self,
+        workflow_id: str = "unknown",
+        name: str = "Builder",
         id: str = "agent_builder_001",
-        registry: Optional[ToolRegistry] = None
+        registry: Optional[ToolRegistry] = None,
+        cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        self.workflow_id = workflow_id
         self.name = name
         self.id = id
         self.metadata = {
@@ -44,7 +55,19 @@ class Builder:
         # Initialize tool registry
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
-    
+
+        # Initialize signer if cert_chain is provided
+        self.signer = None
+        if cert_chain and CRYPTO_AVAILABLE:
+            try:
+                self.signer = Signer(
+                    private_key_pem=cert_chain['key'],
+                    certificate_pem=cert_chain['cert'],
+                    signer_id="builder"
+                )
+            except Exception:
+                pass
+
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""
         if "code_generator" not in self._registry:

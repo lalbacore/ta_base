@@ -33,6 +33,9 @@ python examples/run_capability_tests.py
 
 # Run with coverage
 pytest utils/tests/ -v --cov=swarms --cov=utils
+
+# PKI system tests
+python utils/tests/test_pki.py
 ```
 
 ### Running Examples
@@ -65,6 +68,47 @@ mypy swarms/ utils/
 ```
 
 ## Architecture Overview
+
+### PKI Infrastructure (Cryptographic Trust Layer)
+
+Team Agent implements a **three-tier Public Key Infrastructure (PKI)** that provides cryptographic signing and verification across all workflow operations:
+
+**Certificate Hierarchy:**
+```
+Root CA (self-signed, 10-year validity)
+├── Government/Control Plane CA (5-year validity)
+│   └── Used by: governance.py
+├── Execution Plane CA (5-year validity)
+│   └── Used by: architect.py, builder.py, critic.py
+└── Logging/Artifact Plane CA (5-year validity)
+    └── Used by: recorder.py
+```
+
+**Trust Domains:**
+- **Government** (`TrustDomain.GOVERNMENT`): Policy enforcement and compliance
+- **Execution** (`TrustDomain.EXECUTION`): Design and implementation work
+- **Logging** (`TrustDomain.LOGGING`): Artifact publishing and audit trails
+
+**Key Files:**
+- Location: `.team_agent/pki/`
+- Root CA: `.team_agent/pki/root/root-ca.{key,crt}`
+- Intermediate CAs: `.team_agent/pki/{government,execution,logging}/{domain}-ca.{key,crt,chain.pem}`
+
+**Signing Operations:**
+- **TuringTape entries**: All workflow state transitions are signed
+- **Agent outputs**: Architect, Builder, Critic, Governance, Recorder sign their outputs
+- **Artifacts**: Published files include cryptographic signatures
+- **Logs**: Structured logs are signed for audit integrity
+
+**PKI Components:**
+- `swarms/team_agent/crypto/pki.py`: PKIManager for CA generation
+- `swarms/team_agent/crypto/signing.py`: Signer and Verifier classes
+- Orchestrator initializes PKI and distributes cert chains to roles
+
+**Testing PKI:**
+```bash
+python utils/tests/test_pki.py  # 17 comprehensive tests
+```
 
 ### Core Workflow Pattern
 ```
@@ -341,6 +385,44 @@ cat output/wf_*/wf_*_record.json | jq
 ```bash
 find . -type d -name "__pycache__" -exec rm -rf {} +
 rm -rf .pytest_cache
+```
+
+## PKI Certificate Management
+
+### Regenerating Certificates
+
+To regenerate all certificates (e.g., before open-sourcing with proper root CA):
+
+```python
+from swarms.team_agent.crypto import PKIManager
+
+# Initialize with force=True to regenerate
+pki = PKIManager()
+pki.initialize_pki(force=True)
+```
+
+### Inspecting Certificates
+
+```python
+from swarms.team_agent.crypto import PKIManager, TrustDomain
+
+pki = PKIManager()
+info = pki.get_certificate_info(TrustDomain.EXECUTION)
+print(f"Subject: {info['subject']}")
+print(f"Valid until: {info['not_after']}")
+```
+
+### Verifying Signed Data
+
+```python
+from swarms.team_agent.crypto import Verifier
+from swarms.team_agent.state.turing_tape import TuringTape
+
+# Verify all entries in a workflow tape
+tape = TuringTape(workflow_id="wf_20251204_120000")
+verifier = Verifier(chain_pem=execution_chain['chain'])
+results = tape.verify_all(verifier)
+print(f"Verified: {results['verified']}/{results['total']}")
 ```
 
 ## Common Issues

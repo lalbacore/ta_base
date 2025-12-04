@@ -17,17 +17,19 @@ class Governance(BaseRole):
     Governance role implementation.
     Uses tools for compliance checking and scoring.
     """
-    
+
     def __init__(
-        self, 
-        name: str = "Governance", 
+        self,
+        workflow_id: Optional[str] = None,
+        name: str = "Governance",
         id: str = "agent_governance_001",
-        workflow_id: Optional[str] = None, 
         policy: Optional[Dict[str, Any]] = None,
-        registry: Optional[ToolRegistry] = None
+        registry: Optional[ToolRegistry] = None,
+        cert_chain: Optional[Dict[str, bytes]] = None
     ):
-        """Initialize governance with workflow ID and tool registry."""
-        super().__init__(workflow_id)
+        """Initialize governance with workflow ID, tool registry, and cert chain."""
+        # BaseRole doesn't exist, but base_role.py does - check which one to use
+        super().__init__(workflow_id or f"wf_{int(time.time())}", cert_chain=cert_chain)
         self.name = name
         self.id = id
         self.workflow_id = workflow_id or f"wf_{int(time.time())}"
@@ -92,6 +94,10 @@ class Governance(BaseRole):
             ),
         }
         self.decisions.append(decision)
+
+        # Sign output using BaseRole's signer (inherited)
+        decision = self._sign_output(decision)
+
         return decision
 
     def run(self, context: Dict[str, Any]) -> Dict[str, Any]:

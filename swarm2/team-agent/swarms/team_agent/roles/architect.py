@@ -7,6 +7,14 @@ import uuid
 
 from ..tools import ToolRegistry, ScoringTool
 
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
 
 class Architect:
     """
@@ -15,11 +23,14 @@ class Architect:
     """
 
     def __init__(
-        self, 
-        name: str = "Architect", 
+        self,
+        workflow_id: str = "unknown",
+        name: str = "Architect",
         id: str = "agent_architect_001",
-        registry: Optional[ToolRegistry] = None
+        registry: Optional[ToolRegistry] = None,
+        cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        self.workflow_id = workflow_id
         self.name = name
         self.id = id
         self.metadata = {
@@ -39,10 +50,22 @@ class Architect:
             "describe",
             "act",
         ]
-        
+
         # Initialize tool registry
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
+
+        # Initialize signer if cert_chain is provided
+        self.signer = None
+        if cert_chain and CRYPTO_AVAILABLE:
+            try:
+                self.signer = Signer(
+                    private_key_pem=cert_chain['key'],
+                    certificate_pem=cert_chain['cert'],
+                    signer_id="architect"
+                )
+            except Exception:
+                pass
     
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""
@@ -118,7 +141,7 @@ class Architect:
             "summary": architecture.get("summary", ""),
         })
 
-        return {
+        result = {
             "status": "designed",
             "intent": intent.strip(),
             "design_id": design_id,
@@ -138,6 +161,12 @@ class Architect:
             ],
             "tools_used": ["content_scorer"],
         }
+
+        # Sign output if signer is available
+        if self.signer and CRYPTO_AVAILABLE:
+            result = self.signer.sign_dict(result)
+
+        return result
 
     def _design_architecture(self, intent: str) -> Dict[str, Any]:
         """
