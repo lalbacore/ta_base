@@ -350,6 +350,125 @@ class PKIManager:
             "not_after": cert.not_valid_after.isoformat(),
         }
 
+    def issue_certificate(
+        self,
+        domain: TrustDomain,
+        validity_days: int = 1825
+    ) -> Dict[str, Any]:
+        """
+        (Re)issue certificate for a trust domain.
+
+        This generates a new certificate with a new key pair, effectively
+        replacing the existing certificate for the domain.
+
+        Args:
+            domain: Trust domain to issue certificate for
+            validity_days: Certificate validity period in days (default: 1825 = 5 years)
+
+        Returns:
+            Dict with certificate information:
+            - serial: New certificate serial number (hex)
+            - not_before: Validity start date
+            - not_after: Validity end date
+            - subject: Certificate subject DN
+            - issuer: Certificate issuer DN
+        """
+        # Load root CA
+        with open(self.root_dir / "root-ca.key", "rb") as f:
+            root_key = serialization.load_pem_private_key(
+                f.read(),
+                password=None,
+                backend=default_backend()
+            )
+
+        with open(self.root_dir / "root-ca.crt", "rb") as f:
+            root_cert = x509.load_pem_x509_certificate(
+                f.read(),
+                backend=default_backend()
+            )
+
+        # Generate new private key
+        private_key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=default_backend()
+        )
+
+        # Create certificate signed by root CA
+        subject = x509.Name([
+            x509.NameAttribute(NameOID.COUNTRY_NAME, u"US"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Team Agent"),
+            x509.NameAttribute(
+                NameOID.COMMON_NAME,
+                f"Team Agent {domain.value.title()} CA"
+            ),
+        ])
+
+        cert = (
+            x509.CertificateBuilder()
+            .subject_name(subject)
+            .issuer_name(root_cert.subject)
+            .public_key(private_key.public_key())
+            .serial_number(x509.random_serial_number())
+            .not_valid_before(datetime.utcnow())
+            .not_valid_after(datetime.utcnow() + timedelta(days=validity_days))
+            .add_extension(
+                x509.BasicConstraints(ca=True, path_length=0),
+                critical=True,
+            )
+            .add_extension(
+                x509.KeyUsage(
+                    digital_signature=True,
+                    key_cert_sign=True,
+                    crl_sign=True,
+                    key_encipherment=False,
+                    content_commitment=False,
+                    data_encipherment=False,
+                    key_agreement=False,
+                    encipher_only=False,
+                    decipher_only=False,
+                ),
+                critical=True,
+            )
+            .add_extension(
+                x509.SubjectKeyIdentifier.from_public_key(private_key.public_key()),
+                critical=False,
+            )
+            .add_extension(
+                x509.AuthorityKeyIdentifier.from_issuer_public_key(
+                    root_cert.public_key()
+                ),
+                critical=False,
+            )
+            .sign(root_key, hashes.SHA256(), default_backend())
+        )
+
+        # Save new certificate and key
+        domain_dir = getattr(self, f"{domain.value}_dir")
+
+        key_path = domain_dir / f"{domain.value}-ca.key"
+        cert_path = domain_dir / f"{domain.value}-ca.crt"
+
+        with open(key_path, "wb") as f:
+            f.write(
+                private_key.private_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PrivateFormat.TraditionalOpenSSL,
+                    encryption_algorithm=serialization.NoEncryption()
+                )
+            )
+
+        with open(cert_path, "wb") as f:
+            f.write(cert.public_bytes(serialization.Encoding.PEM))
+
+        return {
+            "serial": format(cert.serial_number, 'x'),
+            "not_before": cert.not_valid_before,
+            "not_after": cert.not_valid_after,
+            "subject": cert.subject.rfc4514_string(),
+            "issuer": cert.issuer.rfc4514_string(),
+        }
+
     # Certificate Revocation Methods
 
     def revoke_certificate(
@@ -557,3 +676,57 @@ class PKIManager:
             OCSPResponder instance, or None if OCSP unavailable
         """
         return self.create_ocsp_responder(domain, cache_duration)
+
+    def create_lifecycle_manager(
+        self,
+        renewal_threshold_days: int = 30,
+        warning_threshold_days: int = 60,
+        critical_threshold_days: int = 7
+    ) -> 'CertificateLifecycleManager':
+        """
+        Create Certificate Lifecycle Manager for expiration monitoring and renewal.
+
+        Args:
+            renewal_threshold_days: Days before expiration to auto-renew (default: 30)
+            warning_threshold_days: Days before expiration to send warning (default: 60)
+            critical_threshold_days: Days before expiration for critical alert (default: 7)
+
+        Returns:
+            CertificateLifecycleManager instance
+        """
+        try:
+            from .lifecycle import CertificateLifecycleManager
+            return CertificateLifecycleManager(
+                pki_manager=self,
+                renewal_threshold_days=renewal_threshold_days,
+                warning_threshold_days=warning_threshold_days,
+                critical_threshold_days=critical_threshold_days
+            )
+        except ImportError:
+            logger.warning("CertificateLifecycleManager not available")
+            return None
+
+    def get_lifecycle_manager(
+        self,
+        renewal_threshold_days: int = 30,
+        warning_threshold_days: int = 60,
+        critical_threshold_days: int = 7
+    ) -> 'CertificateLifecycleManager':
+        """
+        Get or create Certificate Lifecycle Manager.
+
+        This is an alias for create_lifecycle_manager for consistency.
+
+        Args:
+            renewal_threshold_days: Days before expiration to auto-renew (default: 30)
+            warning_threshold_days: Days before expiration to send warning (default: 60)
+            critical_threshold_days: Days before expiration for critical alert (default: 7)
+
+        Returns:
+            CertificateLifecycleManager instance
+        """
+        return self.create_lifecycle_manager(
+            renewal_threshold_days=renewal_threshold_days,
+            warning_threshold_days=warning_threshold_days,
+            critical_threshold_days=critical_threshold_days
+        )
