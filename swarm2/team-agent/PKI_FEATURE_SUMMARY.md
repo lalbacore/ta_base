@@ -167,9 +167,11 @@ team-agent/
 ├── swarms/team_agent/
 │   ├── crypto/
 │   │   ├── __init__.py          # Exports
-│   │   ├── pki.py               # CA management + revocation
-│   │   ├── signing.py           # Sign/verify + CRL checking
-│   │   └── crl.py               # Certificate Revocation Lists
+│   │   ├── pki.py               # CA management + revocation + OCSP
+│   │   ├── signing.py           # Sign/verify + CRL/OCSP checking
+│   │   ├── crl.py               # Certificate Revocation Lists
+│   │   ├── ocsp.py              # OCSP Responder
+│   │   └── ocsp_api.py          # OCSP REST API
 │   ├── orchestrator.py          # PKI initialization
 │   ├── state/
 │   │   └── turing_tape.py       # Signing support
@@ -179,7 +181,8 @@ team-agent/
 │       └── builder.py           # Signing implemented (partial)
 ├── utils/tests/
 │   ├── test_pki.py              # 17 PKI tests
-│   └── test_crl.py              # 20 CRL tests
+│   ├── test_crl.py              # 20 CRL tests
+│   └── test_ocsp.py             # 15 OCSP tests
 ├── .team_agent/pki/             # Generated certificates
 │   ├── crl.db                   # CRL database
 │   ├── root/
@@ -200,7 +203,7 @@ team-agent/
 │       ├── logging-ca.crt
 │       ├── chain.pem
 │       └── crl.pem              # Generated CRL
-└── requirements.txt             # Added cryptography
+└── requirements.txt             # Added cryptography + flask
 ```
 
 ## Usage Examples
@@ -571,6 +574,288 @@ python -m pytest utils/tests/test_crl.py -v
            └─> Agent cannot start
 ```
 
+## OCSP (Online Certificate Status Protocol) System
+
+### Overview
+
+The OCSP system provides real-time certificate status checking, complementing the CRL system with:
+- Instant revocation status queries
+- Signed OCSP responses
+- Response caching for performance
+- REST API for remote checking
+- Integration with Verifier for automatic checking
+
+### Components
+
+**Created: `swarms/team_agent/crypto/ocsp.py`**
+
+- **OCSPResponder class**: Real-time certificate status responder
+  - Generate signed OCSP responses
+  - Cache responses for performance
+  - Support good/revoked/unknown status
+  - Integration with CRLManager
+
+- **OCSPStatus enum**: Certificate status values
+  - GOOD - Certificate is valid
+  - REVOKED - Certificate has been revoked
+  - UNKNOWN - Certificate status unknown
+
+**Created: `swarms/team_agent/crypto/ocsp_api.py`**
+
+- **OCSPApi class**: REST API server for OCSP
+  - HTTP endpoints for status checking
+  - JSON-based request/response
+  - Cache management endpoints
+  - Health check endpoint
+
+### OCSPResponder Features
+
+```python
+class OCSPResponder:
+    def check_certificate_status(serial_number: str) -> Tuple[OCSPStatus, Dict]
+        """Check certificate status (good/revoked/unknown)."""
+
+    def build_ocsp_response(cert_serial: int, cert_issuer: Name) -> bytes
+        """Build and sign OCSP response in DER format."""
+
+    def handle_ocsp_request(cert_serial: int, cert_issuer: Name) -> bytes
+        """Handle OCSP request with caching."""
+
+    def get_cache_stats() -> Dict
+        """Get cache statistics."""
+
+    def clear_cache()
+        """Clear all cached responses."""
+```
+
+### PKIManager Integration
+
+**Updated: `swarms/team_agent/crypto/pki.py`**
+
+Added OCSP methods:
+- `create_ocsp_responder()` - Create OCSP responder for a trust domain
+- `get_ocsp_responder()` - Get or create OCSP responder
+
+### Verifier Integration
+
+**Updated: `swarms/team_agent/crypto/signing.py`**
+
+- Verifier now accepts optional `ocsp_responder` parameter
+- Supports `prefer_ocsp` flag to prefer OCSP over CRL
+- Automatically checks OCSP before signature verification
+- Falls back to CRL if OCSP returns UNKNOWN
+
+### REST API Endpoints
+
+The OCSP API provides HTTP endpoints for certificate status checking:
+
+```
+GET  /health                - Health check and status
+POST /ocsp                  - Certificate status check (JSON)
+POST /ocsp/binary           - OCSP binary protocol (RFC 6960)
+GET  /ocsp/cache/stats      - Cache statistics
+POST /ocsp/cache/clear      - Clear response cache
+```
+
+### Usage Examples
+
+#### Create OCSP Responder
+
+```python
+from swarms.team_agent.crypto import PKIManager, TrustDomain
+
+pki = PKIManager()
+pki.initialize_pki()
+
+# Create OCSP responder for execution domain
+ocsp_responder = pki.create_ocsp_responder(
+    TrustDomain.EXECUTION,
+    cache_duration=300  # 5 minutes
+)
+
+# Check certificate status
+serial_hex = "abc123"
+status, revocation_info = ocsp_responder.check_certificate_status(serial_hex)
+
+if status == OCSPStatus.GOOD:
+    print("Certificate is valid")
+elif status == OCSPStatus.REVOKED:
+    print(f"Certificate revoked: {revocation_info['reason']}")
+else:
+    print("Certificate status unknown")
+```
+
+#### Start OCSP API Server
+
+```python
+from swarms.team_agent.crypto.ocsp_api import create_ocsp_api
+
+# Create OCSP API
+api = create_ocsp_api(
+    pki_manager=pki,
+    host="127.0.0.1",
+    port=8080,
+    cache_duration=300
+)
+
+# Run server
+api.run(debug=False)
+```
+
+#### Query OCSP API
+
+```bash
+# Check certificate status via HTTP
+curl -X POST http://localhost:8080/ocsp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "serial": "abc123",
+    "trust_domain": "execution"
+  }'
+
+# Response:
+# {
+#   "status": "good",
+#   "serial": "abc123",
+#   "trust_domain": "execution"
+# }
+
+# Get cache statistics
+curl http://localhost:8080/ocsp/cache/stats
+
+# Clear cache
+curl -X POST http://localhost:8080/ocsp/cache/clear \
+  -H "Content-Type: application/json" \
+  -d '{"trust_domain": "execution"}'
+```
+
+#### Verifier with OCSP
+
+```python
+from swarms.team_agent.crypto import Verifier, Signer
+
+# Create OCSP responder
+ocsp_responder = pki.create_ocsp_responder(TrustDomain.EXECUTION)
+
+# Create verifier with OCSP support
+verifier = Verifier(
+    chain_pem=cert_chain['chain'],
+    ocsp_responder=ocsp_responder,  # Enable OCSP checking
+    prefer_ocsp=True  # Prefer OCSP over CRL
+)
+
+# Sign data
+signer = Signer(
+    private_key_pem=cert_chain['key'],
+    certificate_pem=cert_chain['cert'],
+    signer_id="architect"
+)
+signed = signer.sign_dict({"task": "complete"})
+
+# Verify - uses OCSP for real-time revocation checking
+is_valid = verifier.verify_dict(signed)
+```
+
+#### OCSP with CRL Fallback
+
+```python
+# Verifier with both OCSP and CRL
+verifier = Verifier(
+    chain_pem=cert_chain['chain'],
+    crl_manager=pki.crl_manager,      # CRL for offline checking
+    ocsp_responder=ocsp_responder,    # OCSP for real-time checking
+    prefer_ocsp=True                  # Try OCSP first, fall back to CRL
+)
+
+# Verification flow:
+# 1. Check OCSP if available
+# 2. If OCSP returns UNKNOWN, check CRL
+# 3. If neither available, allow (but log warning)
+```
+
+#### Cache Management
+
+```python
+# Get cache statistics
+stats = ocsp_responder.get_cache_stats()
+print(f"Total entries: {stats['total_entries']}")
+print(f"Valid entries: {stats['valid_entries']}")
+print(f"Expired entries: {stats['expired_entries']}")
+
+# Clear cache
+ocsp_responder.clear_cache()
+```
+
+### OCSP Response Caching
+
+The OCSP responder implements intelligent caching:
+
+- **Default TTL**: 300 seconds (5 minutes)
+- **Automatic expiration**: Cached responses auto-expire
+- **Cache hit benefits**: Reduced CPU and database load
+- **Per-certificate caching**: Each certificate cached separately
+- **Thread-safe**: Cache operations are atomic
+
+### OCSP Testing
+
+**Created: `utils/tests/test_ocsp.py`**
+
+15 comprehensive tests covering:
+- OCSP responder creation and configuration
+- Certificate status checking (good/revoked)
+- OCSP response building and signing
+- Response caching and expiration
+- Cache statistics and management
+- PKIManager integration
+- Verifier OCSP integration
+- OCSP preference and fallback logic
+- Performance and caching benefits
+
+**All tests passing** ✅
+
+Run tests:
+```bash
+python -m pytest utils/tests/test_ocsp.py -v
+```
+
+### OCSP Workflow
+
+```
+1. Certificate Status Query
+   └─> Client queries OCSP responder
+       └─> Responder checks CRLManager for revocation
+           └─> Returns signed OCSP response (good/revoked/unknown)
+
+2. Response Caching
+   └─> First query generates and caches response
+       └─> Subsequent queries use cached response (if not expired)
+           └─> Cache miss regenerates response
+
+3. Signature Verification with OCSP
+   └─> Verifier checks OCSP before verifying signature
+       └─> If prefer_ocsp=True, check OCSP first
+           └─> If OCSP unavailable or returns UNKNOWN, fall back to CRL
+
+4. REST API Query
+   └─> HTTP POST to /ocsp with serial and trust domain
+       └─> API routes to appropriate OCSP responder
+           └─> Returns JSON response with status
+```
+
+### OCSP vs CRL
+
+| Feature | CRL | OCSP |
+|---------|-----|------|
+| **Update frequency** | Periodic (e.g., daily) | Real-time |
+| **Response size** | Large (entire list) | Small (single cert) |
+| **Latency** | Low (local file) | Medium (network query) |
+| **Scalability** | Good (static files) | Requires service |
+| **Privacy** | Better (no query tracking) | Query reveals interest |
+| **Freshness** | Stale until next update | Always current |
+| **Offline support** | Yes | No (requires responder) |
+
+**Recommendation**: Use OCSP for real-time checking when available, with CRL as fallback for offline scenarios.
+
 ## Security Considerations
 
 ### Current Implementation (Testing/Development)
@@ -602,8 +887,9 @@ python -m pytest utils/tests/test_crl.py -v
 4. **Certificate Policies:**
    - Define certificate policies (CP)
    - Implement certificate practice statement (CPS)
-   - ✅ CRL implemented - consider adding OCSP for real-time checking
-   - Monitor certificate expiration
+   - ✅ CRL implemented - offline revocation checking
+   - ✅ OCSP implemented - real-time revocation checking
+   - Monitor certificate expiration (Phase 3)
 
 ## Testing
 
@@ -616,8 +902,11 @@ python -m pytest utils/tests/test_pki.py -v
 # All CRL tests (20 tests)
 python -m pytest utils/tests/test_crl.py -v
 
-# Run all crypto tests
-python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py -v
+# All OCSP tests (15 tests)
+python -m pytest utils/tests/test_ocsp.py -v
+
+# Run all crypto tests (52 tests total)
+python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py utils/tests/test_ocsp.py -v
 
 # Specific test classes
 python -m pytest utils/tests/test_pki.py::TestPKIManager -v
@@ -625,6 +914,8 @@ python -m pytest utils/tests/test_pki.py::TestSigner -v
 python -m pytest utils/tests/test_pki.py::TestVerifier -v
 python -m pytest utils/tests/test_crl.py::TestCRLManager -v
 python -m pytest utils/tests/test_crl.py::TestVerifierRevocationChecking -v
+python -m pytest utils/tests/test_ocsp.py::TestOCSPResponder -v
+python -m pytest utils/tests/test_ocsp.py::TestVerifierWithOCSP -v
 ```
 
 ## Next Steps
@@ -660,11 +951,11 @@ python -m pytest utils/tests/test_crl.py::TestVerifierRevocationChecking -v
 - **Hardware Security Module (HSM) integration**
 - **Timestamping service** for non-repudiation
 - ✅ **Certificate revocation** - CRL system implemented (Phase 1)
-- **OCSP responder** for real-time revocation checking (Phase 2)
+- ✅ **OCSP responder** - Real-time revocation checking (Phase 2)
+- **Certificate lifecycle management** - Expiration monitoring and auto-renewal (Phase 3)
+- **Trust scoring system** - Agent behavior tracking (Phase 4)
 - **Multi-signature** support for critical operations
 - **Zero-knowledge proofs** for privacy-preserving verification
-- **Certificate expiration monitoring** and auto-renewal
-- **Trust scoring system** based on agent behavior
 
 ## Benefits
 
@@ -674,6 +965,8 @@ python -m pytest utils/tests/test_crl.py::TestVerifierRevocationChecking -v
 4. **Compliance:** Meet regulatory requirements for data integrity
 5. **Separation of Concerns:** Trust domains isolate different operational planes
 6. **Forensics:** Investigate incidents with cryptographic evidence
+7. **Real-time Revocation:** OCSP provides instant certificate status checking
+8. **Performance:** Intelligent caching reduces overhead of revocation checking
 
 ## Conclusion
 
@@ -682,11 +975,14 @@ The PKI infrastructure provides a solid foundation for trusted multi-agent opera
 - ✅ Three-tier CA hierarchy (Root + 3 Intermediate CAs)
 - ✅ Cryptographic signing and verification
 - ✅ Certificate Revocation List (CRL) system with X.509 support
-- ✅ Revocation checking in verifiers and agent initialization
-- ✅ Comprehensive test coverage (37 tests total: 17 PKI + 20 CRL)
+- ✅ OCSP (Online Certificate Status Protocol) responder with REST API
+- ✅ Revocation checking in verifiers (CRL and OCSP)
+- ✅ Agent initialization protection against revoked certificates
+- ✅ Response caching for performance optimization
+- ✅ Comprehensive test coverage (52 tests total: 17 PKI + 20 CRL + 15 OCSP)
 
 The system is production-ready for development/testing and can be upgraded to enterprise-grade security by:
 1. Replacing the auto-generated root CA with a properly managed one
-2. Implementing OCSP for real-time revocation checking
-3. Adding certificate expiration monitoring and auto-renewal
+2. Adding certificate expiration monitoring and auto-renewal (Phase 3)
+3. Implementing trust scoring system (Phase 4)
 4. Integrating with HSM for key protection

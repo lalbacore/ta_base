@@ -135,13 +135,21 @@ class Verifier:
     Used to verify data signed by agents.
     """
 
-    def __init__(self, chain_pem: bytes, crl_manager: Optional['CRLManager'] = None):
+    def __init__(
+        self,
+        chain_pem: bytes,
+        crl_manager: Optional['CRLManager'] = None,
+        ocsp_responder: Optional['OCSPResponder'] = None,
+        prefer_ocsp: bool = True
+    ):
         """
         Initialize verifier with certificate chain.
 
         Args:
             chain_pem: Certificate chain in PEM format (intermediate + root)
             crl_manager: Optional CRLManager for revocation checking
+            ocsp_responder: Optional OCSPResponder for real-time checking
+            prefer_ocsp: If True and both CRL and OCSP available, use OCSP first
         """
         # Load all certificates from chain
         self.certificates = []
@@ -157,8 +165,10 @@ class Verifier:
         # First cert is the signing cert
         self.signing_cert = self.certificates[0]
 
-        # Store CRL manager for revocation checking
+        # Store revocation checking components
         self.crl_manager = crl_manager
+        self.ocsp_responder = ocsp_responder
+        self.prefer_ocsp = prefer_ocsp
 
     def verify(self, signed_data: SignedData) -> bool:
         """
@@ -171,9 +181,21 @@ class Verifier:
             True if signature is valid, False otherwise
         """
         try:
-            # Check revocation status if CRL manager is available
-            if self.crl_manager:
-                serial_hex = format(self.signing_cert.serial_number, 'x')
+            # Check revocation status
+            serial_hex = format(self.signing_cert.serial_number, 'x')
+
+            # Prefer OCSP if available and configured
+            if self.prefer_ocsp and self.ocsp_responder:
+                from .ocsp import OCSPStatus
+                status, _ = self.ocsp_responder.check_certificate_status(serial_hex)
+                if status == OCSPStatus.REVOKED:
+                    return False
+                # If OCSP returns UNKNOWN, fall back to CRL
+                elif status == OCSPStatus.UNKNOWN and self.crl_manager:
+                    if self.crl_manager.is_revoked(serial_hex):
+                        return False
+            # Otherwise use CRL if available
+            elif self.crl_manager:
                 if self.crl_manager.is_revoked(serial_hex):
                     return False
 
