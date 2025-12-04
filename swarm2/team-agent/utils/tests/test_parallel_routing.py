@@ -102,7 +102,6 @@ class TestMissionRouter:
 
 
 class TestRoutedOrchestrator:
-    @pytest.mark.skip(reason="RoutedOrchestrator.execute has missing method _get_capability_by_name")
     def test_routed_execution_simple(self, tmp_path):
         """Test routed orchestrator with simple mission."""
         base = Orchestrator(output_dir=str(tmp_path))
@@ -112,7 +111,6 @@ class TestRoutedOrchestrator:
         result = routed.execute("Generate HRT guide")
         assert result is not None
     
-    @pytest.mark.skip(reason="RoutedOrchestrator.execute has missing method _get_capability_by_name")
     def test_routed_execution_parallel(self, tmp_path):
         """Test routed orchestrator with parallel mission."""
         base = Orchestrator(output_dir=str(tmp_path))
