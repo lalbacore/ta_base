@@ -11,13 +11,13 @@ A complete Public Key Infrastructure (PKI) has been implemented for the Team Age
 - ✅ **Phase 1: CRL System** - Certificate Revocation Lists for offline revocation checking (20 tests)
 - ✅ **Phase 2: OCSP Responder** - Real-time certificate status checking with REST API (15 tests)
 - ✅ **Phase 3: Certificate Lifecycle Management** - Expiration monitoring, auto-renewal, and rotation (24 tests)
+- ✅ **Phase 4: Trust Scoring System** - Agent reputation tracking with SQLite persistence and CLI (31 tests)
 
-**Total: 76 comprehensive tests (17 PKI + 20 CRL + 15 OCSP + 24 Lifecycle) - All passing ✅**
+**Total: 107 comprehensive tests (17 PKI + 20 CRL + 15 OCSP + 24 Lifecycle + 31 Trust) - All passing ✅**
 
 ### Planned Phases
 
-- 🔲 **Phase 4: Trust Scoring System** - Agent reputation and behavior tracking
-- 🔲 **Phase 5: Management Tools** - CLI and monitoring dashboards
+- 🔲 **Phase 5: Management Tools** - Monitoring dashboards and advanced analytics
 
 ## What Was Implemented
 
@@ -1211,6 +1211,537 @@ if expiring:
 
 ---
 
+## Phase 4: Trust Scoring System
+
+### Overview
+
+Phase 4 implements a comprehensive agent reputation tracking system that monitors agent behavior over time and calculates trust scores based on operational metrics. The system provides:
+
+- **Behavior Tracking**: Record operations (success/failure/errors)
+- **Security Monitoring**: Track security incidents, policy violations, and certificate revocations
+- **Trust Scoring**: Calculate weighted trust scores (0-100) based on multiple factors
+- **Persistence**: SQLite database for historical data and trends
+- **CLI Tool**: Command-line interface for reputation management
+- **Historical Analysis**: Track trust scores over time
+
+**Use Case**: Enable policy-based agent selection, automated trust decisions, and security incident response based on agent reputation.
+
+### Implementation
+
+**Created: `swarms/team_agent/crypto/trust.py`**
+
+Core components:
+
+#### EventType Enum
+
+```python
+class EventType(Enum):
+    """Agent event types for reputation tracking."""
+    OPERATION_SUCCESS = "operation_success"      # Successful operation
+    OPERATION_FAILURE = "operation_failure"      # Operation failed
+    OPERATION_ERROR = "operation_error"          # Operation error
+    CERTIFICATE_REVOKED = "certificate_revoked"  # Certificate revoked
+    POLICY_VIOLATION = "policy_violation"        # Policy violated
+    SECURITY_INCIDENT = "security_incident"      # Security incident
+    UPTIME_START = "uptime_start"                # Agent started
+    UPTIME_END = "uptime_end"                    # Agent stopped
+```
+
+#### TrustMetrics Dataclass
+
+```python
+@dataclass
+class TrustMetrics:
+    """Trust metrics for an agent."""
+    agent_id: str
+    total_operations: int
+    successful_operations: int
+    failed_operations: int
+    error_operations: int
+    security_incidents: int
+    certificate_revocations: int
+    policy_violations: int
+    total_uptime_seconds: float
+    average_response_time: float
+    last_seen: datetime
+    trust_score: float
+
+    @property
+    def success_rate(self) -> float:
+        """Calculate success rate percentage (0-100)."""
+
+    @property
+    def error_rate(self) -> float:
+        """Calculate error rate percentage (0-100)."""
+
+    @property
+    def failure_rate(self) -> float:
+        """Calculate failure rate percentage (0-100)."""
+```
+
+#### AgentReputationTracker Class
+
+```python
+class AgentReputationTracker:
+    """
+    Agent Reputation Tracker for PKI trust scoring.
+
+    Features:
+    - Track agent operations (success/failure/error)
+    - Record security incidents and policy violations
+    - Calculate trust scores based on weighted metrics
+    - Persist reputation data to SQLite
+    - Query historical trust data
+    - CLI integration
+    """
+
+    # Default weights for trust score calculation
+    DEFAULT_WEIGHTS = {
+        'success_rate': 0.40,      # 40% weight
+        'error_rate': 0.20,        # 20% weight (inverted)
+        'security': 0.25,          # 25% weight
+        'uptime': 0.15,            # 15% weight
+    }
+
+    def __init__(self, db_path: Optional[Path] = None, weights: Optional[Dict[str, float]] = None)
+    def register_agent(self, agent_id: str) -> bool
+    def record_event(self, agent_id: str, event_type: EventType, metadata: Optional[Dict], response_time: Optional[float])
+    def get_agent_metrics(self, agent_id: str) -> Optional[TrustMetrics]
+    def list_all_agents(self) -> List[TrustMetrics]
+    def get_trust_history(self, agent_id: str, limit: Optional[int]) -> List[Dict]
+    def get_recent_events(self, agent_id: str, limit: int = 100) -> List[Dict]
+    def delete_agent(self, agent_id: str) -> bool
+    def get_statistics(self) -> Dict[str, Any]
+```
+
+**Database Schema:**
+- `agents` table: Core metrics and current trust score
+- `events` table: Detailed event history with metadata
+- `trust_history` table: Historical trust score snapshots
+
+**Storage**: `~/.team_agent/trust.db` (SQLite)
+
+### Trust Score Calculation
+
+Trust scores range from 0-100 and are calculated using a weighted formula:
+
+```
+trust_score = (success_score × 0.40) +
+              (error_score × 0.20) +
+              (security_score × 0.25) +
+              (uptime_score × 0.15)
+
+Where:
+  success_score = (successful_operations / total_operations) × 100
+  error_score = 100 - (error_operations / total_operations) × 100
+  security_score = 100 - (security_incidents / 10) × 100
+  uptime_score = 100 (simplified, can be enhanced)
+```
+
+**Score Interpretation:**
+- 90-100: EXCELLENT - Highly trusted agent
+- 75-89: GOOD - Reliable agent
+- 60-74: FAIR - Acceptable with monitoring
+- 40-59: POOR - Requires review
+- 0-39: CRITICAL - Immediate action required
+
+**Customizable Weights:**
+
+```python
+# Custom weighting for security-focused environments
+custom_weights = {
+    'success_rate': 0.30,
+    'error_rate': 0.15,
+    'security': 0.45,      # Higher security weight
+    'uptime': 0.10,
+}
+
+tracker = AgentReputationTracker(weights=custom_weights)
+```
+
+### CLI Tool
+
+**Created: `scripts/pki_trust_cli.py`**
+
+Command-line interface for managing agent reputation and trust scores.
+
+#### Commands
+
+**1. List All Agents**
+```bash
+python scripts/pki_trust_cli.py list
+```
+
+Output:
+```
+Agent ID                       Trust Score  Operations   Success Rate    Incidents
+===============================================================================================
+architect-agent                     95.40          120       98.3%              0
+builder-agent                       87.50          350       92.0%              1
+critic-agent                        76.80           85       85.0%              3
+```
+
+**2. Show Detailed Metrics**
+```bash
+python scripts/pki_trust_cli.py show architect-agent
+```
+
+Output:
+```
+============================================================
+Agent: architect-agent
+============================================================
+
+Trust Score:        95.40 / 100.0 (EXCELLENT)
+Last Seen:          2025-01-15 14:23:45
+
+Operations:
+  Total:            120
+  Successful:       118 (98.3%)
+  Failed:           1 (0.8%)
+  Errors:           1 (0.8%)
+
+Security:
+  Incidents:        0
+  Cert Revocations: 0
+  Policy Violations: 0
+
+Performance:
+  Avg Response Time: 0.345s
+  Total Uptime:     12345.6s
+```
+
+**3. View Trust Score History**
+```bash
+python scripts/pki_trust_cli.py history architect-agent --limit 10
+```
+
+Output:
+```
+Timestamp            Trust Score     Success Rate    Error Rate
+======================================================================
+2025-01-15 14:23:45      95.40           98.3%          0.8%
+2025-01-15 13:15:22      94.80           97.5%          1.2%
+2025-01-15 12:05:10      93.20           96.0%          2.0%
+```
+
+**4. View Recent Events**
+```bash
+python scripts/pki_trust_cli.py events architect-agent --limit 20
+```
+
+**5. Register New Agent**
+```bash
+python scripts/pki_trust_cli.py register new-agent
+```
+
+**6. Record Events**
+```bash
+# Record successful operation
+python scripts/pki_trust_cli.py record architect-agent operation-success --response-time 0.5
+
+# Record security incident with metadata
+python scripts/pki_trust_cli.py record bad-agent security-incident --metadata reason=unauthorized
+
+# Record operation error
+python scripts/pki_trust_cli.py record builder-agent operation-error --response-time 2.5
+```
+
+**7. Delete Agent**
+```bash
+# With confirmation prompt
+python scripts/pki_trust_cli.py delete old-agent
+
+# Force deletion
+python scripts/pki_trust_cli.py delete old-agent --force
+```
+
+**8. System Statistics**
+```bash
+python scripts/pki_trust_cli.py stats
+```
+
+Output:
+```
+System Statistics
+==================================================
+Total Agents:          15
+Average Trust Score:   82.45
+Min Trust Score:       45.20
+Max Trust Score:       98.75
+Total Operations:      2,450
+Security Incidents:    8
+```
+
+### Usage Examples
+
+#### Basic Tracking
+
+```python
+from swarms.team_agent.crypto import AgentReputationTracker, EventType
+
+# Create tracker
+tracker = AgentReputationTracker()
+
+# Register agent
+tracker.register_agent("architect-agent")
+
+# Record successful operations
+for i in range(10):
+    tracker.record_event(
+        agent_id="architect-agent",
+        event_type=EventType.OPERATION_SUCCESS,
+        response_time=0.5
+    )
+
+# Record a failure
+tracker.record_event(
+    agent_id="architect-agent",
+    event_type=EventType.OPERATION_FAILURE,
+    metadata={"reason": "timeout", "task_id": "task-123"}
+)
+
+# Get current metrics
+metrics = tracker.get_agent_metrics("architect-agent")
+print(f"Trust Score: {metrics.trust_score:.2f}")
+print(f"Success Rate: {metrics.success_rate:.1f}%")
+```
+
+#### Security Incident Handling
+
+```python
+# Record security incident
+tracker.record_event(
+    agent_id="suspicious-agent",
+    event_type=EventType.SECURITY_INCIDENT,
+    metadata={
+        "type": "unauthorized_access",
+        "resource": "/admin/config",
+        "timestamp": "2025-01-15T14:23:45Z"
+    }
+)
+
+# Check trust score
+metrics = tracker.get_agent_metrics("suspicious-agent")
+if metrics.trust_score < 50.0:
+    print("ALERT: Agent trust score critically low!")
+    print(f"Security Incidents: {metrics.security_incidents}")
+```
+
+#### Certificate Revocation Impact
+
+```python
+# Record certificate revocation
+tracker.record_event(
+    agent_id="compromised-agent",
+    event_type=EventType.CERTIFICATE_REVOKED,
+    metadata={"reason": "key_compromise", "cert_serial": "ABC123"}
+)
+
+# Certificate revocations count as security incidents
+metrics = tracker.get_agent_metrics("compromised-agent")
+print(f"Trust Score: {metrics.trust_score:.2f}")
+print(f"Cert Revocations: {metrics.certificate_revocations}")
+print(f"Security Incidents: {metrics.security_incidents}")
+```
+
+#### Historical Analysis
+
+```python
+# Get trust score history
+history = tracker.get_trust_history("architect-agent", limit=30)
+
+for record in history:
+    print(f"{record['timestamp']}: {record['trust_score']:.2f} "
+          f"(Success: {record['success_rate']:.1f}%)")
+
+# Get recent events
+events = tracker.get_recent_events("architect-agent", limit=50)
+
+for event in events:
+    print(f"{event['timestamp']}: {event['event_type']} - {event['metadata']}")
+```
+
+#### Policy-Based Agent Selection
+
+```python
+# Select agents based on trust score
+tracker = AgentReputationTracker()
+agents = tracker.list_all_agents()
+
+# Filter for highly trusted agents
+trusted_agents = [a for a in agents if a.trust_score >= 80.0]
+
+print("Trusted agents for critical task:")
+for agent in trusted_agents:
+    print(f"  {agent.agent_id}: {agent.trust_score:.2f} "
+          f"({agent.total_operations} ops, "
+          f"{agent.success_rate:.1f}% success)")
+```
+
+#### Integration with Orchestrator
+
+```python
+from swarms.team_agent.crypto import AgentReputationTracker, EventType
+
+class TrustedOrchestrator:
+    def __init__(self):
+        self.tracker = AgentReputationTracker()
+
+    def execute_role(self, role_name: str, task: Dict):
+        """Execute role and track reputation."""
+        try:
+            # Execute task
+            result = self._run_role(role_name, task)
+
+            # Record success
+            self.tracker.record_event(
+                agent_id=role_name,
+                event_type=EventType.OPERATION_SUCCESS,
+                response_time=result.get('duration')
+            )
+
+            return result
+
+        except Exception as e:
+            # Record error
+            self.tracker.record_event(
+                agent_id=role_name,
+                event_type=EventType.OPERATION_ERROR,
+                metadata={"error": str(e), "task": task.get('id')}
+            )
+            raise
+
+    def get_best_agent(self, capability: str) -> str:
+        """Select agent with highest trust score for capability."""
+        agents = self.tracker.list_all_agents()
+
+        # Filter by capability and trust score
+        candidates = [a for a in agents if a.trust_score >= 75.0]
+
+        if not candidates:
+            raise ValueError("No trusted agents available")
+
+        # Return agent with highest trust score
+        return max(candidates, key=lambda a: a.trust_score).agent_id
+```
+
+### Best Practices
+
+1. **Regular Monitoring:**
+   - Use `pki-trust list` to review agent trust scores daily
+   - Set up automated alerts for agents with scores < 60.0
+   - Review security incidents immediately
+
+2. **Event Recording:**
+   - Record all operations (success, failure, error)
+   - Include meaningful metadata for debugging
+   - Track response times for performance analysis
+
+3. **Trust Thresholds:**
+   - Define minimum trust scores for different task types
+   - Critical tasks: Require trust_score >= 90.0
+   - Standard tasks: Require trust_score >= 75.0
+   - Low-risk tasks: Require trust_score >= 60.0
+
+4. **Incident Response:**
+   - Investigate agents with trust_score < 50.0
+   - Review recent events for patterns
+   - Consider certificate revocation for compromised agents
+
+5. **Historical Analysis:**
+   - Track trust score trends over time
+   - Identify agents with declining trust scores
+   - Correlate trust changes with system events
+
+6. **Custom Weights:**
+   - Adjust weights based on operational priorities
+   - Security-critical: Increase security weight to 0.40+
+   - Performance-critical: Increase success_rate weight
+   - Test weight changes on historical data
+
+### Trust Scoring Testing
+
+**Created: `utils/tests/test_trust.py`**
+
+31 comprehensive tests covering:
+- Agent registration and metrics retrieval
+- Event recording for all event types
+- Trust score calculation with various scenarios
+- Weighted score customization
+- Agent management (list, delete, statistics)
+- Trust score history tracking
+- Event history with metadata
+- Average response time calculation
+- Integration testing (full lifecycle)
+
+**All tests passing** ✅
+
+Run tests:
+```bash
+# All trust tests (31 tests)
+python -m pytest utils/tests/test_trust.py -v
+
+# Specific test classes
+python -m pytest utils/tests/test_trust.py::TestAgentReputationTracker -v
+python -m pytest utils/tests/test_trust.py::TestTrustScoreCalculation -v
+python -m pytest utils/tests/test_trust.py::TestAgentMetrics -v
+python -m pytest utils/tests/test_trust.py::TestAgentManagement -v
+python -m pytest utils/tests/test_trust.py::TestTrustHistory -v
+python -m pytest utils/tests/test_trust.py::TestEventHistory -v
+python -m pytest utils/tests/test_trust.py::TestIntegration -v
+```
+
+### Integration with PKI System
+
+The trust scoring system integrates with existing PKI components:
+
+```python
+from swarms.team_agent.crypto import (
+    PKIManager, AgentReputationTracker, EventType, TrustDomain
+)
+
+# Initialize PKI and trust tracker
+pki = PKIManager()
+pki.initialize_pki()
+tracker = AgentReputationTracker()
+
+# Generate certificate for agent
+cert_chain = pki.generate_certificate_chain(
+    common_name="architect-agent",
+    trust_domain=TrustDomain.EXECUTION
+)
+
+# Register agent in trust system
+tracker.register_agent("architect-agent")
+
+# Monitor certificate revocations
+def on_certificate_revoked(agent_id: str, cert_serial: str):
+    """Handle certificate revocation."""
+    tracker.record_event(
+        agent_id=agent_id,
+        event_type=EventType.CERTIFICATE_REVOKED,
+        metadata={"cert_serial": cert_serial}
+    )
+
+    # Check if trust score dropped below threshold
+    metrics = tracker.get_agent_metrics(agent_id)
+    if metrics.trust_score < 50.0:
+        print(f"ALERT: {agent_id} trust score critical after revocation!")
+
+# Policy violations affect trust score
+def enforce_policy(agent_id: str, policy: str):
+    """Enforce policy and track violations."""
+    if not check_policy(agent_id, policy):
+        tracker.record_event(
+            agent_id=agent_id,
+            event_type=EventType.POLICY_VIOLATION,
+            metadata={"policy": policy}
+        )
+```
+
+---
+
 ## Security Considerations
 
 ### Current Implementation (Testing/Development)
@@ -1263,8 +1794,11 @@ python -m pytest utils/tests/test_ocsp.py -v
 # All Lifecycle tests (24 tests)
 python -m pytest utils/tests/test_lifecycle.py -v
 
-# Run all crypto tests (76 tests total)
-python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py utils/tests/test_ocsp.py utils/tests/test_lifecycle.py -v
+# All Trust tests (31 tests)
+python -m pytest utils/tests/test_trust.py -v
+
+# Run all crypto tests (107 tests total)
+python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py utils/tests/test_ocsp.py utils/tests/test_lifecycle.py utils/tests/test_trust.py -v
 
 # Specific test classes
 python -m pytest utils/tests/test_pki.py::TestPKIManager -v
@@ -1277,6 +1811,9 @@ python -m pytest utils/tests/test_ocsp.py::TestVerifierWithOCSP -v
 python -m pytest utils/tests/test_lifecycle.py::TestCertificateLifecycleManager -v
 python -m pytest utils/tests/test_lifecycle.py::TestLifecycleNotifications -v
 python -m pytest utils/tests/test_lifecycle.py::TestLifecycleIntegration -v
+python -m pytest utils/tests/test_trust.py::TestAgentReputationTracker -v
+python -m pytest utils/tests/test_trust.py::TestTrustScoreCalculation -v
+python -m pytest utils/tests/test_trust.py::TestAgentManagement -v
 ```
 
 ## Next Steps
@@ -1328,6 +1865,8 @@ python -m pytest utils/tests/test_lifecycle.py::TestLifecycleIntegration -v
 6. **Forensics:** Investigate incidents with cryptographic evidence
 7. **Real-time Revocation:** OCSP provides instant certificate status checking
 8. **Performance:** Intelligent caching reduces overhead of revocation checking
+9. **Automated Certificate Management:** Lifecycle management prevents certificate expiration incidents
+10. **Reputation-Based Trust:** Agent behavior tracking enables policy-based decisions and security response
 
 ## Conclusion
 
@@ -1337,13 +1876,17 @@ The PKI infrastructure provides a solid foundation for trusted multi-agent opera
 - ✅ Cryptographic signing and verification
 - ✅ Certificate Revocation List (CRL) system with X.509 support
 - ✅ OCSP (Online Certificate Status Protocol) responder with REST API
+- ✅ Certificate Lifecycle Management with expiration monitoring and auto-renewal
+- ✅ Trust Scoring System with agent reputation tracking and CLI
 - ✅ Revocation checking in verifiers (CRL and OCSP)
 - ✅ Agent initialization protection against revoked certificates
 - ✅ Response caching for performance optimization
-- ✅ Comprehensive test coverage (52 tests total: 17 PKI + 20 CRL + 15 OCSP)
+- ✅ Comprehensive test coverage (107 tests: 17 PKI + 20 CRL + 15 OCSP + 24 Lifecycle + 31 Trust)
+
+### Production Readiness
 
 The system is production-ready for development/testing and can be upgraded to enterprise-grade security by:
 1. Replacing the auto-generated root CA with a properly managed one
-2. Adding certificate expiration monitoring and auto-renewal (Phase 3)
-3. Implementing trust scoring system (Phase 4)
-4. Integrating with HSM for key protection
+2. Integrating with HSM for key protection
+3. Implementing distributed trust scoring across multi-node deployments
+4. Adding advanced analytics and monitoring dashboards (Phase 5)
