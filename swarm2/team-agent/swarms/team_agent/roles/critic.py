@@ -9,6 +9,14 @@ import uuid
 
 from ..tools import ToolRegistry, ReviewTool, ScoringTool, CodeValidatorTool
 
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
 
 class Critic:
     """
@@ -17,11 +25,14 @@ class Critic:
     """
 
     def __init__(
-        self, 
-        name: str = "Critic", 
+        self,
+        workflow_id: str = "unknown",
+        name: str = "Critic",
         id: str = "agent_critic_001",
-        registry: Optional[ToolRegistry] = None
+        registry: Optional[ToolRegistry] = None,
+        cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        self.workflow_id = workflow_id
         self.name = name
         self.id = id
         self.metadata = {
@@ -47,7 +58,19 @@ class Critic:
         # Initialize tool registry
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
-    
+
+        # Initialize signer if cert_chain is provided
+        self.signer = None
+        if cert_chain and CRYPTO_AVAILABLE:
+            try:
+                self.signer = Signer(
+                    private_key_pem=cert_chain['key'],
+                    certificate_pem=cert_chain['cert'],
+                    signer_id="critic"
+                )
+            except Exception:
+                pass
+
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""
         if "code_reviewer" not in self._registry:
@@ -189,6 +212,11 @@ class Critic:
         }
 
         self.reviews.append(review)
+
+        # Sign output if signer is available
+        if self.signer and CRYPTO_AVAILABLE:
+            review = self.signer.sign_dict(review)
+
         return review
 
     def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
