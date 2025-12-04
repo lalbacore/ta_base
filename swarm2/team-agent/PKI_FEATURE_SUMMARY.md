@@ -4,6 +4,21 @@
 
 A complete Public Key Infrastructure (PKI) has been implemented for the Team Agent framework, providing cryptographic signing and verification across all workflow operations.
 
+## Implementation Status
+
+### Completed Phases
+
+- ✅ **Phase 1: CRL System** - Certificate Revocation Lists for offline revocation checking (20 tests)
+- ✅ **Phase 2: OCSP Responder** - Real-time certificate status checking with REST API (15 tests)
+- ✅ **Phase 3: Certificate Lifecycle Management** - Expiration monitoring, auto-renewal, and rotation (24 tests)
+
+**Total: 76 comprehensive tests (17 PKI + 20 CRL + 15 OCSP + 24 Lifecycle) - All passing ✅**
+
+### Planned Phases
+
+- 🔲 **Phase 4: Trust Scoring System** - Agent reputation and behavior tracking
+- 🔲 **Phase 5: Management Tools** - CLI and monitoring dashboards
+
 ## What Was Implemented
 
 ### 1. PKI Infrastructure (`swarms/team_agent/crypto/`)
@@ -856,6 +871,346 @@ python -m pytest utils/tests/test_ocsp.py -v
 
 **Recommendation**: Use OCSP for real-time checking when available, with CRL as fallback for offline scenarios.
 
+---
+
+## Phase 3: Certificate Lifecycle Management
+
+The Certificate Lifecycle Manager automates certificate expiration monitoring, renewal, and rotation to ensure continuous PKI operations without manual intervention.
+
+### Overview
+
+**CertificateLifecycleManager** provides:
+- **Expiration Monitoring**: Track certificate expiration dates across all trust domains
+- **Automatic Renewal**: Auto-renew certificates before expiration
+- **Certificate Rotation**: Generate new certificates with new key pairs
+- **Notification System**: Configurable alerts for expiring certificates
+- **Event Logging**: Complete audit trail of lifecycle operations
+
+### Core Components
+
+#### CertificateLifecycleManager
+
+```python
+from swarms.team_agent.crypto import CertificateLifecycleManager, TrustDomain
+
+# Create lifecycle manager
+lifecycle = pki.create_lifecycle_manager(
+    renewal_threshold_days=30,   # Auto-renew within 30 days of expiry
+    warning_threshold_days=60,   # Send warnings at 60 days
+    critical_threshold_days=7    # Critical alerts at 7 days
+)
+```
+
+#### CertificateStatus Enum
+
+Certificate lifecycle states:
+- **VALID**: Certificate is valid and not expiring soon
+- **EXPIRING_SOON**: Certificate expires within threshold
+- **EXPIRED**: Certificate has expired
+- **RENEWED**: Certificate has been renewed
+- **ROTATED**: Certificate has been rotated with new key
+
+#### NotificationLevel Enum
+
+Alert severity levels:
+- **INFO**: Informational notifications
+- **WARNING**: Warning alerts (approaching expiration)
+- **CRITICAL**: Critical alerts (imminent expiration)
+
+### Usage Examples
+
+#### Basic Expiration Monitoring
+
+```python
+from swarms.team_agent.crypto import PKIManager, TrustDomain
+
+# Initialize PKI
+pki = PKIManager()
+pki.initialize_pki()
+
+# Create lifecycle manager
+lifecycle = pki.create_lifecycle_manager()
+
+# Check single certificate expiration
+expiry_date = lifecycle.get_certificate_expiration(TrustDomain.EXECUTION)
+print(f"Certificate expires: {expiry_date}")
+
+# Get detailed certificate information
+cert_info = lifecycle.get_certificate_info(TrustDomain.EXECUTION)
+print(f"Domain: {cert_info['domain']}")
+print(f"Serial: {cert_info['serial']}")
+print(f"Days until expiry: {cert_info['days_until_expiry']}")
+print(f"Status: {cert_info['status']}")
+
+# Check all certificates
+all_status = lifecycle.get_all_certificate_status()
+for cert in all_status:
+    print(f"{cert['domain']}: {cert['days_until_expiry']} days remaining")
+```
+
+#### Check for Expiring Certificates
+
+```python
+# Check for certificates expiring within threshold
+expiring = lifecycle.check_expiring_certificates(threshold_days=30)
+
+for cert in expiring:
+    print(f"⚠️  {cert['domain']} expires in {cert['days_until_expiry']} days")
+    print(f"   Serial: {cert['serial']}")
+    print(f"   Expires: {cert['not_after']}")
+```
+
+#### Manual Certificate Renewal
+
+```python
+# Renew a specific certificate
+renewal_info = lifecycle.renew_certificate(
+    domain=TrustDomain.EXECUTION,
+    validity_days=365  # New validity period
+)
+
+print(f"Renewed {renewal_info['domain']}")
+print(f"Old serial: {renewal_info['old_serial']}")
+print(f"New serial: {renewal_info['new_serial']}")
+print(f"New expiry: {renewal_info['new_expiry']}")
+```
+
+#### Certificate Rotation
+
+```python
+# Rotate certificate with new key pair
+rotation_info = lifecycle.rotate_certificate(
+    domain=TrustDomain.GOVERNMENT,
+    validity_days=730  # 2 years
+)
+
+print(f"Rotated {rotation_info['domain']}")
+print(f"Key rotated: {rotation_info['key_rotated']}")
+print(f"Old serial: {rotation_info['old_serial']}")
+print(f"New serial: {rotation_info['new_serial']}")
+```
+
+#### Automatic Renewal
+
+```python
+# Dry-run: Check what would be renewed
+renewals = lifecycle.auto_renew_expiring_certificates(dry_run=True)
+for renewal in renewals:
+    print(f"Would renew: {renewal['domain']} ({renewal['days_until_expiry']} days)")
+
+# Actually renew expiring certificates
+renewals = lifecycle.auto_renew_expiring_certificates(dry_run=False)
+for renewal in renewals:
+    print(f"✅ Renewed {renewal['domain']}")
+    print(f"   New serial: {renewal['new_serial']}")
+```
+
+#### Notification System
+
+```python
+# Define notification handler
+def email_notification_handler(notification):
+    """Send email alerts for lifecycle events."""
+    event = notification['event']
+    level = notification['level']
+    data = notification['data']
+
+    if level == 'critical':
+        subject = f"🚨 CRITICAL: Certificate expiring soon"
+    elif level == 'warning':
+        subject = f"⚠️  WARNING: Certificate expiration warning"
+    else:
+        subject = f"ℹ️  INFO: Certificate lifecycle event"
+
+    print(f"{subject}: {event}")
+    print(f"Data: {data}")
+    # send_email(subject, data)  # Your email implementation
+
+# Register notification handler
+lifecycle.add_notification_handler(email_notification_handler)
+
+# Notifications are sent automatically on:
+# - Certificate renewal
+# - Certificate rotation
+# - Expiration warnings
+lifecycle.check_and_notify_expiring()
+```
+
+#### Event Logging
+
+```python
+# Get all lifecycle events
+events = lifecycle.get_event_log()
+for event in events:
+    print(f"{event['timestamp']}: {event['event']}")
+    print(f"  Data: {event['data']}")
+
+# Filter by event type
+renewals = lifecycle.get_event_log(event_type="certificate_renewed")
+rotations = lifecycle.get_event_log(event_type="certificate_rotated")
+
+# Limit results
+recent_events = lifecycle.get_event_log(limit=10)
+```
+
+### Automated Monitoring
+
+#### Scheduled Monitoring Script
+
+```python
+#!/usr/bin/env python3
+"""
+Certificate lifecycle monitoring daemon.
+
+Run this script periodically (e.g., daily via cron) to:
+- Check for expiring certificates
+- Send notifications
+- Auto-renew certificates
+"""
+
+import logging
+from swarms.team_agent.crypto import PKIManager
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def monitor_certificates():
+    """Monitor and manage certificate lifecycle."""
+    # Initialize PKI and lifecycle manager
+    pki = PKIManager()
+    lifecycle = pki.create_lifecycle_manager(
+        renewal_threshold_days=30,
+        warning_threshold_days=60,
+        critical_threshold_days=7
+    )
+
+    # Register notification handler
+    def log_notification(notification):
+        level = notification['level'].upper()
+        event = notification['event']
+        data = notification['data']
+        logger.log(
+            getattr(logging, level, logging.INFO),
+            f"{event}: {data}"
+        )
+
+    lifecycle.add_notification_handler(log_notification)
+
+    # Check for expiring certificates and send notifications
+    logger.info("Checking certificate expiration status...")
+    lifecycle.check_and_notify_expiring()
+
+    # Auto-renew certificates expiring within threshold
+    logger.info("Checking for auto-renewal candidates...")
+    renewals = lifecycle.auto_renew_expiring_certificates(dry_run=False)
+
+    if renewals:
+        logger.info(f"Auto-renewed {len(renewals)} certificates")
+        for renewal in renewals:
+            logger.info(f"  - {renewal['domain']}: {renewal['new_serial']}")
+    else:
+        logger.info("No certificates require renewal")
+
+if __name__ == "__main__":
+    monitor_certificates()
+```
+
+#### Cron Job Setup
+
+```bash
+# Run certificate monitoring daily at 2 AM
+0 2 * * * /usr/bin/python3 /path/to/monitor_certificates.py >> /var/log/cert_monitor.log 2>&1
+```
+
+### Renewal vs. Rotation
+
+**Certificate Renewal:**
+- Generates new certificate with **new validity period**
+- Implementation note: Currently generates new key pair (same as rotation)
+- Use for: Regular expiration renewal
+
+**Certificate Rotation:**
+- Generates new certificate with **new key pair**
+- Complete cryptographic refresh
+- Use for: Security incidents, key compromise, periodic security hardening
+
+### Best Practices
+
+1. **Set Appropriate Thresholds:**
+   ```python
+   lifecycle = pki.create_lifecycle_manager(
+       renewal_threshold_days=30,   # Auto-renew 30 days before expiry
+       warning_threshold_days=60,   # Warning at 60 days
+       critical_threshold_days=7    # Critical alert at 7 days
+   )
+   ```
+
+2. **Monitor Regularly:**
+   - Run `check_and_notify_expiring()` daily via cron
+   - Review event logs periodically
+   - Set up proper notification handlers (email, Slack, PagerDuty)
+
+3. **Test Auto-Renewal:**
+   - Use `dry_run=True` to preview renewals
+   - Test notification handlers before production
+   - Verify renewed certificates work with existing systems
+
+4. **Plan for Rotation:**
+   - Schedule periodic key rotation (e.g., annually)
+   - Update all systems that use rotated certificates
+   - Maintain grace period for old certificates
+
+5. **Event Auditing:**
+   - Review lifecycle event logs regularly
+   - Track all renewals and rotations
+   - Integrate with SIEM for security monitoring
+
+### Lifecycle Testing
+
+Run the comprehensive lifecycle test suite:
+
+```bash
+# All lifecycle tests (24 tests)
+python -m pytest utils/tests/test_lifecycle.py -v
+
+# Specific test classes
+python -m pytest utils/tests/test_lifecycle.py::TestCertificateLifecycleManager -v
+python -m pytest utils/tests/test_lifecycle.py::TestLifecycleNotifications -v
+python -m pytest utils/tests/test_lifecycle.py::TestLifecycleEventLog -v
+python -m pytest utils/tests/test_lifecycle.py::TestLifecycleIntegration -v
+```
+
+### Integration with PKI System
+
+The lifecycle manager integrates seamlessly with existing PKI components:
+
+```python
+# Complete PKI workflow with lifecycle management
+pki = PKIManager()
+pki.initialize_pki()
+
+# Create all managers
+crl_manager = pki.crl_manager
+ocsp_responder = pki.create_ocsp_responder(TrustDomain.EXECUTION)
+lifecycle_manager = pki.create_lifecycle_manager()
+
+# Monitor and maintain certificates
+lifecycle_manager.check_and_notify_expiring()
+expiring = lifecycle_manager.check_expiring_certificates(threshold_days=30)
+
+if expiring:
+    # Auto-renew expiring certificates
+    renewals = lifecycle_manager.auto_renew_expiring_certificates()
+
+    # Update CRL and OCSP after renewal
+    for renewal in renewals:
+        # New certificates are automatically available
+        # OCSP responder will cache new status
+        pass
+```
+
+---
+
 ## Security Considerations
 
 ### Current Implementation (Testing/Development)
@@ -905,8 +1260,11 @@ python -m pytest utils/tests/test_crl.py -v
 # All OCSP tests (15 tests)
 python -m pytest utils/tests/test_ocsp.py -v
 
-# Run all crypto tests (52 tests total)
-python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py utils/tests/test_ocsp.py -v
+# All Lifecycle tests (24 tests)
+python -m pytest utils/tests/test_lifecycle.py -v
+
+# Run all crypto tests (76 tests total)
+python -m pytest utils/tests/test_pki.py utils/tests/test_crl.py utils/tests/test_ocsp.py utils/tests/test_lifecycle.py -v
 
 # Specific test classes
 python -m pytest utils/tests/test_pki.py::TestPKIManager -v
@@ -916,6 +1274,9 @@ python -m pytest utils/tests/test_crl.py::TestCRLManager -v
 python -m pytest utils/tests/test_crl.py::TestVerifierRevocationChecking -v
 python -m pytest utils/tests/test_ocsp.py::TestOCSPResponder -v
 python -m pytest utils/tests/test_ocsp.py::TestVerifierWithOCSP -v
+python -m pytest utils/tests/test_lifecycle.py::TestCertificateLifecycleManager -v
+python -m pytest utils/tests/test_lifecycle.py::TestLifecycleNotifications -v
+python -m pytest utils/tests/test_lifecycle.py::TestLifecycleIntegration -v
 ```
 
 ## Next Steps
@@ -942,8 +1303,8 @@ python -m pytest utils/tests/test_ocsp.py::TestVerifierWithOCSP -v
    - Audit trail reports
 
 5. **Key Management:**
-   - Implement key rotation
-   - Add certificate expiration monitoring
+   - ✅ Certificate expiration monitoring - Implemented (Phase 3)
+   - ✅ Certificate rotation - Implemented (Phase 3)
    - Create key backup/recovery procedures
 
 ### Optional Enhancements
@@ -952,7 +1313,7 @@ python -m pytest utils/tests/test_ocsp.py::TestVerifierWithOCSP -v
 - **Timestamping service** for non-repudiation
 - ✅ **Certificate revocation** - CRL system implemented (Phase 1)
 - ✅ **OCSP responder** - Real-time revocation checking (Phase 2)
-- **Certificate lifecycle management** - Expiration monitoring and auto-renewal (Phase 3)
+- ✅ **Certificate lifecycle management** - Expiration monitoring and auto-renewal (Phase 3)
 - **Trust scoring system** - Agent behavior tracking (Phase 4)
 - **Multi-signature** support for critical operations
 - **Zero-knowledge proofs** for privacy-preserving verification

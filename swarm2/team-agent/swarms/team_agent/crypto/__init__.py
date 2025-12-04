@@ -6,6 +6,7 @@ from .pki import PKIManager, TrustDomain
 from .signing import Signer, Verifier, SignedData
 from .crl import CRLManager, RevocationReason
 from .ocsp import OCSPResponder, OCSPStatus
+from .lifecycle import CertificateLifecycleManager, CertificateStatus, NotificationLevel
 
 __all__ = [
     "PKIManager",
@@ -17,4 +18,7 @@ __all__ = [
     "RevocationReason",
     "OCSPResponder",
     "OCSPStatus",
+    "CertificateLifecycleManager",
+    "CertificateStatus",
+    "NotificationLevel",
 ]
