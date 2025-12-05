@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="create-mission">
       <h1 class="page-title">Create New Mission</h1>
       <p class="page-subtitle">
@@ -10,11 +10,10 @@
         <MissionCreateForm />
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import MissionCreateForm from '@/components/mission/MissionCreateForm.vue'
 </script>
 

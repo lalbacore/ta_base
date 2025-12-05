@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="dashboard">
       <h1 class="dashboard-title">Dashboard</h1>
 
@@ -28,11 +28,10 @@
         Welcome to Team Agent Platform - Multi-Agent Orchestration System
       </p>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 </script>
 

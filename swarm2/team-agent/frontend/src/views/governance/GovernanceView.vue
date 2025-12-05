@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="governance-view">
       <h1 class="page-title">Governance & Policy</h1>
 
@@ -16,11 +16,10 @@
         <p>Configure governance policies and view decision history</p>
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Message from 'primevue/message'
 </script>
 

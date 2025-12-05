@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="mission-detail">
       <!-- Header -->
       <div class="page-header">
@@ -183,7 +183,7 @@
         @rejected="handleBreakpointRejected"
       />
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
@@ -197,7 +197,6 @@ import ProgressSpinner from 'primevue/progressspinner'
 import Message from 'primevue/message'
 import Divider from 'primevue/divider'
 import Menu from 'primevue/menu'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import { useMissionStore } from '@/stores/mission.store'
 import { useWorkflowWebSocket } from '@/composables/useWorkflowWebSocket'
 import WorkflowStageTimeline from '@/components/mission/WorkflowStageTimeline.vue'

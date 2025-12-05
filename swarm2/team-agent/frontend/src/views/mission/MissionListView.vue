@@ -1,6 +1,5 @@
 <template>
-  <AppLayout>
-    <div class="mission-list">
+  <div class="mission-list">
       <div class="page-header">
         <div>
           <h1 class="page-title">Missions</h1>
@@ -52,7 +51,6 @@
         />
       </div>
     </div>
-  </AppLayout>
 </template>
 
 <script setup lang="ts">
@@ -62,7 +60,6 @@ import Button from 'primevue/button'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import ProgressSpinner from 'primevue/progressspinner'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import { useMissionStore } from '@/stores/mission.store'
 import MissionCard from '@/components/mission/MissionCard.vue'
 

@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="registry-view">
       <h1 class="page-title">Capability Registry</h1>
 
@@ -16,11 +16,10 @@
         <p>Browse and manage A2A capabilities and providers</p>
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Message from 'primevue/message'
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="pki-management">
       <h1 class="page-title">PKI Management</h1>
 
@@ -16,11 +16,10 @@
         <p>View and manage certificates for Root, Government, Execution, and Logging domains</p>
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Message from 'primevue/message'
 </script>
 

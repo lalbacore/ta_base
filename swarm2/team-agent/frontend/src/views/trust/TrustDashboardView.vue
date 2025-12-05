@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="trust-dashboard">
       <h1 class="page-title">Trust Scoring Dashboard</h1>
 
@@ -16,11 +16,10 @@
         <p>Trust scores will appear here once agents start executing workflows</p>
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Message from 'primevue/message'
 </script>
 

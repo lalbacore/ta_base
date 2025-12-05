@@ -1,5 +1,5 @@
 <template>
-  <AppLayout>
+  
     <div class="artifacts-view">
       <h1 class="page-title">Artifacts & Manifests</h1>
 
@@ -16,11 +16,10 @@
         <p>View workflow manifests and verify signatures</p>
       </div>
     </div>
-  </AppLayout>
+  
 </template>
 
 <script setup lang="ts">
-import AppLayout from '@/components/layout/AppLayout.vue'
 import Message from 'primevue/message'
 </script>
 
