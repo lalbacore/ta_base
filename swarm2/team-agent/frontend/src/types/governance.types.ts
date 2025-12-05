@@ -2,8 +2,8 @@ export interface PolicyConfig {
   min_trust_score: number
   require_security_review: boolean
   allowed_languages: string[]
-  max_execution_time: number
-  require_approval_below_trust: number
+  max_cost_per_mission: number
+  require_code_review: boolean
   auto_approve_threshold: number
   enable_breakpoints: boolean
 }
@@ -11,26 +11,41 @@ export interface PolicyConfig {
 export interface GovernanceDecision {
   decision_id: string
   workflow_id: string
+  stage: string
+  decision: 'approved' | 'rejected'
   timestamp: string
-  status: 'approved' | 'rejected'
-  composite_score: number
-  violations: string[]
-  reasons: string[]
+  trust_score: number
+  policy_violations: number
+  reason: string
 }
 
-export interface ApprovalGate {
-  gate_id: string
-  workflow_id: string
-  gate_type: 'human_review' | 'policy_check' | 'security_audit'
-  status: 'pending' | 'approved' | 'rejected'
-  created_at: string
-  decision_details?: any
+export interface ComplianceViolation {
+  policy: string
+  required: any
+  actual: any
+  message: string
 }
 
-export interface PolicyAuditLog {
-  event_id: string
-  event_type: 'policy_updated' | 'decision_made' | 'gate_approved' | 'gate_rejected'
-  timestamp: string
-  user?: string
-  details: any
+export interface ComplianceSatisfied {
+  policy: string
+  message: string
+}
+
+export interface ComplianceWarning {
+  policy: string
+  message: string
+}
+
+export interface ComplianceReport {
+  status: 'fully_compliant' | 'compliant_with_warnings' | 'non_compliant'
+  compliance_score: number
+  violations: ComplianceViolation[]
+  satisfied: ComplianceSatisfied[]
+  warnings: ComplianceWarning[]
+  summary: {
+    total_checks: number
+    violations_count: number
+    satisfied_count: number
+    warnings_count: number
+  }
 }
