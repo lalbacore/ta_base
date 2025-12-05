@@ -493,66 +493,373 @@ AGENT_TRUST_HISTORY = {
 # ============================================================================
 
 SAMPLE_CAPABILITIES = [
+    # Code Generation
     {
         'capability_id': 'cap_python_api',
         'capability_type': 'code_generation',
         'provider_id': 'agent_coder_001',
+        'provider_name': 'CodeMaster Pro',
         'name': 'Python REST API Development',
         'description': 'Build production-ready REST APIs with FastAPI or Flask',
         'trust_score': 94,
         'reputation': 4.8,
         'price': 85.0,
         'invocations': 45,
-        'tags': ['python', 'rest', 'api', 'fastapi', 'flask']
+        'success_rate': 0.94,
+        'tags': ['python', 'rest', 'api', 'fastapi', 'flask'],
+        'created_at': timestamp(days_ago=60)
     },
+    {
+        'capability_id': 'cap_react_frontend',
+        'capability_type': 'code_generation',
+        'provider_id': 'agent_frontend_002',
+        'provider_name': 'ReactBuilder AI',
+        'name': 'React Application Development',
+        'description': 'Build modern React applications with TypeScript and state management',
+        'trust_score': 91,
+        'reputation': 4.6,
+        'price': 90.0,
+        'invocations': 38,
+        'success_rate': 0.91,
+        'tags': ['react', 'typescript', 'frontend', 'redux'],
+        'created_at': timestamp(days_ago=45)
+    },
+    {
+        'capability_id': 'cap_nodejs_microservice',
+        'capability_type': 'code_generation',
+        'provider_id': 'agent_backend_003',
+        'provider_name': 'MicroService Expert',
+        'name': 'Node.js Microservices',
+        'description': 'Design and implement scalable microservices with Node.js',
+        'trust_score': 93,
+        'reputation': 4.7,
+        'price': 100.0,
+        'invocations': 32,
+        'success_rate': 0.93,
+        'tags': ['nodejs', 'microservices', 'express', 'nestjs'],
+        'created_at': timestamp(days_ago=50)
+    },
+
+    # Security Audit
     {
         'capability_id': 'cap_security_scan',
         'capability_type': 'security_audit',
         'provider_id': 'agent_security_003',
+        'provider_name': 'SecureGuard AI',
         'name': 'Comprehensive Security Audit',
         'description': 'OWASP Top 10 scanning, dependency analysis, code review',
         'trust_score': 98,
         'reputation': 4.9,
         'price': 65.0,
         'invocations': 67,
-        'tags': ['security', 'owasp', 'audit', 'vulnerability']
+        'success_rate': 0.97,
+        'tags': ['security', 'owasp', 'audit', 'vulnerability'],
+        'created_at': timestamp(days_ago=90)
     },
+    {
+        'capability_id': 'cap_penetration_test',
+        'capability_type': 'security_audit',
+        'provider_id': 'agent_pentest_004',
+        'provider_name': 'PenTest Master',
+        'name': 'Penetration Testing',
+        'description': 'Ethical hacking and penetration testing for web applications',
+        'trust_score': 96,
+        'reputation': 4.8,
+        'price': 120.0,
+        'invocations': 24,
+        'success_rate': 0.96,
+        'tags': ['pentest', 'security', 'hacking', 'vulnerability'],
+        'created_at': timestamp(days_ago=70)
+    },
+
+    # Testing
     {
         'capability_id': 'cap_unit_testing',
         'capability_type': 'testing',
         'provider_id': 'agent_tester_005',
+        'provider_name': 'TestBot Elite',
         'name': 'Automated Test Suite Generation',
         'description': 'Create comprehensive unit and integration tests',
         'trust_score': 89,
         'reputation': 4.5,
         'price': 45.0,
         'invocations': 38,
-        'tags': ['testing', 'pytest', 'unittest', 'coverage']
+        'success_rate': 0.89,
+        'tags': ['testing', 'pytest', 'unittest', 'coverage'],
+        'created_at': timestamp(days_ago=55)
     },
+    {
+        'capability_id': 'cap_e2e_testing',
+        'capability_type': 'testing',
+        'provider_id': 'agent_qa_006',
+        'provider_name': 'QA Automation Pro',
+        'name': 'End-to-End Testing',
+        'description': 'Automated E2E tests with Playwright and Cypress',
+        'trust_score': 90,
+        'reputation': 4.6,
+        'price': 55.0,
+        'invocations': 29,
+        'success_rate': 0.90,
+        'tags': ['e2e', 'playwright', 'cypress', 'automation'],
+        'created_at': timestamp(days_ago=40)
+    },
+
+    # Data Analysis
     {
         'capability_id': 'cap_sql_optimize',
         'capability_type': 'data_analysis',
         'provider_id': 'agent_data_007',
+        'provider_name': 'DataWizard',
         'name': 'Database Query Optimization',
         'description': 'Analyze and optimize SQL queries for PostgreSQL/MySQL',
         'trust_score': 92,
         'reputation': 4.7,
         'price': 75.0,
         'invocations': 29,
-        'tags': ['database', 'sql', 'performance', 'postgresql']
+        'success_rate': 0.92,
+        'tags': ['database', 'sql', 'performance', 'postgresql'],
+        'created_at': timestamp(days_ago=65)
     },
+    {
+        'capability_id': 'cap_data_visualization',
+        'capability_type': 'data_analysis',
+        'provider_id': 'agent_viz_008',
+        'provider_name': 'VisualizerBot',
+        'name': 'Data Visualization',
+        'description': 'Create interactive dashboards with D3.js and Chart.js',
+        'trust_score': 88,
+        'reputation': 4.4,
+        'price': 60.0,
+        'invocations': 26,
+        'success_rate': 0.88,
+        'tags': ['visualization', 'd3', 'charts', 'dashboard'],
+        'created_at': timestamp(days_ago=35)
+    },
+
+    # Deployment
     {
         'capability_id': 'cap_k8s_deploy',
         'capability_type': 'deployment',
         'provider_id': 'agent_deploy_009',
+        'provider_name': 'DeployMaster',
         'name': 'Kubernetes Deployment',
         'description': 'Deploy and configure applications on Kubernetes clusters',
         'trust_score': 87,
         'reputation': 4.4,
         'price': 95.0,
         'invocations': 22,
-        'tags': ['kubernetes', 'docker', 'containers', 'deployment']
+        'success_rate': 0.88,
+        'tags': ['kubernetes', 'docker', 'containers', 'deployment'],
+        'created_at': timestamp(days_ago=48)
+    },
+    {
+        'capability_id': 'cap_aws_deploy',
+        'capability_type': 'deployment',
+        'provider_id': 'agent_cloud_010',
+        'provider_name': 'CloudDeploy AI',
+        'name': 'AWS Infrastructure Deployment',
+        'description': 'Deploy and manage infrastructure on AWS with Terraform',
+        'trust_score': 91,
+        'reputation': 4.6,
+        'price': 110.0,
+        'invocations': 31,
+        'success_rate': 0.91,
+        'tags': ['aws', 'terraform', 'infrastructure', 'iac'],
+        'created_at': timestamp(days_ago=52)
+    },
+
+    # Documentation
+    {
+        'capability_id': 'cap_api_docs',
+        'capability_type': 'documentation',
+        'provider_id': 'agent_docs_011',
+        'provider_name': 'DocuGenius',
+        'name': 'API Documentation Generation',
+        'description': 'Generate OpenAPI/Swagger documentation for REST APIs',
+        'trust_score': 85,
+        'reputation': 4.3,
+        'price': 40.0,
+        'invocations': 45,
+        'success_rate': 0.91,
+        'tags': ['documentation', 'openapi', 'swagger', 'api'],
+        'created_at': timestamp(days_ago=58)
+    },
+    {
+        'capability_id': 'cap_user_guides',
+        'capability_type': 'documentation',
+        'provider_id': 'agent_writer_012',
+        'provider_name': 'TechWriter Pro',
+        'name': 'User Guide & Tutorial Creation',
+        'description': 'Write comprehensive user guides and tutorials',
+        'trust_score': 83,
+        'reputation': 4.2,
+        'price': 35.0,
+        'invocations': 38,
+        'success_rate': 0.89,
+        'tags': ['documentation', 'tutorial', 'guide', 'markdown'],
+        'created_at': timestamp(days_ago=42)
+    },
+
+    # Code Review
+    {
+        'capability_id': 'cap_code_review',
+        'capability_type': 'code_review',
+        'provider_id': 'agent_reviewer_013',
+        'provider_name': 'CodeCritic AI',
+        'name': 'Comprehensive Code Review',
+        'description': 'In-depth code review for quality, performance, and best practices',
+        'trust_score': 95,
+        'reputation': 4.8,
+        'price': 70.0,
+        'invocations': 53,
+        'success_rate': 0.95,
+        'tags': ['review', 'quality', 'best-practices', 'refactoring'],
+        'created_at': timestamp(days_ago=75)
+    },
+
+    # Monitoring
+    {
+        'capability_id': 'cap_observability',
+        'capability_type': 'monitoring',
+        'provider_id': 'agent_monitor_014',
+        'provider_name': 'ObservabilityBot',
+        'name': 'Application Observability Setup',
+        'description': 'Set up monitoring with Prometheus, Grafana, and ELK stack',
+        'trust_score': 89,
+        'reputation': 4.5,
+        'price': 80.0,
+        'invocations': 27,
+        'success_rate': 0.89,
+        'tags': ['monitoring', 'prometheus', 'grafana', 'observability'],
+        'created_at': timestamp(days_ago=38)
+    },
+
+    # Refactoring
+    {
+        'capability_id': 'cap_refactor',
+        'capability_type': 'refactoring',
+        'provider_id': 'agent_refactor_015',
+        'provider_name': 'RefactorMaster',
+        'name': 'Code Refactoring & Optimization',
+        'description': 'Refactor legacy code for better maintainability and performance',
+        'trust_score': 92,
+        'reputation': 4.7,
+        'price': 90.0,
+        'invocations': 34,
+        'success_rate': 0.92,
+        'tags': ['refactoring', 'optimization', 'clean-code', 'legacy'],
+        'created_at': timestamp(days_ago=62)
+    },
+
+    # Database Design
+    {
+        'capability_id': 'cap_db_design',
+        'capability_type': 'database_design',
+        'provider_id': 'agent_dbarch_016',
+        'provider_name': 'DatabaseArchitect',
+        'name': 'Database Schema Design',
+        'description': 'Design normalized database schemas with ER diagrams',
+        'trust_score': 93,
+        'reputation': 4.7,
+        'price': 85.0,
+        'invocations': 25,
+        'success_rate': 0.93,
+        'tags': ['database', 'schema', 'er-diagram', 'normalization'],
+        'created_at': timestamp(days_ago=67)
+    },
+
+    # Performance Optimization
+    {
+        'capability_id': 'cap_perf_opt',
+        'capability_type': 'performance_optimization',
+        'provider_id': 'agent_perf_017',
+        'provider_name': 'PerformanceGuru',
+        'name': 'Application Performance Tuning',
+        'description': 'Profile and optimize application performance bottlenecks',
+        'trust_score': 94,
+        'reputation': 4.8,
+        'price': 95.0,
+        'invocations': 21,
+        'success_rate': 0.94,
+        'tags': ['performance', 'profiling', 'optimization', 'benchmarking'],
+        'created_at': timestamp(days_ago=44)
+    },
+
+    # CI/CD
+    {
+        'capability_id': 'cap_cicd_pipeline',
+        'capability_type': 'cicd',
+        'provider_id': 'agent_devops_018',
+        'provider_name': 'DevOps Automation',
+        'name': 'CI/CD Pipeline Setup',
+        'description': 'Configure GitHub Actions, GitLab CI, or Jenkins pipelines',
+        'trust_score': 90,
+        'reputation': 4.6,
+        'price': 75.0,
+        'invocations': 36,
+        'success_rate': 0.90,
+        'tags': ['cicd', 'github-actions', 'jenkins', 'automation'],
+        'created_at': timestamp(days_ago=51)
+    },
+
+    # API Integration
+    {
+        'capability_id': 'cap_api_integration',
+        'capability_type': 'api_integration',
+        'provider_id': 'agent_integrator_019',
+        'provider_name': 'APIConnector',
+        'name': 'Third-Party API Integration',
+        'description': 'Integrate with payment gateways, social media, and SaaS APIs',
+        'trust_score': 88,
+        'reputation': 4.5,
+        'price': 70.0,
+        'invocations': 33,
+        'success_rate': 0.88,
+        'tags': ['api', 'integration', 'rest', 'webhooks'],
+        'created_at': timestamp(days_ago=46)
+    },
+
+    # Machine Learning
+    {
+        'capability_id': 'cap_ml_model',
+        'capability_type': 'machine_learning',
+        'provider_id': 'agent_ml_020',
+        'provider_name': 'MLEngineer AI',
+        'name': 'ML Model Development',
+        'description': 'Build and train machine learning models with scikit-learn and TensorFlow',
+        'trust_score': 91,
+        'reputation': 4.6,
+        'price': 130.0,
+        'invocations': 18,
+        'success_rate': 0.91,
+        'tags': ['machine-learning', 'tensorflow', 'scikit-learn', 'ai'],
+        'created_at': timestamp(days_ago=33)
     }
+]
+
+# Provider information
+SAMPLE_PROVIDERS = [
+    {'provider_id': 'agent_coder_001', 'name': 'CodeMaster Pro', 'type': 'code_generation', 'trust_score': 94, 'total_capabilities': 1},
+    {'provider_id': 'agent_frontend_002', 'name': 'ReactBuilder AI', 'type': 'code_generation', 'trust_score': 91, 'total_capabilities': 1},
+    {'provider_id': 'agent_backend_003', 'name': 'MicroService Expert', 'type': 'code_generation', 'trust_score': 93, 'total_capabilities': 1},
+    {'provider_id': 'agent_security_003', 'name': 'SecureGuard AI', 'type': 'security_audit', 'trust_score': 98, 'total_capabilities': 1},
+    {'provider_id': 'agent_pentest_004', 'name': 'PenTest Master', 'type': 'security_audit', 'trust_score': 96, 'total_capabilities': 1},
+    {'provider_id': 'agent_tester_005', 'name': 'TestBot Elite', 'type': 'testing', 'trust_score': 89, 'total_capabilities': 1},
+    {'provider_id': 'agent_qa_006', 'name': 'QA Automation Pro', 'type': 'testing', 'trust_score': 90, 'total_capabilities': 1},
+    {'provider_id': 'agent_data_007', 'name': 'DataWizard', 'type': 'data_analysis', 'trust_score': 92, 'total_capabilities': 1},
+    {'provider_id': 'agent_viz_008', 'name': 'VisualizerBot', 'type': 'data_analysis', 'trust_score': 88, 'total_capabilities': 1},
+    {'provider_id': 'agent_deploy_009', 'name': 'DeployMaster', 'type': 'deployment', 'trust_score': 87, 'total_capabilities': 1},
+    {'provider_id': 'agent_cloud_010', 'name': 'CloudDeploy AI', 'type': 'deployment', 'trust_score': 91, 'total_capabilities': 1},
+    {'provider_id': 'agent_docs_011', 'name': 'DocuGenius', 'type': 'documentation', 'trust_score': 85, 'total_capabilities': 1},
+    {'provider_id': 'agent_writer_012', 'name': 'TechWriter Pro', 'type': 'documentation', 'trust_score': 83, 'total_capabilities': 1},
+    {'provider_id': 'agent_reviewer_013', 'name': 'CodeCritic AI', 'type': 'code_review', 'trust_score': 95, 'total_capabilities': 1},
+    {'provider_id': 'agent_monitor_014', 'name': 'ObservabilityBot', 'type': 'monitoring', 'trust_score': 89, 'total_capabilities': 1},
+    {'provider_id': 'agent_refactor_015', 'name': 'RefactorMaster', 'type': 'refactoring', 'trust_score': 92, 'total_capabilities': 1},
+    {'provider_id': 'agent_dbarch_016', 'name': 'DatabaseArchitect', 'type': 'database_design', 'trust_score': 93, 'total_capabilities': 1},
+    {'provider_id': 'agent_perf_017', 'name': 'PerformanceGuru', 'type': 'performance_optimization', 'trust_score': 94, 'total_capabilities': 1},
+    {'provider_id': 'agent_devops_018', 'name': 'DevOps Automation', 'type': 'cicd', 'trust_score': 90, 'total_capabilities': 1},
+    {'provider_id': 'agent_integrator_019', 'name': 'APIConnector', 'type': 'api_integration', 'trust_score': 88, 'total_capabilities': 1},
+    {'provider_id': 'agent_ml_020', 'name': 'MLEngineer AI', 'type': 'machine_learning', 'trust_score': 91, 'total_capabilities': 1}
 ]
 
 # ============================================================================

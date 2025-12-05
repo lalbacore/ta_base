@@ -82,3 +82,13 @@ def revoke_capability(capability_id):
         return jsonify({'status': 'revoked'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@registry_bp.route('/statistics', methods=['GET'])
+def get_statistics():
+    """Get registry statistics."""
+    try:
+        stats = registry_service.get_statistics()
+        return jsonify(stats), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
