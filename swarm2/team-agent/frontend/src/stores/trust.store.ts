@@ -27,22 +27,50 @@ export const useTrustStore = defineStore('trust', () => {
 
   // Actions
   async function fetchAllAgents(): Promise<void> {
-    // TODO: API call
+    const trustService = await import('@/services/trust.service')
+    const agentList = await trustService.default.getAllAgents()
+
+    agentList.forEach(agent => {
+      agents.value.set(agent.agent_id, agent)
+    })
+
+    // Update statistics
+    statistics.value.total_agents = agentList.length
+    statistics.value.average_trust_score = agentList.reduce((acc, a) => acc + a.trust_score, 0) / agentList.length
+    statistics.value.total_operations = agentList.reduce((acc, a) => acc + a.total_operations, 0)
+    statistics.value.total_incidents = agentList.reduce((acc, a) => acc + a.security_incidents, 0)
   }
 
   async function fetchAgentDetails(agentId: string): Promise<TrustMetrics | null> {
-    // TODO: API call
+    const trustService = await import('@/services/trust.service')
+    const agent = await trustService.default.getAgentDetails(agentId)
+
+    if (agent) {
+      agents.value.set(agentId, agent)
+      return agent
+    }
+
     return agents.value.get(agentId) || null
   }
 
   async function fetchAgentHistory(agentId: string): Promise<TrustHistory | null> {
-    // TODO: API call
+    const trustService = await import('@/services/trust.service')
+    const agentHistory = await trustService.default.getAgentHistory(agentId)
+
+    if (agentHistory) {
+      history.value.set(agentId, agentHistory)
+      return agentHistory
+    }
+
     return history.value.get(agentId) || null
   }
 
   async function fetchAgentEvents(agentId: string): Promise<TrustEvent[]> {
-    // TODO: API call
-    return events.value.get(agentId) || []
+    const trustService = await import('@/services/trust.service')
+    const agentEvents = await trustService.default.getAgentEvents(agentId)
+
+    events.value.set(agentId, agentEvents)
+    return agentEvents
   }
 
   return {
