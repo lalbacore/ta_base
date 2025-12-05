@@ -33,6 +33,10 @@ export class PKIService {
     const response = await apiClient.get('/pki/crl')
     return response.data
   }
+
+  async generateCertificate(certData: any): Promise<void> {
+    await apiClient.post('/pki/generate', certData)
+  }
 }
 
 export default new PKIService()
