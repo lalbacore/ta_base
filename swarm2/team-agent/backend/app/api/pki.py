@@ -80,3 +80,14 @@ def get_crl():
         return jsonify(crl), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@pki_bp.route('/generate', methods=['POST'])
+def generate_certificate():
+    """Generate a new certificate."""
+    try:
+        data = request.get_json()
+        new_cert = pki_service.generate_certificate(data)
+        return jsonify(new_cert), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

@@ -68,6 +68,49 @@ class PKIService:
             'revoked_certificates': self.revoked
         }
 
+    def generate_certificate(self, cert_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate a new certificate."""
+        # TODO: Call pki_manager.generate_certificate(domain, subject, key_size, algorithm, validity_days)
+        from datetime import datetime, timedelta
+        import secrets
+
+        domain = cert_data.get('domain')
+        subject = cert_data.get('subject', f'Team Agent {domain.capitalize()}')
+        key_size = cert_data.get('key_size', 2048)
+        algorithm = cert_data.get('algorithm', 'SHA256-RSA')
+        validity_days = cert_data.get('validity_days', 365)
+
+        # Generate certificate data
+        issued_date = datetime.now()
+        expiry_date = issued_date + timedelta(days=validity_days)
+        days_until_expiry = validity_days
+
+        # Determine status based on days until expiry
+        if days_until_expiry < 7:
+            status = 'expiring_soon'
+        elif days_until_expiry < 30:
+            status = 'expiring_soon'
+        else:
+            status = 'valid'
+
+        new_cert = {
+            'domain': domain,
+            'subject': subject,
+            'issuer': 'Root CA',
+            'serial_number': secrets.token_hex(16),
+            'valid_from': issued_date.isoformat(),
+            'valid_to': expiry_date.isoformat(),
+            'status': status,
+            'days_until_expiry': days_until_expiry,
+            'key_size': key_size,
+            'signature_algorithm': algorithm
+        }
+
+        # Add to certificates dict
+        self.certificates[domain] = new_cert
+
+        return new_cert
+
 
 # Singleton instance
 pki_service = PKIService()
