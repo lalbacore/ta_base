@@ -1,5 +1,5 @@
 """
-Governance Service - Bridges Flask API to Governance role.
+Governance Service - Bridges Flask API to Governance role with SQLAlchemy persistence.
 """
 import sys
 import os
@@ -7,39 +7,83 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from typing import Dict, Any, List, Optional
-from app.data.seed_data import GOVERNANCE_CONFIG, GOVERNANCE_DECISIONS
+from app.database import get_backend_session
+from app.models.governance import GovernancePolicy, GovernanceDecision
 
 
 class GovernanceService:
     """
     Service layer for governance and policy management.
-    Bridges Flask API to Governance role.
+
+    Uses SQLAlchemy for persistent storage of policies and decisions.
     """
 
     def __init__(self):
-        # TODO: Initialize governance when ready
+        # TODO: Initialize governance role when ready
         # from swarms.team_agent.roles.governance import Governance
-        # from storage.models import AgentConfig
         # self.governance = Governance()
-
-        # Load seed data
-        self.policy_config = GOVERNANCE_CONFIG.copy()
-        self.decisions = GOVERNANCE_DECISIONS.copy()
+        pass
 
     def get_policy_config(self) -> Dict[str, Any]:
-        """Get current policy configuration."""
-        # TODO: Get from governance.policy or storage.get_agent_config()
-        return self.policy_config
+        """
+        Get current policy configuration from database.
+
+        Returns the first (and should be only) policy record.
+        If no policy exists, creates a default one.
+        """
+        with get_backend_session() as session:
+            policy = session.query(GovernancePolicy).first()
+
+            if not policy:
+                # Create default policy if none exists
+                policy = GovernancePolicy(
+                    min_trust_score=75.0,
+                    require_security_review=True,
+                    allowed_languages=['python', 'javascript', 'typescript', 'go', 'rust'],
+                    max_cost_per_mission=500.0,
+                    require_code_review=True,
+                    auto_approve_threshold=90.0,
+                    enable_breakpoints=True
+                )
+                session.add(policy)
+                session.commit()
+
+            return policy.to_dict()
 
     def update_policy_config(self, config: Dict[str, Any]) -> None:
-        """Update policy configuration."""
-        # TODO: Update governance.policy and persist to storage
-        self.policy_config.update(config)
+        """
+        Update policy configuration in database.
+
+        Updates the first policy record or creates one if none exists.
+        """
+        with get_backend_session() as session:
+            policy = session.query(GovernancePolicy).first()
+
+            if not policy:
+                # Create new policy
+                policy = GovernancePolicy(**config)
+                session.add(policy)
+            else:
+                # Update existing policy
+                for key, value in config.items():
+                    if hasattr(policy, key):
+                        setattr(policy, key, value)
+
+            session.commit()
 
     def get_decisions(self, limit: int = 50) -> List[Dict[str, Any]]:
-        """Get governance decision history."""
-        # TODO: Get from governance.decisions list
-        return self.decisions[:limit]
+        """
+        Get governance decision history from database.
+
+        Returns most recent decisions, ordered by timestamp descending.
+        """
+        with get_backend_session() as session:
+            decisions = session.query(GovernanceDecision)\
+                .order_by(GovernanceDecision.timestamp.desc())\
+                .limit(limit)\
+                .all()
+
+            return [decision.to_dict() for decision in decisions]
 
     def get_pending_gates(self) -> List[Dict[str, Any]]:
         """Get pending approval gates."""
@@ -63,38 +107,41 @@ class GovernanceService:
 
         Returns a compliance report showing which policies are satisfied/violated.
         """
+        # Get current policy from database
+        policy_config = self.get_policy_config()
+
         violations = []
         satisfied = []
         warnings = []
 
         # Check min trust score
         min_trust = mission_data.get('min_trust_score', 0)
-        if min_trust < self.policy_config['min_trust_score']:
+        if min_trust < policy_config['min_trust_score']:
             violations.append({
                 'policy': 'min_trust_score',
-                'required': self.policy_config['min_trust_score'],
+                'required': policy_config['min_trust_score'],
                 'actual': min_trust,
-                'message': f'Mission trust score ({min_trust}) below minimum required ({self.policy_config["min_trust_score"]})'
+                'message': f'Mission trust score ({min_trust}) below minimum required ({policy_config["min_trust_score"]})'
             })
         else:
             satisfied.append({
                 'policy': 'min_trust_score',
-                'message': f'Trust score requirement met ({min_trust} >= {self.policy_config["min_trust_score"]})'
+                'message': f'Trust score requirement met ({min_trust} >= {policy_config["min_trust_score"]})'
             })
 
         # Check max cost
         max_cost = mission_data.get('max_cost', 0)
-        if max_cost > self.policy_config['max_cost_per_mission']:
+        if max_cost > policy_config['max_cost_per_mission']:
             violations.append({
                 'policy': 'max_cost_per_mission',
-                'required': self.policy_config['max_cost_per_mission'],
+                'required': policy_config['max_cost_per_mission'],
                 'actual': max_cost,
-                'message': f'Mission cost (${max_cost}) exceeds maximum (${self.policy_config["max_cost_per_mission"]})'
+                'message': f'Mission cost (${max_cost}) exceeds maximum (${policy_config["max_cost_per_mission"]})'
             })
         else:
             satisfied.append({
                 'policy': 'max_cost_per_mission',
-                'message': f'Cost within budget (${max_cost} <= ${self.policy_config["max_cost_per_mission"]})'
+                'message': f'Cost within budget (${max_cost} <= ${policy_config["max_cost_per_mission"]})'
             })
 
         # Check if security review is required
@@ -102,7 +149,7 @@ class GovernanceService:
         needs_security = any(cap.get('capability_type') in ['deployment', 'security_audit']
                            for cap in capabilities)
 
-        if self.policy_config['require_security_review'] and needs_security:
+        if policy_config['require_security_review'] and needs_security:
             has_security_cap = any(cap.get('capability_type') == 'security_audit'
                                  for cap in capabilities)
             if has_security_cap:
@@ -119,7 +166,7 @@ class GovernanceService:
         # Check if code review is required
         has_code_gen = any(cap.get('capability_type') == 'code_generation'
                           for cap in capabilities)
-        if self.policy_config['require_code_review'] and has_code_gen:
+        if policy_config['require_code_review'] and has_code_gen:
             has_review_cap = any(cap.get('capability_type') == 'code_review'
                                 for cap in capabilities)
             if has_review_cap:

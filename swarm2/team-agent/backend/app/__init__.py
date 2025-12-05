@@ -41,6 +41,17 @@ def create_app():
     # Register WebSocket handlers
     from app.websocket import workflow_handler, trust_handler, pki_handler
 
+    # Initialize database schema
+    print("🔧 Initializing database...")
+    from app.database import init_backend_db
+    init_backend_db()
+    print("✅ Database schema ready")
+
+    # Load seed data on first run
+    with app.app_context():
+        from app.data.seed_loader import seed_database
+        seed_database()
+
     # Health check endpoint
     @app.route('/health')
     def health_check():
