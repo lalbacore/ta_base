@@ -8,20 +8,20 @@ export class MissionService {
   }
 
   async getWorkflowStatus(workflowId: string): Promise<WorkflowStatus> {
-    const response = await apiClient.get(`/workflow/${workflowId}/status`)
+    const response = await apiClient.get(`/mission/workflow/${workflowId}/status`)
     return response.data
   }
 
   async resumeWorkflow(workflowId: string): Promise<void> {
-    await apiClient.post(`/workflow/${workflowId}/resume`)
+    await apiClient.post(`/mission/workflow/${workflowId}/resume`)
   }
 
   async approveBreakpoint(breakpointId: string, optionIndex: number): Promise<void> {
-    await apiClient.post(`/breakpoint/${breakpointId}/approve`, { option_index: optionIndex })
+    await apiClient.post(`/mission/breakpoint/${breakpointId}/approve`, { option_index: optionIndex })
   }
 
   async rejectBreakpoint(breakpointId: string): Promise<void> {
-    await apiClient.post(`/breakpoint/${breakpointId}/reject`)
+    await apiClient.post(`/mission/breakpoint/${breakpointId}/reject`)
   }
 
   async listMissions(): Promise<MissionSpec[]> {
@@ -30,7 +30,7 @@ export class MissionService {
   }
 
   async listWorkflows(): Promise<WorkflowStatus[]> {
-    const response = await apiClient.get('/workflow/list')
+    const response = await apiClient.get('/mission/workflow/list')
     return response.data
   }
 }
