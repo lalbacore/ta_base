@@ -1,82 +1,86 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Capability, CapabilityProvider, CapabilitySearchFilters, CapabilityMatchResult } from '@/types/registry.types'
+import type { Capability, Provider, RegistryStatistics, CapabilityFilters } from '@/types/registry.types'
 
 export const useRegistryStore = defineStore('registry', () => {
   // State
   const capabilities = ref<Capability[]>([])
-  const providers = ref<CapabilityProvider[]>([])
-  const matches = ref<CapabilityMatchResult[]>([])
-  const searchFilters = ref<CapabilitySearchFilters>({})
-  const statistics = ref({
-    total_capabilities: 0,
-    total_providers: 0,
-    total_invocations: 0
-  })
+  const providers = ref<Provider[]>([])
+  const statistics = ref<RegistryStatistics | null>(null)
+  const filters = ref<CapabilityFilters>({})
+  const isLoading = ref(false)
 
   // Getters
-  const filteredCapabilities = computed(() => {
-    let result = capabilities.value
+  const filteredCapabilities = computed(() => capabilities.value)
 
-    if (searchFilters.value.capability_type) {
-      result = result.filter(c => c.capability_type === searchFilters.value.capability_type)
-    }
-
-    if (searchFilters.value.min_trust_score) {
-      result = result.filter(c => c.trust_score >= searchFilters.value.min_trust_score!)
-    }
-
-    if (searchFilters.value.max_price) {
-      result = result.filter(c => c.price <= searchFilters.value.max_price!)
-    }
-
-    return result
+  const capabilitiesByType = computed(() => {
+    const byType: Record<string, Capability[]> = {}
+    capabilities.value.forEach(cap => {
+      if (!byType[cap.capability_type]) {
+        byType[cap.capability_type] = []
+      }
+      byType[cap.capability_type].push(cap)
+    })
+    return byType
   })
 
-  const topProviders = computed(() =>
-    providers.value.sort((a, b) => b.reputation - a.reputation).slice(0, 10)
+  const highTrustCapabilities = computed(() =>
+    capabilities.value.filter(c => c.trust_score >= 90)
   )
 
   // Actions
-  async function fetchCapabilities(): Promise<void> {
-    // TODO: API call
+  async function fetchCapabilities(newFilters?: CapabilityFilters): Promise<void> {
+    const registryService = await import('@/services/registry.service')
+    isLoading.value = true
+    try {
+      if (newFilters) {
+        filters.value = newFilters
+      }
+      capabilities.value = await registryService.default.getAllCapabilities(filters.value)
+    } finally {
+      isLoading.value = false
+    }
   }
 
   async function fetchProviders(): Promise<void> {
-    // TODO: API call
+    const registryService = await import('@/services/registry.service')
+    providers.value = await registryService.default.getAllProviders()
   }
 
-  async function discoverCapabilities(requirements: any): Promise<Capability[]> {
-    // TODO: API call
-    return []
-  }
-
-  async function matchCapabilities(requirements: any): Promise<CapabilityMatchResult[]> {
-    // TODO: API call
-    return []
+  async function fetchStatistics(): Promise<void> {
+    const registryService = await import('@/services/registry.service')
+    statistics.value = await registryService.default.getStatistics()
   }
 
   async function revokeCapability(capabilityId: string): Promise<void> {
-    // TODO: API call
+    const registryService = await import('@/services/registry.service')
+    await registryService.default.revokeCapability(capabilityId)
+    // Refresh capabilities after revocation
+    await fetchCapabilities()
   }
 
-  function updateSearchFilters(filters: CapabilitySearchFilters): void {
-    searchFilters.value = { ...searchFilters.value, ...filters }
+  function setFilters(newFilters: CapabilityFilters): void {
+    filters.value = newFilters
+  }
+
+  function clearFilters(): void {
+    filters.value = {}
   }
 
   return {
     capabilities,
     providers,
-    matches,
-    searchFilters,
     statistics,
+    filters,
+    isLoading,
     filteredCapabilities,
-    topProviders,
+    capabilitiesByType,
+    highTrustCapabilities,
     fetchCapabilities,
     fetchProviders,
-    discoverCapabilities,
-    matchCapabilities,
+    fetchStatistics,
     revokeCapability,
-    updateSearchFilters
+    setFilters,
+    clearFilters
   }
 })
