@@ -2,10 +2,12 @@
   <AppLayout>
     <router-view />
   </AppLayout>
+  <Toast />
 </template>
 
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
+import Toast from 'primevue/toast'
 </script>
 
 <style>
