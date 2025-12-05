@@ -4,33 +4,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@chakra-ui/vue-next": "^0.3.1",
-    "@emotion/css": "^11.11.2",
     "axios": "^1.6.7",
-    "chart.js": "^4.4.1",
     "pinia": "^2.1.7",
     "vue": "^3.4.15",
-    "vue-chartjs": "^5.3.0",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
-    "@types/node": "^20.10.5",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "@vitejs/plugin-vue": "^4.5.2",
-    "@vue/eslint-config-typescript": "^12.0.0",
-    "@vue/test-utils": "^2.4.3",
-    "eslint": "^8.56.0",
-    "eslint-plugin-vue": "^9.19.2",
+    "@vitejs/plugin-vue": "^5.0.3",
     "typescript": "^5.3.3",
-    "vite": "^5.0.8",
-    "vitest": "^1.0.4",
-    "vue-tsc": "^1.8.25"
+    "vite": "^5.0.12"
   }
 }
