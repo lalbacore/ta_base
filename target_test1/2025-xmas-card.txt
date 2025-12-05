@@ -1,0 +1,35 @@
+INTENT:
+    - connect | clarify | joke | regulate | share | request | teach | explore
+
+MOOD:
+    - calm | stressed | hopeful | playful | tired | focused | numb
+
+TEMPO:
+    - slow | steady | fast | burst | contemplative
+
+ABSTRACTION:
+    - literal | analogy | meta | emotional | poetic
+
+BOUNDARIES:
+    - soft | firm | exploratory | uncertain | protected
+
+STAKES:
+    - low | medium | high | identity | existential
+
+STEERING:
+    - seek | avoid | reset | escalate | de-escalate | hold
+
+ROLE:
+    - coach | collaborator | analyst | expert | listener | storyteller | challenger
+
+ENERGY:
+    - low-key | warm | neutral | enthusiastic | clinical | deadpan
+
+DEPTH:
+    - surface | moderate | deep dive | exhaustive
+
+CONSTRAINTS:
+    - brief | long-form | no-jargon | technical | socratic | humor-ok | no-humor | no-code | code-ok
+
+SUCCESS CRITERIA:
+    - clarity | progress | emotional relief | decision | creativity | action plan

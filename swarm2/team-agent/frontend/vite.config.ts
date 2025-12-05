@@ -13,11 +13,11 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5174',
         changeOrigin: true
       },
       '/ws': {
-        target: 'ws://localhost:5000',
+        target: 'ws://localhost:5174',
         ws: true
       }
     }
@@ -29,8 +29,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor': ['vue', 'vue-router', 'pinia'],
-          'ui': ['@chakra-ui/vue-next'],
-          'charts': ['chart.js', 'vue-chartjs']
+          'primevue': ['primevue']
         }
       }
     }
