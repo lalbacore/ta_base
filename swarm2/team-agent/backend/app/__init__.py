@@ -35,7 +35,7 @@ def create_app():
     app.register_blueprint(trust_bp, url_prefix='/api/trust')
     app.register_blueprint(pki_bp, url_prefix='/api/pki')
     app.register_blueprint(registry_bp, url_prefix='/api/registry')
-    app.register_blueprint(governance_bp, url_prefix='/api/policy')
+    app.register_blueprint(governance_bp, url_prefix='/api/governance')
     app.register_blueprint(artifacts_bp, url_prefix='/api')
 
     # Register WebSocket handlers
