@@ -8,6 +8,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from typing import Dict, Any, List, Optional
+from app.data.seed_data import SAMPLE_MISSIONS, SAMPLE_WORKFLOWS, SAMPLE_BREAKPOINTS
 
 
 class MissionService:
@@ -20,8 +21,11 @@ class MissionService:
         # TODO: Initialize orchestrator when ready
         # from swarms.team_agent.orchestrator_a2a import OrchestratorA2A
         # self.orchestrator = OrchestratorA2A(enable_a2a=True, enable_breakpoints=True)
-        self.missions = {}
-        self.workflows = {}
+
+        # Load seed data
+        self.missions = {m['mission_id']: m for m in SAMPLE_MISSIONS}
+        self.workflows = {w['workflow_id']: w for w in SAMPLE_WORKFLOWS}
+        self.breakpoints = {bp['breakpoint_id']: bp for bp in SAMPLE_BREAKPOINTS}
 
     def submit_mission(self, mission_data: Dict[str, Any]) -> Dict[str, str]:
         """
@@ -90,6 +94,16 @@ class MissionService:
         """Reject a breakpoint."""
         # TODO: Implement breakpoint rejection
         pass
+
+    def list_breakpoints(self, workflow_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """List all breakpoints, optionally filtered by workflow_id."""
+        if workflow_id:
+            return [bp for bp in self.breakpoints.values() if bp['workflow_id'] == workflow_id]
+        return list(self.breakpoints.values())
+
+    def get_breakpoint(self, breakpoint_id: str) -> Optional[Dict[str, Any]]:
+        """Get breakpoint details."""
+        return self.breakpoints.get(breakpoint_id)
 
 
 # Singleton instance

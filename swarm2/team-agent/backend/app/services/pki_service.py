@@ -7,6 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from typing import Dict, Any, List, Optional
+from app.data.seed_data import SAMPLE_CERTIFICATES, REVOKED_CERTIFICATES
 
 
 class PKIService:
@@ -21,17 +22,20 @@ class PKIService:
         # from swarms.team_agent.crypto.crl import CRLManager
         # self.pki_manager = PKIManager()
         # self.crl_manager = CRLManager()
-        pass
+
+        # Load seed data - SAMPLE_CERTIFICATES is already a dict keyed by domain
+        self.certificates = SAMPLE_CERTIFICATES.copy()
+        self.revoked = REVOKED_CERTIFICATES.copy()
 
     def get_all_certificates(self) -> List[Dict[str, Any]]:
         """Get status of all certificates."""
         # TODO: Get from pki_manager.get_certificate_info() for each domain
-        return []
+        return list(self.certificates.values())
 
     def get_certificate(self, domain: str) -> Optional[Dict[str, Any]]:
         """Get certificate details for a trust domain."""
         # TODO: Get from pki_manager.get_certificate_info(domain)
-        return None
+        return self.certificates.get(domain)
 
     def renew_certificate(self, domain: str) -> None:
         """Renew a certificate (same key)."""
@@ -51,12 +55,18 @@ class PKIService:
     def get_revoked_certificates(self) -> List[Dict[str, Any]]:
         """Get list of revoked certificates."""
         # TODO: Get from crl_manager.get_revocation_info()
-        return []
+        return self.revoked
 
     def get_crl(self) -> Dict[str, Any]:
         """Get Certificate Revocation List."""
         # TODO: Get CRL data from crl_manager
-        return {}
+        return {
+            'version': 2,
+            'issuer': 'Root CA',
+            'last_update': SAMPLE_CERTIFICATES[0]['issued_date'],
+            'next_update': SAMPLE_CERTIFICATES[0]['expiry_date'],
+            'revoked_certificates': self.revoked
+        }
 
 
 # Singleton instance

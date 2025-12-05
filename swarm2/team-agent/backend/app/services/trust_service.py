@@ -7,6 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from typing import Dict, Any, List, Optional
+from app.data.seed_data import SAMPLE_AGENTS, AGENT_TRUST_HISTORY
 
 
 class TrustService:
@@ -19,7 +20,10 @@ class TrustService:
         # TODO: Initialize trust tracker when ready
         # from swarms.team_agent.crypto.trust import AgentReputationTracker
         # self.tracker = AgentReputationTracker()
-        self.agents = {}
+
+        # Load seed data
+        self.agents = {agent['agent_id']: agent for agent in SAMPLE_AGENTS}
+        self.trust_history = AGENT_TRUST_HISTORY
 
     def get_all_agents(self) -> List[Dict[str, Any]]:
         """
@@ -39,15 +43,16 @@ class TrustService:
     def get_agent_history(self, agent_id: str) -> Dict[str, Any]:
         """Get trust score history for an agent."""
         # TODO: Get from tracker.get_trust_history(agent_id)
-        return {
+        return self.trust_history.get(agent_id, {
             'agent_id': agent_id,
             'data_points': []
-        }
+        })
 
     def get_agent_events(self, agent_id: str) -> List[Dict[str, Any]]:
         """Get trust events for an agent."""
         # TODO: Get from tracker event log
-        return []
+        agent = self.agents.get(agent_id)
+        return agent.get('recent_events', []) if agent else []
 
     def record_event(self, agent_id: str, event_data: Dict[str, Any]) -> None:
         """Record a new trust event."""

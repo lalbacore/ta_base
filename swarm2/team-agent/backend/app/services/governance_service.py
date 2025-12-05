@@ -7,6 +7,7 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from typing import Dict, Any, List, Optional
+from app.data.seed_data import GOVERNANCE_CONFIG, GOVERNANCE_DECISIONS
 
 
 class GovernanceService:
@@ -20,15 +21,10 @@ class GovernanceService:
         # from swarms.team_agent.roles.governance import Governance
         # from storage.models import AgentConfig
         # self.governance = Governance()
-        self.policy_config = {
-            'min_trust_score': 75,
-            'require_security_review': True,
-            'allowed_languages': ['python', 'typescript', 'javascript'],
-            'max_execution_time': 3600,
-            'require_approval_below_trust': 60,
-            'auto_approve_threshold': 90,
-            'enable_breakpoints': True
-        }
+
+        # Load seed data
+        self.policy_config = GOVERNANCE_CONFIG.copy()
+        self.decisions = GOVERNANCE_DECISIONS.copy()
 
     def get_policy_config(self) -> Dict[str, Any]:
         """Get current policy configuration."""
@@ -43,7 +39,7 @@ class GovernanceService:
     def get_decisions(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get governance decision history."""
         # TODO: Get from governance.decisions list
-        return []
+        return self.decisions[:limit]
 
     def get_pending_gates(self) -> List[Dict[str, Any]]:
         """Get pending approval gates."""
