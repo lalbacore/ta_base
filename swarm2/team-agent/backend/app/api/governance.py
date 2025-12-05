@@ -67,3 +67,14 @@ def handle_approval_gate(gate_id):
         return jsonify({'status': action}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@governance_bp.route('/check-compliance', methods=['POST'])
+def check_compliance():
+    """Check mission compliance against policies (Easter Egg!)."""
+    try:
+        mission_data = request.get_json()
+        compliance_report = governance_service.check_mission_compliance(mission_data)
+        return jsonify(compliance_report), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
