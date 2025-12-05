@@ -1,35 +1,64 @@
 <template>
-  <c-box p="8">
-    <c-heading mb="6">Dashboard</c-heading>
+  <AppLayout>
+    <div class="dashboard">
+      <h1 class="dashboard-title">Dashboard</h1>
 
-    <c-simple-grid columns="3" spacing="6" mb="8">
-      <StatCard
-        title="Active Missions"
-        value="0"
-        icon="🎯"
-        color-scheme="blue"
-      />
-      <StatCard
-        title="Average Trust Score"
-        value="0"
-        icon="🔒"
-        color-scheme="green"
-      />
-      <StatCard
-        title="Certificates Expiring"
-        value="0"
-        icon="⚠️"
-        color-scheme="orange"
-      />
-    </c-simple-grid>
+      <div class="stats-grid">
+        <StatCard
+          title="Active Missions"
+          value="0"
+          icon="🎯"
+          color-scheme="blue"
+        />
+        <StatCard
+          title="Average Trust Score"
+          value="0"
+          icon="🔒"
+          color-scheme="green"
+        />
+        <StatCard
+          title="Certificates Expiring"
+          value="0"
+          icon="⚠️"
+          color-scheme="orange"
+        />
+      </div>
 
-    <c-text color="gray.500">
-      Welcome to Team Agent Platform - Multi-Agent Orchestration System
-    </c-text>
-  </c-box>
+      <p class="welcome-text">
+        Welcome to Team Agent Platform - Multi-Agent Orchestration System
+      </p>
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { CBox, CHeading, CSimpleGrid, CText } from '@chakra-ui/vue-next'
+import AppLayout from '@/components/layout/AppLayout.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 </script>
+
+<style scoped>
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.welcome-text {
+  color: #64748b;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+</style>

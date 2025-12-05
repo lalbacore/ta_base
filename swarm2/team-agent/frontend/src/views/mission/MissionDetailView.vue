@@ -1,290 +1,203 @@
 <template>
-  <c-box p="8">
-    <!-- Header -->
-    <c-flex justify="space-between" align="start" mb="6">
-      <c-box>
-        <c-button
-          variant="ghost"
-          size="sm"
-          left-icon="←"
-          mb="3"
-          @click="handleBack"
-        >
-          Back to Missions
-        </c-button>
-        <c-h-stack spacing="3" mb="2">
-          <c-heading>{{ missionId }}</c-heading>
-          <c-badge
-            v-if="workflow"
-            :color-scheme="statusColorScheme"
-            font-size="md"
-            px="3"
-            py="1"
-          >
-            {{ workflow.status }}
-          </c-badge>
-        </c-h-stack>
-        <c-text color="gray.600" v-if="mission">
-          {{ mission.description }}
-        </c-text>
-      </c-box>
-
-      <c-menu>
-        <c-menu-button
-          as="c-button"
-          variant="outline"
-          size="sm"
-        >
-          Actions
-        </c-menu-button>
-        <c-menu-list>
-          <c-menu-item @click="handleRefresh">
-            Refresh Status
-          </c-menu-item>
-          <c-menu-item
-            v-if="workflow?.status === 'paused'"
-            @click="handleResume"
-          >
-            Resume Workflow
-          </c-menu-item>
-          <c-menu-divider />
-          <c-menu-item color="red.500" @click="handleCancel">
-            Cancel Mission
-          </c-menu-item>
-        </c-menu-list>
-      </c-menu>
-    </c-flex>
-
-    <!-- Loading State -->
-    <c-box v-if="isLoading" text-align="center" py="12">
-      <c-spinner size="xl" color="blue.500" mb="4" />
-      <c-text color="gray.600">Loading mission details...</c-text>
-    </c-box>
-
-    <!-- Error State -->
-    <c-alert v-else-if="error" status="error" border-radius="md" mb="6">
-      <c-alert-icon />
-      <c-alert-description>
-        {{ error }}
-      </c-alert-description>
-    </c-alert>
-
-    <!-- Content -->
-    <c-grid
-      v-else
-      template-columns="{ base: '1fr', lg: '2fr 1fr' }"
-      gap="6"
-    >
-      <!-- Main Content -->
-      <c-v-stack spacing="6" align="stretch">
-        <!-- Progress Overview -->
-        <c-box
-          p="6"
-          bg="white"
-          border="1px"
-          border-color="gray.200"
-          border-radius="lg"
-          box-shadow="sm"
-        >
-          <c-heading size="md" mb="4">Progress Overview</c-heading>
-
-          <c-flex justify="space-between" mb="2">
-            <c-text font-weight="medium">Overall Progress</c-text>
-            <c-text font-weight="bold" :color="progressColor">
-              {{ workflow?.progress || 0 }}%
-            </c-text>
-          </c-flex>
-
-          <c-progress
-            :value="workflow?.progress || 0"
-            :color-scheme="progressColorScheme"
-            size="lg"
-            border-radius="full"
-            mb="4"
+  <AppLayout>
+    <div class="mission-detail">
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <Button
+            label="Back to Missions"
+            icon="pi pi-arrow-left"
+            text
+            size="small"
+            @click="handleBack"
+            class="back-button"
           />
+          <div class="title-row">
+            <h1 class="page-title">{{ missionId }}</h1>
+            <Tag v-if="workflow" :severity="statusSeverity" class="status-tag">
+              {{ workflow.status }}
+            </Tag>
+          </div>
+          <p v-if="mission" class="mission-description">
+            {{ mission.description }}
+          </p>
+        </div>
 
-          <c-text font-size="sm" color="gray.600">
-            Current Stage: {{ formatStageName(workflow?.current_stage || 'none') }}
-          </c-text>
-        </c-box>
+        <Menu ref="menu" :model="actionMenuItems" :popup="true" />
+        <Button
+          label="Actions"
+          icon="pi pi-angle-down"
+          iconPos="right"
+          outlined
+          size="small"
+          @click="(event) => menu?.toggle(event)"
+        />
+      </div>
 
-        <!-- Workflow Timeline -->
-        <c-box
-          p="6"
-          bg="white"
-          border="1px"
-          border-color="gray.200"
-          border-radius="lg"
-          box-shadow="sm"
-        >
-          <WorkflowStageTimeline :stages="workflow?.stages || []" />
-        </c-box>
+      <!-- Loading State -->
+      <div v-if="isLoading" class="loading-state">
+        <ProgressSpinner />
+        <p>Loading mission details...</p>
+      </div>
 
-        <!-- Pending Breakpoints -->
-        <c-box
-          v-if="pendingBreakpoints.length > 0"
-          p="6"
-          bg="orange.50"
-          border="1px"
-          border-color="orange.200"
-          border-radius="lg"
-        >
-          <c-h-stack spacing="3" mb="4">
-            <c-icon name="warning" color="orange.500" />
-            <c-heading size="md">Approval Required</c-heading>
-          </c-h-stack>
+      <!-- Error State -->
+      <Message v-else-if="error" severity="error" :closable="false">
+        {{ error }}
+      </Message>
 
-          <c-text mb="4" color="gray.700">
-            This workflow requires your approval to continue
-          </c-text>
+      <!-- Content -->
+      <div v-else class="detail-grid">
+        <!-- Main Content -->
+        <div class="main-content">
+          <!-- Progress Overview -->
+          <Card>
+            <template #content>
+              <h3 class="section-title">Progress Overview</h3>
 
-          <c-button color-scheme="orange" @click="handleBreakpointApproval">
-            Review & Approve
-          </c-button>
-        </c-box>
-      </c-v-stack>
+              <div class="progress-header">
+                <span class="progress-label">Overall Progress</span>
+                <span class="progress-value" :style="{ color: progressColor }">
+                  {{ workflow?.progress || 0 }}%
+                </span>
+              </div>
 
-      <!-- Sidebar -->
-      <c-v-stack spacing="6" align="stretch">
-        <!-- Mission Details Card -->
-        <c-box
-          p="6"
-          bg="white"
-          border="1px"
-          border-color="gray.200"
-          border-radius="lg"
-          box-shadow="sm"
-        >
-          <c-heading size="sm" mb="4">Mission Details</c-heading>
+              <ProgressBar
+                :value="workflow?.progress || 0"
+                :showValue="false"
+                class="progress-bar"
+              />
 
-          <c-v-stack spacing="3" align="stretch">
-            <c-box>
-              <c-text font-size="xs" color="gray.500" mb="1">
-                Created
-              </c-text>
-              <c-text font-size="sm">
-                {{ formatDate(workflow?.created_at) }}
-              </c-text>
-            </c-box>
+              <p class="current-stage">
+                Current Stage: {{ formatStageName(workflow?.current_stage || 'none') }}
+              </p>
+            </template>
+          </Card>
 
-            <c-box>
-              <c-text font-size="xs" color="gray.500" mb="1">
-                Last Updated
-              </c-text>
-              <c-text font-size="sm">
-                {{ formatDate(workflow?.updated_at) }}
-              </c-text>
-            </c-box>
+          <!-- Workflow Timeline -->
+          <Card>
+            <template #content>
+              <WorkflowStageTimeline :stages="workflow?.stages || []" />
+            </template>
+          </Card>
 
-            <c-divider />
+          <!-- Pending Breakpoints -->
+          <Message
+            v-if="pendingBreakpoints.length > 0"
+            severity="warn"
+            :closable="false"
+          >
+            <h4>Approval Required</h4>
+            <p>This workflow requires your approval to continue</p>
+            <Button
+              label="Review & Approve"
+              severity="warning"
+              @click="handleBreakpointApproval"
+              class="mt-3"
+            />
+          </Message>
+        </div>
 
-            <c-box>
-              <c-text font-size="xs" color="gray.500" mb="1">
-                Min Trust Score
-              </c-text>
-              <c-text font-size="sm" font-weight="bold">
-                {{ mission?.min_trust_score || 0 }}
-              </c-text>
-            </c-box>
+        <!-- Sidebar -->
+        <div class="sidebar-content">
+          <!-- Mission Details Card -->
+          <Card>
+            <template #content>
+              <h4 class="card-title">Mission Details</h4>
 
-            <c-box v-if="mission?.max_cost">
-              <c-text font-size="xs" color="gray.500" mb="1">
-                Max Cost
-              </c-text>
-              <c-text font-size="sm" font-weight="bold">
-                ${{ mission.max_cost }}
-              </c-text>
-            </c-box>
-          </c-v-stack>
-        </c-box>
+              <div class="detail-list">
+                <div class="detail-item">
+                  <span class="detail-label">Created</span>
+                  <span class="detail-value">
+                    {{ formatDate(workflow?.created_at) }}
+                  </span>
+                </div>
 
-        <!-- Required Capabilities -->
-        <c-box
-          v-if="mission?.required_capabilities && mission.required_capabilities.length > 0"
-          p="6"
-          bg="white"
-          border="1px"
-          border-color="gray.200"
-          border-radius="lg"
-          box-shadow="sm"
-        >
-          <c-heading size="sm" mb="4">Required Capabilities</c-heading>
+                <div class="detail-item">
+                  <span class="detail-label">Last Updated</span>
+                  <span class="detail-value">
+                    {{ formatDate(workflow?.updated_at) }}
+                  </span>
+                </div>
 
-          <c-v-stack spacing="2" align="stretch">
-            <c-badge
-              v-for="(cap, index) in mission.required_capabilities"
-              :key="index"
-              variant="outline"
-              color-scheme="blue"
-              p="2"
-            >
-              {{ formatCapabilityType(cap.capability_type) }}
-            </c-badge>
-          </c-v-stack>
-        </c-box>
+                <Divider />
 
-        <!-- Breakpoints -->
-        <c-box
-          v-if="mission?.breakpoints && mission.breakpoints.length > 0"
-          p="6"
-          bg="white"
-          border="1px"
-          border-color="gray.200"
-          border-radius="lg"
-          box-shadow="sm"
-        >
-          <c-heading size="sm" mb="4">Breakpoints</c-heading>
+                <div class="detail-item">
+                  <span class="detail-label">Min Trust Score</span>
+                  <span class="detail-value detail-value-bold">
+                    {{ mission?.min_trust_score || 0 }}
+                  </span>
+                </div>
 
-          <c-v-stack spacing="2" align="stretch">
-            <c-text
-              v-for="(bp, index) in mission.breakpoints"
-              :key="index"
-              font-size="sm"
-            >
-              • {{ formatBreakpointType(bp) }}
-            </c-text>
-          </c-v-stack>
-        </c-box>
-      </c-v-stack>
-    </c-grid>
+                <div v-if="mission?.max_cost" class="detail-item">
+                  <span class="detail-label">Max Cost</span>
+                  <span class="detail-value detail-value-bold">
+                    ${{ mission.max_cost }}
+                  </span>
+                </div>
+              </div>
+            </template>
+          </Card>
 
-    <!-- Breakpoint Approval Modal -->
-    <BreakpointApprovalModal
-      :is-open="showBreakpointModal"
-      :breakpoint="currentBreakpoint"
-      @close="showBreakpointModal = false"
-      @approved="handleBreakpointApproved"
-      @rejected="handleBreakpointRejected"
-    />
-  </c-box>
+          <!-- Required Capabilities -->
+          <Card v-if="mission?.required_capabilities && mission.required_capabilities.length > 0">
+            <template #content>
+              <h4 class="card-title">Required Capabilities</h4>
+
+              <div class="capability-list">
+                <Tag
+                  v-for="(cap, index) in mission.required_capabilities"
+                  :key="index"
+                  severity="info"
+                  class="capability-tag"
+                >
+                  {{ formatCapabilityType(cap.capability_type) }}
+                </Tag>
+              </div>
+            </template>
+          </Card>
+
+          <!-- Breakpoints -->
+          <Card v-if="mission?.breakpoints && mission.breakpoints.length > 0">
+            <template #content>
+              <h4 class="card-title">Breakpoints</h4>
+
+              <ul class="breakpoint-list">
+                <li
+                  v-for="(bp, index) in mission.breakpoints"
+                  :key="index"
+                >
+                  {{ formatBreakpointType(bp) }}
+                </li>
+              </ul>
+            </template>
+          </Card>
+        </div>
+      </div>
+
+      <!-- Breakpoint Approval Modal -->
+      <BreakpointApprovalModal
+        :is-open="showBreakpointModal"
+        :breakpoint="currentBreakpoint"
+        @close="showBreakpointModal = false"
+        @approved="handleBreakpointApproved"
+        @rejected="handleBreakpointRejected"
+      />
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  CBox,
-  CFlex,
-  CGrid,
-  CHStack,
-  CVStack,
-  CHeading,
-  CText,
-  CBadge,
-  CButton,
-  CProgress,
-  CSpinner,
-  CAlert,
-  CAlertIcon,
-  CAlertDescription,
-  CDivider,
-  CMenu,
-  CMenuButton,
-  CMenuList,
-  CMenuItem,
-  CMenuDivider,
-  CIcon
-} from '@chakra-ui/vue-next'
+import Button from 'primevue/button'
+import Card from 'primevue/card'
+import Tag from 'primevue/tag'
+import ProgressBar from 'primevue/progressbar'
+import ProgressSpinner from 'primevue/progressspinner'
+import Message from 'primevue/message'
+import Divider from 'primevue/divider'
+import Menu from 'primevue/menu'
+import AppLayout from '@/components/layout/AppLayout.vue'
 import { useMissionStore } from '@/stores/mission.store'
 import { useWorkflowWebSocket } from '@/composables/useWorkflowWebSocket'
 import WorkflowStageTimeline from '@/components/mission/WorkflowStageTimeline.vue'
@@ -294,6 +207,7 @@ const route = useRoute()
 const router = useRouter()
 const missionStore = useMissionStore()
 
+const menu = ref()
 const missionId = computed(() => route.params.id as string)
 const mission = computed(() => missionStore.missions.get(missionId.value))
 const workflow = computed(() => missionStore.workflows.get(missionId.value))
@@ -313,34 +227,47 @@ const pendingBreakpoints = computed(() =>
   )
 )
 
-const statusColorScheme = computed(() => {
+const statusSeverity = computed(() => {
   switch (workflow.value?.status) {
     case 'running':
-      return 'blue'
+      return 'info'
     case 'completed':
-      return 'green'
+      return 'success'
     case 'failed':
-      return 'red'
+      return 'danger'
     case 'paused':
-      return 'orange'
+      return 'warning'
     default:
-      return 'gray'
+      return 'secondary'
   }
-})
-
-const progressColorScheme = computed(() => {
-  const progress = workflow.value?.progress || 0
-  if (progress === 100) return 'green'
-  if (progress >= 50) return 'blue'
-  return 'gray'
 })
 
 const progressColor = computed(() => {
   const progress = workflow.value?.progress || 0
-  if (progress === 100) return 'green.600'
-  if (progress >= 50) return 'blue.600'
-  return 'gray.600'
+  if (progress === 100) return '#10b981'
+  if (progress >= 50) return '#3b82f6'
+  return '#64748b'
 })
+
+const actionMenuItems = computed(() => [
+  {
+    label: 'Refresh Status',
+    icon: 'pi pi-refresh',
+    command: handleRefresh
+  },
+  ...(workflow.value?.status === 'paused' ? [{
+    label: 'Resume Workflow',
+    icon: 'pi pi-play',
+    command: handleResume
+  }] : []),
+  { separator: true },
+  {
+    label: 'Cancel Mission',
+    icon: 'pi pi-times',
+    command: handleCancel,
+    class: 'text-red-500'
+  }
+])
 
 async function loadMissionDetails() {
   isLoading.value = true
@@ -431,3 +358,179 @@ onUnmounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.mission-detail {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.back-button {
+  margin-bottom: 1rem;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1e293b;
+}
+
+.status-tag {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+.mission-description {
+  color: #64748b;
+  margin: 0;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 0;
+  color: #64748b;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.main-content,
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.progress-label {
+  font-weight: 500;
+  color: #334155;
+}
+
+.progress-value {
+  font-weight: 700;
+}
+
+.progress-bar {
+  margin-bottom: 1rem;
+}
+
+.current-stage {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: #1e293b;
+}
+
+.detail-value-bold {
+  font-weight: 700;
+}
+
+.capability-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.capability-tag {
+  padding: 0.5rem 0.75rem;
+}
+
+.breakpoint-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.breakpoint-list li {
+  font-size: 0.875rem;
+  color: #475569;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.breakpoint-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #3b82f6;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

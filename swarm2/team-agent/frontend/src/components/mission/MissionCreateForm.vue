@@ -1,223 +1,216 @@
 <template>
-  <c-box as="form" @submit.prevent="handleSubmit">
-    <c-v-stack spacing="6" align="stretch">
+  <form @submit.prevent="handleSubmit" class="mission-create-form">
+    <div class="form-section">
       <!-- Mission Description -->
-      <c-form-control :is-invalid="errors.description" is-required>
-        <c-form-label>Mission Description</c-form-label>
-        <c-textarea
+      <div class="form-field" :class="{ 'p-invalid': errors.description }">
+        <label for="description" class="required">Mission Description</label>
+        <Textarea
+          id="description"
           v-model="form.description"
           placeholder="Describe what you want the agents to accomplish..."
           rows="4"
           @blur="validateField('description')"
+          :invalid="!!errors.description"
         />
-        <c-form-error-message v-if="errors.description">
+        <small v-if="errors.description" class="p-error">
           {{ errors.description }}
-        </c-form-error-message>
-        <c-form-helper-text>
+        </small>
+        <small v-else class="p-text-secondary">
           Provide a clear description of the mission objectives
-        </c-form-helper-text>
-      </c-form-control>
+        </small>
+      </div>
 
       <!-- Required Capabilities -->
-      <c-form-control :is-invalid="errors.required_capabilities">
-        <c-form-label>Required Capabilities</c-form-label>
-        <c-v-stack spacing="3">
-          <c-button
-            size="sm"
-            left-icon="+"
-            variant="outline"
-            @click="addCapability"
-          >
-            Add Capability
-          </c-button>
+      <div class="form-field" :class="{ 'p-invalid': errors.required_capabilities }">
+        <label>Required Capabilities</label>
 
-          <c-box
-            v-for="(cap, index) in form.required_capabilities"
-            :key="index"
-            p="4"
-            border="1px"
-            border-color="gray.200"
-            border-radius="md"
-          >
-            <c-h-stack spacing="3" mb="3">
-              <c-select
-                v-model="cap.capability_type"
-                placeholder="Select capability type"
-                flex="1"
-              >
-                <option value="code_generation">Code Generation</option>
-                <option value="code_review">Code Review</option>
-                <option value="testing">Testing</option>
-                <option value="security_audit">Security Audit</option>
-                <option value="documentation">Documentation</option>
-                <option value="deployment">Deployment</option>
-                <option value="monitoring">Monitoring</option>
-                <option value="data_analysis">Data Analysis</option>
-              </c-select>
-              <c-icon-button
-                aria-label="Remove capability"
-                icon="close"
-                size="sm"
-                color-scheme="red"
-                variant="ghost"
-                @click="removeCapability(index)"
+        <Button
+          label="Add Capability"
+          icon="pi pi-plus"
+          size="small"
+          outlined
+          @click="addCapability"
+          class="mb-3"
+        />
+
+        <div
+          v-for="(cap, index) in form.required_capabilities"
+          :key="index"
+          class="capability-item"
+        >
+          <div class="capability-header">
+            <Dropdown
+              v-model="cap.capability_type"
+              :options="capabilityTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select capability type"
+              class="flex-1"
+            />
+            <Button
+              icon="pi pi-times"
+              severity="danger"
+              text
+              rounded
+              @click="removeCapability(index)"
+              aria-label="Remove capability"
+            />
+          </div>
+
+          <div class="capability-params">
+            <div class="form-field">
+              <label>Min Trust Score</label>
+              <InputNumber
+                v-model="cap.min_trust_score"
+                :min="0"
+                :max="100"
+                :step="5"
               />
-            </c-h-stack>
+            </div>
 
-            <c-simple-grid columns="2" spacing="3">
-              <c-form-control>
-                <c-form-label font-size="sm">Min Trust Score</c-form-label>
-                <c-number-input
-                  v-model="cap.min_trust_score"
-                  :min="0"
-                  :max="100"
-                  :step="5"
-                />
-              </c-form-control>
+            <div class="form-field">
+              <label>Max Cost</label>
+              <InputNumber
+                v-model="cap.max_cost"
+                :min="0"
+                :step="10"
+              />
+            </div>
+          </div>
+        </div>
 
-              <c-form-control>
-                <c-form-label font-size="sm">Max Cost</c-form-label>
-                <c-number-input
-                  v-model="cap.max_cost"
-                  :min="0"
-                  :step="10"
-                />
-              </c-form-control>
-            </c-simple-grid>
-          </c-box>
-        </c-v-stack>
-        <c-form-error-message v-if="errors.required_capabilities">
+        <small v-if="errors.required_capabilities" class="p-error">
           {{ errors.required_capabilities }}
-        </c-form-error-message>
-      </c-form-control>
+        </small>
+      </div>
 
       <!-- Mission Parameters -->
-      <c-simple-grid columns="2" spacing="4">
-        <c-form-control>
-          <c-form-label>Min Trust Score</c-form-label>
-          <c-number-input
+      <div class="form-row">
+        <div class="form-field">
+          <label>Min Trust Score</label>
+          <InputNumber
             v-model="form.min_trust_score"
             :min="0"
             :max="100"
             :step="5"
           />
-          <c-form-helper-text>
+          <small class="p-text-secondary">
             Minimum trust score required (0-100)
-          </c-form-helper-text>
-        </c-form-control>
+          </small>
+        </div>
 
-        <c-form-control>
-          <c-form-label>Max Cost</c-form-label>
-          <c-number-input
+        <div class="form-field">
+          <label>Max Cost</label>
+          <InputNumber
             v-model="form.max_cost"
             :min="0"
             :step="50"
           />
-          <c-form-helper-text>
+          <small class="p-text-secondary">
             Maximum allowed cost (leave empty for unlimited)
-          </c-form-helper-text>
-        </c-form-control>
-      </c-simple-grid>
+          </small>
+        </div>
+      </div>
 
       <!-- Breakpoints -->
-      <c-form-control>
-        <c-form-label>Breakpoints</c-form-label>
-        <c-checkbox-group v-model="form.breakpoints">
-          <c-v-stack spacing="2" align="start">
-            <c-checkbox value="capability_selection">
-              Capability Selection - Require approval for capability choices
-            </c-checkbox>
-            <c-checkbox value="design_approval">
-              Design Approval - Review architecture before building
-            </c-checkbox>
-            <c-checkbox value="build_approval">
-              Build Approval - Review implementation before deployment
-            </c-checkbox>
-            <c-checkbox value="review_approval">
-              Review Approval - Confirm code review results
-            </c-checkbox>
-          </c-v-stack>
-        </c-checkbox-group>
-        <c-form-helper-text>
+      <div class="form-field">
+        <label>Breakpoints</label>
+        <div class="breakpoints-list">
+          <div v-for="bp in breakpointOptions" :key="bp.value" class="field-checkbox">
+            <Checkbox
+              v-model="form.breakpoints"
+              :inputId="bp.value"
+              :value="bp.value"
+            />
+            <label :for="bp.value">{{ bp.label }}</label>
+          </div>
+        </div>
+        <small class="p-text-secondary">
           Select stages where human approval is required
-        </c-form-helper-text>
-      </c-form-control>
+        </small>
+      </div>
 
       <!-- Auto-Approval Settings -->
-      <c-box p="4" bg="blue.50" border-radius="md">
-        <c-v-stack spacing="3" align="stretch">
-          <c-checkbox v-model="form.auto_approve_trusted">
-            Auto-approve high-trust agents
-          </c-checkbox>
+      <Panel header="Auto-Approval Settings" class="auto-approve-panel">
+        <div class="form-field">
+          <div class="field-checkbox">
+            <Checkbox
+              v-model="form.auto_approve_trusted"
+              inputId="autoApprove"
+              :binary="true"
+            />
+            <label for="autoApprove">Auto-approve high-trust agents</label>
+          </div>
+        </div>
 
-          <c-form-control v-if="form.auto_approve_trusted">
-            <c-form-label>Auto-Approve Threshold</c-form-label>
-            <c-slider
-              v-model="form.auto_approve_threshold"
-              :min="0"
-              :max="100"
-              :step="5"
-            >
-              <c-slider-track>
-                <c-slider-filled-track />
-              </c-slider-track>
-              <c-slider-thumb />
-            </c-slider>
-            <c-text font-size="sm" color="gray.600" mt="1">
-              Trust score ≥ {{ form.auto_approve_threshold }} will auto-approve
-            </c-text>
-          </c-form-control>
-        </c-v-stack>
-      </c-box>
+        <div v-if="form.auto_approve_trusted" class="form-field">
+          <label>Auto-Approve Threshold</label>
+          <Slider
+            v-model="form.auto_approve_threshold"
+            :min="0"
+            :max="100"
+            :step="5"
+            class="mb-2"
+          />
+          <small class="p-text-secondary">
+            Trust score ≥ {{ form.auto_approve_threshold }} will auto-approve
+          </small>
+        </div>
+      </Panel>
 
       <!-- Submit Buttons -->
-      <c-h-stack spacing="3" justify="flex-end">
-        <c-button variant="ghost" @click="handleCancel">
-          Cancel
-        </c-button>
-        <c-button
+      <div class="form-actions">
+        <Button
+          label="Cancel"
+          severity="secondary"
+          text
+          @click="handleCancel"
+        />
+        <Button
           type="submit"
-          color-scheme="blue"
-          :is-loading="isSubmitting"
-          :is-disabled="!isFormValid"
-        >
-          Submit Mission
-        </c-button>
-      </c-h-stack>
-    </c-v-stack>
-  </c-box>
+          label="Submit Mission"
+          icon="pi pi-check"
+          :loading="isSubmitting"
+          :disabled="!isFormValid"
+        />
+      </div>
+    </div>
+  </form>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  CBox,
-  CVStack,
-  CHStack,
-  CButton,
-  CFormControl,
-  CFormLabel,
-  CFormErrorMessage,
-  CFormHelperText,
-  CTextarea,
-  CSelect,
-  CNumberInput,
-  CCheckbox,
-  CCheckboxGroup,
-  CSlider,
-  CSliderTrack,
-  CSliderFilledTrack,
-  CSliderThumb,
-  CText,
-  CSimpleGrid,
-  CIconButton
-} from '@chakra-ui/vue-next'
+import Button from 'primevue/button'
+import Textarea from 'primevue/textarea'
+import Dropdown from 'primevue/dropdown'
+import InputNumber from 'primevue/inputnumber'
+import Checkbox from 'primevue/checkbox'
+import Slider from 'primevue/slider'
+import Panel from 'primevue/panel'
 import { useMissionStore } from '@/stores/mission.store'
 import type { MissionSpec, BreakpointType } from '@/types/mission.types'
 
 const router = useRouter()
 const missionStore = useMissionStore()
+
+const capabilityTypes = [
+  { label: 'Code Generation', value: 'code_generation' },
+  { label: 'Code Review', value: 'code_review' },
+  { label: 'Testing', value: 'testing' },
+  { label: 'Security Audit', value: 'security_audit' },
+  { label: 'Documentation', value: 'documentation' },
+  { label: 'Deployment', value: 'deployment' },
+  { label: 'Monitoring', value: 'monitoring' },
+  { label: 'Data Analysis', value: 'data_analysis' }
+]
+
+const breakpointOptions = [
+  { label: 'Capability Selection - Require approval for capability choices', value: 'capability_selection' },
+  { label: 'Design Approval - Review architecture before building', value: 'design_approval' },
+  { label: 'Build Approval - Review implementation before deployment', value: 'build_approval' },
+  { label: 'Review Approval - Confirm code review results', value: 'review_approval' }
+]
 
 const form = reactive({
   description: '',
@@ -310,3 +303,113 @@ function handleCancel() {
   router.push('/missions')
 }
 </script>
+
+<style scoped>
+.mission-create-form {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-field label.required::after {
+  content: ' *';
+  color: #ef4444;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.capability-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.capability-header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.capability-header .flex-1 {
+  flex: 1;
+}
+
+.capability-params {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.capability-params .form-field label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.breakpoints-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-checkbox label {
+  font-weight: 400 !important;
+  cursor: pointer;
+  margin: 0;
+}
+
+.auto-approve-panel {
+  background-color: #eff6ff;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+small.p-error {
+  color: #ef4444;
+}
+
+small.p-text-secondary {
+  color: #64748b;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+</style>

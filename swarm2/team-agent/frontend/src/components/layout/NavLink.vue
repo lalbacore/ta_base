@@ -1,24 +1,40 @@
 <template>
   <router-link :to="to" custom v-slot="{ navigate, isActive }">
-    <c-button
+    <Button
       @click="navigate"
-      w="full"
-      justify-content="flex-start"
-      :variant="isActive ? 'solid' : 'ghost'"
-      :color-scheme="isActive ? 'blue' : 'gray'"
-      left-icon="icon"
+      :severity="isActive ? 'primary' : 'secondary'"
+      :text="!isActive"
+      class="nav-link"
+      :class="{ 'active': isActive }"
     >
-      <c-text mr="2">{{ icon }}</c-text>
+      <span class="nav-icon">{{ icon }}</span>
       <slot />
-    </c-button>
+    </Button>
   </router-link>
 </template>
 
 <script setup lang="ts">
-import { CButton, CText } from '@chakra-ui/vue-next'
+import Button from 'primevue/button'
 
 defineProps<{
   to: string
   icon: string
 }>()
 </script>
+
+<style scoped>
+.nav-link {
+  width: 100%;
+  justify-content: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.nav-icon {
+  margin-right: 0.5rem;
+}
+
+.nav-link.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+</style>

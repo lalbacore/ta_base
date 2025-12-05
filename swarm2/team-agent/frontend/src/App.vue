@@ -1,66 +1,11 @@
 <template>
   <div id="app">
-    <div class="coming-soon">
-      <div class="container">
-        <h1>🚀 Team Agent Platform</h1>
-        <p class="subtitle">Multi-Agent Orchestration System</p>
-
-        <div class="status-card">
-          <h2>✅ Backend Running</h2>
-          <p>Flask API: <code>http://localhost:5174</code></p>
-
-          <h2 style="margin-top: 2rem;">✅ Frontend Running</h2>
-          <p>Vue 3 + Vite: <code>http://localhost:5173</code></p>
-        </div>
-
-        <div class="info-card">
-          <h3>🎉 Phase 2 Complete - Mission Management UI</h3>
-          <p>All code is written and tested! The UI components use Chakra UI which had dependency conflicts.</p>
-
-          <h4 style="margin-top: 1.5rem;">What's Implemented:</h4>
-          <ul style="text-align: left; max-width: 600px; margin: 1rem auto;">
-            <li>✅ Mission Create Form with validation</li>
-            <li>✅ Mission List with filtering</li>
-            <li>✅ Mission Detail with workflow timeline</li>
-            <li>✅ Breakpoint Approval Modal</li>
-            <li>✅ WebSocket real-time updates</li>
-            <li>✅ Pinia state management</li>
-            <li>✅ API service layer</li>
-          </ul>
-
-          <h4 style="margin-top: 1.5rem;">Next Steps:</h4>
-          <ul style="text-align: left; max-width: 600px; margin: 1rem auto;">
-            <li>🔧 Switch to PrimeVue or Vuetify (stable UI library)</li>
-            <li>🔧 Rebuild components with new UI library</li>
-            <li>🚀 Then you'll see the full working UI!</li>
-          </ul>
-        </div>
-
-        <div class="api-test">
-          <h3>Test the Backend API:</h3>
-          <p style="margin: 1rem 0;">
-            <a href="http://localhost:5174/health" target="_blank" class="button">
-              🔗 Open Health Check
-            </a>
-          </p>
-          <p class="small">Should return: <code>{"status": "healthy", "service": "team-agent-backend"}</code></p>
-        </div>
-
-        <div class="github-link">
-          <p>
-            <strong>📦 All code is on GitHub:</strong><br>
-            <a href="https://github.com/lalbacore/ta_base/pull/32" target="_blank">
-              Pull Request #32 - View Code
-            </a>
-          </p>
-        </div>
-      </div>
-    </div>
+    <router-view />
   </div>
 </template>
 
 <script setup lang="ts">
-// Placeholder until we add a stable UI library
+// Main app component - router handles all views
 </script>
 
 <style>

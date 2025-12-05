@@ -1,138 +1,72 @@
 <template>
-  <c-box>
-    <c-heading size="md" mb="4">Workflow Progress</c-heading>
+  <div class="workflow-timeline">
+    <h3 class="timeline-title">Workflow Progress</h3>
 
-    <c-v-stack spacing="0" align="stretch">
-      <c-box
-        v-for="(stage, index) in stages"
-        :key="stage.stage_name"
-        position="relative"
-      >
-        <!-- Timeline Line -->
-        <c-box
-          v-if="index < stages.length - 1"
-          position="absolute"
-          left="19px"
-          top="40px"
-          bottom="-40px"
-          w="2px"
-          :bg="getLineColor(stage, stages[index + 1])"
-        />
+    <div v-if="stages.length === 0" class="empty-state">
+      <p>No workflow stages yet</p>
+    </div>
 
-        <!-- Stage Item -->
-        <c-flex align="start" py="4">
-          <!-- Status Icon -->
-          <c-box
-            position="relative"
-            z-index="1"
-            flex-shrink="0"
-            mr="4"
+    <Timeline v-else :value="stages" class="custom-timeline">
+      <template #marker="slotProps">
+        <div class="timeline-marker" :class="`status-${slotProps.item.status}`">
+          <ProgressSpinner
+            v-if="slotProps.item.status === 'running'"
+            style="width: 24px; height: 24px"
+            strokeWidth="4"
+          />
+          <i v-else-if="slotProps.item.status === 'completed'" class="pi pi-check"></i>
+          <i v-else-if="slotProps.item.status === 'failed'" class="pi pi-times"></i>
+          <i v-else class="pi pi-circle"></i>
+        </div>
+      </template>
+
+      <template #content="slotProps">
+        <div class="stage-content">
+          <div class="stage-header">
+            <h4 class="stage-name">
+              {{ formatStageName(slotProps.item.stage_name) }}
+            </h4>
+            <Tag :severity="getStatusSeverity(slotProps.item.status)">
+              {{ slotProps.item.status }}
+            </Tag>
+          </div>
+
+          <p class="stage-description">
+            {{ getStageDescription(slotProps.item.stage_name) }}
+          </p>
+
+          <div class="stage-timestamps">
+            <span v-if="slotProps.item.started_at">
+              <i class="pi pi-clock"></i>
+              Started: {{ formatTimestamp(slotProps.item.started_at) }}
+            </span>
+            <span v-if="slotProps.item.completed_at">
+              <i class="pi pi-check-circle"></i>
+              Completed: {{ formatTimestamp(slotProps.item.completed_at) }}
+            </span>
+            <span v-if="slotProps.item.started_at && slotProps.item.completed_at">
+              <i class="pi pi-stopwatch"></i>
+              Duration: {{ calculateDuration(slotProps.item.started_at, slotProps.item.completed_at) }}
+            </span>
+          </div>
+
+          <div
+            v-if="slotProps.item.output && slotProps.item.status === 'completed'"
+            class="stage-output"
           >
-            <c-circle
-              size="40px"
-              :bg="getStatusColor(stage.status)"
-              color="white"
-              display="flex"
-              align-items="center"
-              justify-content="center"
-              box-shadow="0 0 0 4px white"
-            >
-              <c-text v-if="stage.status === 'completed'" font-size="xl">
-                ✓
-              </c-text>
-              <c-text v-else-if="stage.status === 'failed'" font-size="xl">
-                ✗
-              </c-text>
-              <c-spinner
-                v-else-if="stage.status === 'running'"
-                size="sm"
-                color="white"
-              />
-              <c-text v-else font-size="xl">
-                ○
-              </c-text>
-            </c-circle>
-          </c-box>
-
-          <!-- Stage Content -->
-          <c-box flex="1">
-            <c-h-stack spacing="3" mb="2">
-              <c-heading size="sm">
-                {{ formatStageName(stage.stage_name) }}
-              </c-heading>
-              <c-badge :color-scheme="getStatusColorScheme(stage.status)">
-                {{ stage.status }}
-              </c-badge>
-            </c-h-stack>
-
-            <c-text font-size="sm" color="gray.600" mb="2">
-              {{ getStageDescription(stage.stage_name) }}
-            </c-text>
-
-            <!-- Timestamps -->
-            <c-h-stack spacing="4" font-size="xs" color="gray.500">
-              <c-text v-if="stage.started_at">
-                Started: {{ formatTimestamp(stage.started_at) }}
-              </c-text>
-              <c-text v-if="stage.completed_at">
-                Completed: {{ formatTimestamp(stage.completed_at) }}
-              </c-text>
-              <c-text v-if="stage.started_at && stage.completed_at">
-                Duration: {{ calculateDuration(stage.started_at, stage.completed_at) }}
-              </c-text>
-            </c-h-stack>
-
-            <!-- Stage Output (if available) -->
-            <c-box
-              v-if="stage.output && stage.status === 'completed'"
-              mt="3"
-              p="3"
-              bg="gray.50"
-              border-radius="md"
-              border="1px"
-              border-color="gray.200"
-            >
-              <c-text font-size="sm" font-weight="medium" mb="2">
-                Output
-              </c-text>
-              <c-code font-size="xs" display="block" white-space="pre-wrap">
-                {{ JSON.stringify(stage.output, null, 2) }}
-              </c-code>
-            </c-box>
-          </c-box>
-        </c-flex>
-      </c-box>
-    </c-v-stack>
-
-    <!-- Empty State -->
-    <c-box
-      v-if="stages.length === 0"
-      p="8"
-      text-align="center"
-      border="2px dashed"
-      border-color="gray.300"
-      border-radius="md"
-    >
-      <c-text color="gray.500">
-        No workflow stages yet
-      </c-text>
-    </c-box>
-  </c-box>
+            <div class="output-label">Output</div>
+            <pre class="output-code">{{ JSON.stringify(slotProps.item.output, null, 2) }}</pre>
+          </div>
+        </div>
+      </template>
+    </Timeline>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {
-  CBox,
-  CFlex,
-  CHStack,
-  CVStack,
-  CHeading,
-  CText,
-  CBadge,
-  CCircle,
-  CSpinner,
-  CCode
-} from '@chakra-ui/vue-next'
+import Timeline from 'primevue/timeline'
+import Tag from 'primevue/tag'
+import ProgressSpinner from 'primevue/progressspinner'
 import type { WorkflowStage } from '@/types/mission.types'
 
 defineProps<{
@@ -159,40 +93,17 @@ function getStageDescription(stage: string): string {
   return descriptions[stage] || 'Processing stage...'
 }
 
-function getStatusColor(status: string): string {
+function getStatusSeverity(status: string): string {
   switch (status) {
     case 'completed':
-      return 'green.500'
+      return 'success'
     case 'running':
-      return 'blue.500'
+      return 'info'
     case 'failed':
-      return 'red.500'
+      return 'danger'
     default:
-      return 'gray.300'
+      return 'secondary'
   }
-}
-
-function getStatusColorScheme(status: string): string {
-  switch (status) {
-    case 'completed':
-      return 'green'
-    case 'running':
-      return 'blue'
-    case 'failed':
-      return 'red'
-    default:
-      return 'gray'
-  }
-}
-
-function getLineColor(currentStage: WorkflowStage, nextStage: WorkflowStage): string {
-  if (currentStage.status === 'completed') {
-    if (nextStage.status === 'pending') {
-      return 'gray.300'
-    }
-    return 'green.500'
-  }
-  return 'gray.300'
 }
 
 function formatTimestamp(timestamp: string): string {
@@ -217,3 +128,119 @@ function calculateDuration(start: string, end: string): string {
   return `${hours}h ${remainingMinutes}m`
 }
 </script>
+
+<style scoped>
+.workflow-timeline {
+  padding: 1rem;
+}
+
+.timeline-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+.timeline-marker {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.25rem;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.timeline-marker.status-completed {
+  background-color: #10b981;
+}
+
+.timeline-marker.status-running {
+  background-color: #3b82f6;
+}
+
+.timeline-marker.status-failed {
+  background-color: #ef4444;
+}
+
+.timeline-marker.status-pending {
+  background-color: #cbd5e1;
+  color: #64748b;
+}
+
+.stage-content {
+  padding-bottom: 2rem;
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.stage-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1e293b;
+}
+
+.stage-description {
+  color: #64748b;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.stage-timestamps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.stage-timestamps span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.stage-timestamps i {
+  font-size: 0.75rem;
+}
+
+.stage-output {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.output-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #334155;
+}
+
+.output-code {
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  color: #1e293b;
+}
+</style>

@@ -1,36 +1,16 @@
 <template>
-  <c-box h="100vh" display="flex" flex-direction="column">
+  <div class="app-layout">
     <!-- Header -->
-    <c-box
-      as="header"
-      bg="gray.800"
-      color="white"
-      px="6"
-      py="4"
-      box-shadow="sm"
-      display="flex"
-      align-items="center"
-      justify-content="space-between"
-    >
-      <c-heading size="md">Team Agent Platform</c-heading>
-      <c-flex align="center" gap="4">
-        <c-text font-size="sm">Multi-Agent Orchestration</c-text>
-      </c-flex>
-    </c-box>
+    <header class="app-header">
+      <h1 class="app-title">Team Agent Platform</h1>
+      <span class="app-subtitle">Multi-Agent Orchestration</span>
+    </header>
 
     <!-- Main Container -->
-    <c-flex flex="1" overflow="hidden">
+    <div class="app-main">
       <!-- Sidebar -->
-      <c-box
-        as="nav"
-        w="250px"
-        bg="gray.50"
-        border-right="1px"
-        border-color="gray.200"
-        overflow-y="auto"
-        p="4"
-      >
-        <c-v-stack spacing="2" align="stretch">
+      <nav class="app-sidebar">
+        <div class="nav-links">
           <NavLink to="/" icon="📊">Dashboard</NavLink>
           <NavLink to="/missions" icon="🎯">Missions</NavLink>
           <NavLink to="/trust" icon="🔒">Trust Scoring</NavLink>
@@ -39,18 +19,73 @@
           <NavLink to="/governance" icon="⚖️">Governance</NavLink>
           <NavLink to="/artifacts" icon="📦">Artifacts</NavLink>
           <NavLink to="/logs" icon="📝">Logs</NavLink>
-        </c-v-stack>
-      </c-box>
+        </div>
+      </nav>
 
       <!-- Content Area -->
-      <c-box flex="1" overflow-y="auto" bg="white">
+      <main class="app-content">
         <router-view />
-      </c-box>
-    </c-flex>
-  </c-box>
+      </main>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { CBox, CFlex, CHeading, CText, CVStack } from '@chakra-ui/vue-next'
 import NavLink from './NavLink.vue'
 </script>
+
+<style scoped>
+.app-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background-color: #1e293b;
+  color: white;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.app-subtitle {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.app-sidebar {
+  width: 250px;
+  background-color: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #ffffff;
+  padding: 1.5rem;
+}
+</style>

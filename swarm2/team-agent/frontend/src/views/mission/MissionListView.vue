@@ -1,89 +1,68 @@
 <template>
-  <c-box p="8">
-    <c-flex justify="space-between" align="center" mb="6">
-      <c-box>
-        <c-heading mb="2">Missions</c-heading>
-        <c-text color="gray.600">
-          Manage and monitor your workflow missions
-        </c-text>
-      </c-box>
-      <c-button color-scheme="blue" @click="navigateToCreate">
-        + Create Mission
-      </c-button>
-    </c-flex>
+  <AppLayout>
+    <div class="mission-list">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Missions</h1>
+          <p class="page-subtitle">
+            Manage and monitor your workflow missions
+          </p>
+        </div>
+        <Button
+          label="Create Mission"
+          icon="pi pi-plus"
+          @click="navigateToCreate"
+        />
+      </div>
 
-    <!-- Filter Tabs -->
-    <c-tabs variant="enclosed" mb="6" @change="handleTabChange">
-      <c-tab-list>
-        <c-tab>All ({{ allMissions.length }})</c-tab>
-        <c-tab>Active ({{ activeMissions.length }})</c-tab>
-        <c-tab>Completed ({{ completedMissions.length }})</c-tab>
-        <c-tab>Failed ({{ failedMissions.length }})</c-tab>
-      </c-tab-list>
-    </c-tabs>
+      <!-- Filter Tabs -->
+      <TabView v-model:activeIndex="currentTab" class="mission-tabs">
+        <TabPanel :header="`All (${allMissions.length})`"></TabPanel>
+        <TabPanel :header="`Active (${activeMissions.length})`"></TabPanel>
+        <TabPanel :header="`Completed (${completedMissions.length})`"></TabPanel>
+        <TabPanel :header="`Failed (${failedMissions.length})`"></TabPanel>
+      </TabView>
 
-    <!-- Loading State -->
-    <c-box v-if="isLoading" text-align="center" py="12">
-      <c-spinner size="xl" color="blue.500" mb="4" />
-      <c-text color="gray.600">Loading missions...</c-text>
-    </c-box>
+      <!-- Loading State -->
+      <div v-if="isLoading" class="loading-state">
+        <ProgressSpinner />
+        <p>Loading missions...</p>
+      </div>
 
-    <!-- Empty State -->
-    <c-box
-      v-else-if="filteredMissions.length === 0"
-      p="12"
-      text-align="center"
-      border="2px dashed"
-      border-color="gray.300"
-      border-radius="lg"
-      bg="gray.50"
-    >
-      <c-text font-size="xl" color="gray.500" mb="2">
-        {{ emptyStateMessage }}
-      </c-text>
-      <c-text color="gray.400" mb="4">
-        {{ emptyStateSubtext }}
-      </c-text>
-      <c-button
-        v-if="currentTab === 0"
-        color-scheme="blue"
-        @click="navigateToCreate"
-      >
-        Create Your First Mission
-      </c-button>
-    </c-box>
+      <!-- Empty State -->
+      <div v-else-if="filteredMissions.length === 0" class="empty-state">
+        <i class="pi pi-inbox empty-icon"></i>
+        <h3>{{ emptyStateMessage }}</h3>
+        <p>{{ emptyStateSubtext }}</p>
+        <Button
+          v-if="currentTab === 0"
+          label="Create Your First Mission"
+          icon="pi pi-plus"
+          @click="navigateToCreate"
+        />
+      </div>
 
-    <!-- Mission Grid -->
-    <c-simple-grid
-      v-else
-      columns="{ base: 1, md: 2, lg: 3 }"
-      spacing="6"
-    >
-      <MissionCard
-        v-for="mission in filteredMissions"
-        :key="mission.mission_id"
-        :mission="mission"
-        :workflow="getWorkflowForMission(mission.mission_id)"
-      />
-    </c-simple-grid>
-  </c-box>
+      <!-- Mission Grid -->
+      <div v-else class="mission-grid">
+        <MissionCard
+          v-for="mission in filteredMissions"
+          :key="mission.mission_id"
+          :mission="mission"
+          :workflow="getWorkflowForMission(mission.mission_id)"
+        />
+      </div>
+    </div>
+  </AppLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  CBox,
-  CFlex,
-  CHeading,
-  CButton,
-  CText,
-  CTabs,
-  CTabList,
-  CTab,
-  CSimpleGrid,
-  CSpinner
-} from '@chakra-ui/vue-next'
+import Button from 'primevue/button'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import ProgressSpinner from 'primevue/progressspinner'
+import AppLayout from '@/components/layout/AppLayout.vue'
 import { useMissionStore } from '@/stores/mission.store'
 import MissionCard from '@/components/mission/MissionCard.vue'
 
@@ -159,10 +138,6 @@ function getWorkflowForMission(missionId: string) {
   return missionStore.workflows.get(missionId)
 }
 
-function handleTabChange(index: number) {
-  currentTab.value = index
-}
-
 function navigateToCreate() {
   router.push('/missions/create')
 }
@@ -181,3 +156,93 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.mission-list {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.page-subtitle {
+  color: #64748b;
+  margin: 0;
+}
+
+.mission-tabs {
+  margin-bottom: 2rem;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 0;
+  color: #64748b;
+}
+
+.loading-state p {
+  margin-top: 1rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background-color: #f8fafc;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+.mission-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .mission-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
