@@ -8,6 +8,7 @@ from .crl import CRLManager, RevocationReason
 from .ocsp import OCSPResponder, OCSPStatus
 from .lifecycle import CertificateLifecycleManager, CertificateStatus, NotificationLevel
 from .trust import AgentReputationTracker, EventType, TrustMetrics
+from .secrets import SecretsManager, SecretType, AccessLevel, SecretMetadata, SecretHandle
 
 __all__ = [
     "PKIManager",
@@ -25,4 +26,9 @@ __all__ = [
     "AgentReputationTracker",
     "EventType",
     "TrustMetrics",
+    "SecretsManager",
+    "SecretType",
+    "AccessLevel",
+    "SecretMetadata",
+    "SecretHandle",
 ]
