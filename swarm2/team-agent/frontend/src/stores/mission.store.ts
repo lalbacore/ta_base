@@ -24,18 +24,42 @@ export const useMissionStore = defineStore('mission', () => {
 
   // Actions
   async function submitMission(mission: MissionSpec): Promise<string> {
-    // TODO: API call
-    missions.value.set(mission.mission_id, mission)
-    return mission.mission_id
+    const missionService = await import('@/services/mission.service')
+    const result = await missionService.default.submitMission(mission)
+
+    missions.value.set(result.mission_id, mission)
+
+    // Create initial workflow status
+    workflows.value.set(result.mission_id, {
+      workflow_id: result.mission_id,
+      mission_id: result.mission_id,
+      status: 'pending',
+      current_stage: 'initializing',
+      progress: 0,
+      stages: [],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+
+    return result.mission_id
   }
 
   async function fetchWorkflowStatus(workflowId: string): Promise<WorkflowStatus | null> {
-    // TODO: API call
+    const missionService = await import('@/services/mission.service')
+    const status = await missionService.default.getWorkflowStatus(workflowId)
+
+    if (status) {
+      workflows.value.set(workflowId, status)
+      return status
+    }
+
     return workflows.value.get(workflowId) || null
   }
 
   async function approveBreakpoint(breakpointId: string, optionIndex: number): Promise<void> {
-    // TODO: API call
+    const missionService = await import('@/services/mission.service')
+    await missionService.default.approveBreakpoint(breakpointId, optionIndex)
+
     const breakpoint = breakpoints.value.get(breakpointId)
     if (breakpoint) {
       breakpoint.status = 'approved'
@@ -43,11 +67,31 @@ export const useMissionStore = defineStore('mission', () => {
   }
 
   async function rejectBreakpoint(breakpointId: string): Promise<void> {
-    // TODO: API call
+    const missionService = await import('@/services/mission.service')
+    await missionService.default.rejectBreakpoint(breakpointId)
+
     const breakpoint = breakpoints.value.get(breakpointId)
     if (breakpoint) {
       breakpoint.status = 'rejected'
     }
+  }
+
+  async function listMissions(): Promise<void> {
+    const missionService = await import('@/services/mission.service')
+    const missionList = await missionService.default.listMissions()
+
+    missionList.forEach(mission => {
+      missions.value.set(mission.mission_id, mission)
+    })
+  }
+
+  async function listWorkflows(): Promise<void> {
+    const missionService = await import('@/services/mission.service')
+    const workflowList = await missionService.default.listWorkflows()
+
+    workflowList.forEach(workflow => {
+      workflows.value.set(workflow.workflow_id, workflow)
+    })
   }
 
   return {
@@ -61,6 +105,8 @@ export const useMissionStore = defineStore('mission', () => {
     submitMission,
     fetchWorkflowStatus,
     approveBreakpoint,
-    rejectBreakpoint
+    rejectBreakpoint,
+    listMissions,
+    listWorkflows
   }
 })
