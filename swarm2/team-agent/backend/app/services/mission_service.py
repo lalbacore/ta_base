@@ -208,6 +208,11 @@ class MissionService:
         # Count artifacts
         artifacts = list(workflow_dir.glob('*.py'))
 
+        # Read stages from turing tape, or fallback to workflow record
+        stages = self._read_workflow_stages(actual_workflow_id)
+        if not stages:
+            stages = self._generate_stages_from_record(workflow_dir)
+
         return {
             'workflow_id': actual_workflow_id,
             'mission_id': mission_id if mission else actual_workflow_id,
@@ -219,7 +224,7 @@ class MissionService:
             'created_at': mission.get('submitted_at') if mission else datetime.fromtimestamp(workflow_dir.stat().st_ctime).isoformat(),
             'updated_at': mission.get('updated_at') if mission else datetime.now().isoformat(),
             'completed_at': mission.get('completed_at') if mission else datetime.fromtimestamp(workflow_dir.stat().st_mtime).isoformat(),
-            'stages': []
+            'stages': stages
         }
 
     def list_workflows(self) -> List[Dict[str, Any]]:
@@ -275,6 +280,203 @@ class MissionService:
         """Get breakpoint details."""
         # Not implemented yet - would require breakpoint support
         return None
+
+    def _read_workflow_stages(self, workflow_id: str) -> List[Dict[str, Any]]:
+        """
+        Read workflow stages from turing tape.
+
+        Args:
+            workflow_id: Workflow identifier
+
+        Returns:
+            List of stage dictionaries
+        """
+        # Tape is in project directory, not home directory
+        project_root = Path(__file__).parent.parent.parent
+        tape_path = project_root / ".team_agent" / "tape" / f"{workflow_id}.jsonl"
+
+        if not tape_path.exists():
+            return []
+
+        stages = []
+        agent_entries = {}  # Group entries by agent
+
+        try:
+            with open(tape_path, 'r') as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+
+                    entry = json.loads(line)
+                    agent = entry.get('agent', 'unknown')
+
+                    if agent not in agent_entries:
+                        agent_entries[agent] = []
+
+                    agent_entries[agent].append(entry)
+
+            # Convert agent entries to stages
+            stage_order = ['orchestrator', 'architect', 'builder', 'critic', 'recorder']
+
+            for agent in stage_order:
+                if agent not in agent_entries:
+                    continue
+
+                entries = agent_entries[agent]
+                if not entries:
+                    continue
+
+                # Get first and last entry for timing
+                first_entry = entries[0]
+                last_entry = entries[-1]
+
+                # Determine status
+                status = 'completed'
+                output = {}
+
+                # Try to extract meaningful output
+                if 'state' in last_entry:
+                    state = last_entry['state']
+                    if isinstance(state, dict):
+                        # Extract key information based on agent type
+                        if agent == 'architect' and 'architecture' in state:
+                            output = {'architecture': state['architecture']}
+                        elif agent == 'builder' and 'artifacts' in state:
+                            output = {'artifacts_count': len(state.get('artifacts', []))}
+                        elif agent == 'critic' and 'review' in state:
+                            output = {'score': state.get('review', {}).get('score')}
+                        elif agent == 'recorder' and 'published' in state:
+                            output = {'published': state['published']}
+                        else:
+                            output = {'completed': True}
+
+                stages.append({
+                    'stage_name': agent,
+                    'status': status,
+                    'started_at': first_entry.get('ts', datetime.now().isoformat()),
+                    'completed_at': last_entry.get('ts', datetime.now().isoformat()),
+                    'output': output
+                })
+
+        except Exception as e:
+            print(f"Error reading turing tape for {workflow_id}: {e}")
+            return []
+
+        return stages
+
+    def _generate_stages_from_record(self, workflow_dir: Path) -> List[Dict[str, Any]]:
+        """
+        Generate workflow stages from workflow record when turing tape doesn't exist.
+
+        Args:
+            workflow_dir: Path to workflow output directory
+
+        Returns:
+            List of stage dictionaries
+        """
+        stages = []
+
+        # Find workflow record file
+        record_files = list(workflow_dir.glob('*_record.json'))
+        if not record_files:
+            # No record file - generate basic stages from directory existence
+            # If the workflow directory exists and has files, assume all phases completed
+            files = list(workflow_dir.glob('*.py'))
+            if files:
+                # Use the earliest file timestamp as start time
+                earliest_file = min(files, key=lambda f: f.stat().st_ctime)
+                base_time = datetime.fromtimestamp(earliest_file.stat().st_ctime)
+
+                # Generate basic stages for completed workflow
+                stage_names = ['orchestrator', 'architect', 'builder', 'critic', 'recorder']
+                for i, stage_name in enumerate(stage_names):
+                    stages.append({
+                        'stage_name': stage_name,
+                        'status': 'completed',
+                        'started_at': base_time.isoformat(),
+                        'completed_at': base_time.isoformat(),
+                        'output': {'completed': True}
+                    })
+
+                return stages
+            return []
+
+        try:
+            with open(record_files[0], 'r') as f:
+                record = json.load(f)
+
+            # Use file modification time as fallback for timing
+            record_mtime = datetime.fromtimestamp(record_files[0].stat().st_mtime)
+            base_time = record_mtime
+
+            # Generate orchestrator stage (always happens first)
+            stages.append({
+                'stage_name': 'orchestrator',
+                'status': 'completed',
+                'started_at': base_time.isoformat(),
+                'completed_at': base_time.isoformat(),
+                'output': {'mission': record.get('mission', '')}
+            })
+
+            # Generate architect stage if architecture exists
+            if 'architecture' in record and record['architecture']:
+                stages.append({
+                    'stage_name': 'architect',
+                    'status': 'completed',
+                    'started_at': base_time.isoformat(),
+                    'completed_at': base_time.isoformat(),
+                    'output': {'architecture': record['architecture']}
+                })
+
+            # Generate builder stage if implementation exists
+            if 'implementation' in record and record['implementation']:
+                impl = record['implementation']
+                output = {}
+                if 'artifacts' in impl:
+                    output['artifacts_count'] = len(impl['artifacts'])
+                if 'capability_used' in impl:
+                    output['capability_used'] = impl['capability_used']
+
+                stages.append({
+                    'stage_name': 'builder',
+                    'status': 'completed',
+                    'started_at': base_time.isoformat(),
+                    'completed_at': base_time.isoformat(),
+                    'output': output
+                })
+
+            # Generate critic stage if review exists
+            if 'review' in record and record['review']:
+                review = record['review']
+                output = {}
+                if 'score' in review:
+                    output['score'] = review['score']
+                if 'issues' in review:
+                    output['issues_count'] = len(review['issues'])
+
+                stages.append({
+                    'stage_name': 'critic',
+                    'status': 'completed',
+                    'started_at': base_time.isoformat(),
+                    'completed_at': base_time.isoformat(),
+                    'output': output
+                })
+
+            # Generate recorder stage if artifacts exist
+            if 'artifacts' in record and record['artifacts']:
+                stages.append({
+                    'stage_name': 'recorder',
+                    'status': 'completed',
+                    'started_at': base_time.isoformat(),
+                    'completed_at': record.get('timestamp', base_time.isoformat()),
+                    'output': {'published': True, 'artifacts': record['artifacts']}
+                })
+
+        except Exception as e:
+            print(f"Error generating stages from record: {e}")
+            return []
+
+        return stages
 
     def _load_seed_missions(self):
         """Load sample missions from seed data for demo purposes."""
