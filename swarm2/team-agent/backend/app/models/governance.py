@@ -11,9 +11,9 @@ from app.models.base import Base, TimestampMixin
 
 class GovernancePolicy(Base, TimestampMixin):
     """
-    Global governance policy configuration.
+    Governance policy configuration.
 
-    Stores the active policy settings that control:
+    Stores policy settings that control:
     - Mission approval requirements
     - Trust score thresholds
     - Security and code review requirements
@@ -21,11 +21,17 @@ class GovernancePolicy(Base, TimestampMixin):
     - Cost limits
     - Breakpoint and auto-approval settings
 
-    There should typically be only one active policy record.
+    Multiple policies can exist (templates, dev/staging/prod),
+    but only one should be active at a time.
     """
     __tablename__ = 'governance_policies'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+
+    # Policy metadata
+    name = Column(String, nullable=False, unique=True)  # e.g. "Production", "Development", "Strict"
+    description = Column(Text)  # Human-readable description
+    is_active = Column(Boolean, default=False, nullable=False, index=True)  # Only one should be active
 
     # Trust and approval settings
     min_trust_score = Column(Float, nullable=False, default=75.0)
@@ -45,13 +51,16 @@ class GovernancePolicy(Base, TimestampMixin):
     enable_breakpoints = Column(Boolean, default=True, nullable=False)
 
     def __repr__(self):
-        return (f"<GovernancePolicy(id={self.id}, min_trust={self.min_trust_score}, "
-                f"threshold={self.auto_approve_threshold})>")
+        return (f"<GovernancePolicy(id={self.id}, name='{self.name}', "
+                f"active={self.is_active})>")
 
     def to_dict(self):
         """Convert to dictionary for API responses."""
         return {
             'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'is_active': self.is_active,
             'min_trust_score': self.min_trust_score,
             'require_security_review': self.require_security_review,
             'allowed_languages': self.allowed_languages,

@@ -26,17 +26,27 @@ class GovernanceService:
 
     def get_policy_config(self) -> Dict[str, Any]:
         """
-        Get current policy configuration from database.
+        Get current active policy configuration from database.
 
-        Returns the first (and should be only) policy record.
-        If no policy exists, creates a default one.
+        Returns the active policy record.
+        If no active policy exists, returns the first policy or creates a default one.
         """
         with get_backend_session() as session:
-            policy = session.query(GovernancePolicy).first()
+            # Try to get active policy first
+            policy = session.query(GovernancePolicy)\
+                .filter(GovernancePolicy.is_active == True)\
+                .first()
+
+            # Fall back to first policy if no active one
+            if not policy:
+                policy = session.query(GovernancePolicy).first()
 
             if not policy:
                 # Create default policy if none exists
                 policy = GovernancePolicy(
+                    name='Default Policy',
+                    description='Default governance policy for Team Agent missions',
+                    is_active=True,
                     min_trust_score=75.0,
                     require_security_review=True,
                     allowed_languages=['python', 'javascript', 'typescript', 'go', 'rust'],
@@ -84,6 +94,120 @@ class GovernanceService:
                 .all()
 
             return [decision.to_dict() for decision in decisions]
+
+    # Policy CRUD Methods
+
+    def get_all_policies(self) -> List[Dict[str, Any]]:
+        """
+        Get all governance policies from database.
+
+        Returns all policies with their metadata (name, description, active status).
+        """
+        with get_backend_session() as session:
+            policies = session.query(GovernancePolicy)\
+                .order_by(GovernancePolicy.is_active.desc(), GovernancePolicy.name)\
+                .all()
+
+            return [policy.to_dict() for policy in policies]
+
+    def get_active_policy(self) -> Optional[Dict[str, Any]]:
+        """
+        Get the currently active policy.
+
+        Returns None if no active policy exists.
+        """
+        with get_backend_session() as session:
+            policy = session.query(GovernancePolicy)\
+                .filter(GovernancePolicy.is_active == True)\
+                .first()
+
+            return policy.to_dict() if policy else None
+
+    def create_policy(self, policy_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Create a new governance policy.
+
+        New policies are created as inactive by default.
+        To activate, call activate_policy() separately.
+        """
+        with get_backend_session() as session:
+            # Ensure new policies start as inactive
+            policy_data['is_active'] = False
+
+            policy = GovernancePolicy(**policy_data)
+            session.add(policy)
+            session.flush()  # Get the ID
+
+            return policy.to_dict()
+
+    def update_policy(self, policy_id: int, policy_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Update an existing governance policy.
+
+        Cannot change is_active via this method - use activate_policy() instead.
+        """
+        with get_backend_session() as session:
+            policy = session.query(GovernancePolicy)\
+                .filter(GovernancePolicy.id == policy_id)\
+                .first()
+
+            if not policy:
+                raise ValueError(f"Policy {policy_id} not found")
+
+            # Don't allow changing is_active via update
+            if 'is_active' in policy_data:
+                del policy_data['is_active']
+
+            # Update fields
+            for key, value in policy_data.items():
+                if hasattr(policy, key):
+                    setattr(policy, key, value)
+
+            session.flush()
+            return policy.to_dict()
+
+    def delete_policy(self, policy_id: int) -> None:
+        """
+        Delete a governance policy.
+
+        Cannot delete the active policy - deactivate it first.
+        """
+        with get_backend_session() as session:
+            policy = session.query(GovernancePolicy)\
+                .filter(GovernancePolicy.id == policy_id)\
+                .first()
+
+            if not policy:
+                raise ValueError(f"Policy {policy_id} not found")
+
+            if policy.is_active:
+                raise ValueError("Cannot delete active policy - activate another policy first")
+
+            session.delete(policy)
+
+    def activate_policy(self, policy_id: int) -> Dict[str, Any]:
+        """
+        Activate a governance policy.
+
+        Automatically deactivates all other policies (only one can be active).
+        """
+        with get_backend_session() as session:
+            # Deactivate all policies
+            session.query(GovernancePolicy)\
+                .update({GovernancePolicy.is_active: False})
+
+            # Activate the selected policy
+            policy = session.query(GovernancePolicy)\
+                .filter(GovernancePolicy.id == policy_id)\
+                .first()
+
+            if not policy:
+                raise ValueError(f"Policy {policy_id} not found")
+
+            policy.is_active = True
+            session.flush()
+
+            return policy.to_dict()
 
     def get_pending_gates(self) -> List[Dict[str, Any]]:
         """Get pending approval gates."""

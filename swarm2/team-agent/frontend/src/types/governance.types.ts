@@ -1,4 +1,8 @@
-export interface PolicyConfig {
+export interface Policy {
+  id: number
+  name: string
+  description: string | null
+  is_active: boolean
   min_trust_score: number
   require_security_review: boolean
   allowed_languages: string[]
@@ -6,6 +10,24 @@ export interface PolicyConfig {
   require_code_review: boolean
   auto_approve_threshold: number
   enable_breakpoints: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface PolicyConfig {
+  id?: number
+  name?: string
+  description?: string | null
+  is_active?: boolean
+  min_trust_score: number
+  require_security_review: boolean
+  allowed_languages: string[]
+  max_cost_per_mission: number
+  require_code_review: boolean
+  auto_approve_threshold: number
+  enable_breakpoints: boolean
+  created_at?: string
+  updated_at?: string
 }
 
 export interface GovernanceDecision {

@@ -99,7 +99,7 @@ class Orchestrator:
         except Exception:
             pass
 
-        final_record = self._execute_workflow(mission, architect, critic, recorder, governance)
+        final_record = self._execute_workflow(mission, architect, builder, critic, recorder, governance)
         return {"workflow_id": self.current_workflow_id, "final_record": final_record}
 
     def _prepare_context(self, base: dict | str) -> dict:
@@ -115,7 +115,7 @@ class Orchestrator:
         ctx = self._prepare_context(payload)
         return agent.run(ctx)
 
-    def _execute_workflow(self, mission: str, architect, critic, recorder, governance=None) -> dict:
+    def _execute_workflow(self, mission: str, architect, builder, critic, recorder, governance=None) -> dict:
         self.logger.info(f"Starting workflow execution: {mission}")
 
         # Phase 1
@@ -131,23 +131,26 @@ class Orchestrator:
 
         # Phase 2
         self.logger.info("Phase 2: Implementation")
-        builder_result = self.dynamic_builder.run(
-            mission=mission,
-            architecture=json.dumps(architect_output),
-        )
+        # Use actual Builder agent with LLM-powered code generation
+        builder_result = self._run_agent(builder, architect_output)
 
         # Phase 3: Review
         self.logger.info("Phase 3: Review")
-        
-        # Handle artifacts as either dict or list
-        artifacts = builder_result.get("artifacts", {})
-        if isinstance(artifacts, list):
-            # Convert list to dict, extract code from first artifact
-            code = artifacts[0].get("content", "") if artifacts else ""
+
+        # Extract code from builder result
+        # Builder returns generated_code list with component code
+        generated_code = builder_result.get("generated_code", [])
+        if generated_code:
+            # Combine all component code for review
+            code = "\n\n".join(item.get("code", "") for item in generated_code)
         else:
-            # Dict format
-            code = artifacts.get("primary_code", "")
-        
+            # Fallback for dict format (DynamicBuilder)
+            artifacts = builder_result.get("artifacts", {})
+            if isinstance(artifacts, dict):
+                code = artifacts.get("primary_code", "")
+            else:
+                code = ""
+
         critic_payload = {
             "mission": mission,
             "architecture": architect_output,
@@ -172,25 +175,35 @@ class Orchestrator:
         workflow_dir = Path(self.output_dir) / self.current_workflow_id
         workflow_dir.mkdir(parents=True, exist_ok=True)
 
-        artifacts = builder_result.get("artifacts", {})
         published_artifacts = {}
-        
-        # Handle both dict and list formats
-        if isinstance(artifacts, list):
-            for idx, artifact in enumerate(artifacts):
-                name = artifact.get("name", f"artifact_{idx}")
-                content = artifact.get("content", "")
-                filename = artifact.get("filename", f"{name}.py")
-                path = workflow_dir / filename
-                path.write_text(content)
-                published_artifacts[name] = str(path)
+
+        # Check if Builder generated code
+        generated_code = builder_result.get("generated_code", [])
+        if generated_code:
+            # Write out code from Builder's generated_code list
+            for item in generated_code:
+                component = item.get("component", "unknown")
+                code = item.get("code", "")
+                if code:
+                    filename = f"{component}.py"
+                    path = workflow_dir / filename
+                    path.write_text(code)
+                    published_artifacts[component] = str(path)
+
+            # Use first component as primary code
+            if generated_code:
+                published_artifacts["primary_code"] = published_artifacts.get(
+                    generated_code[0].get("component", "unknown"), ""
+                )
         else:
-            # Dict format
-            for name, content in artifacts.items():
-                suffix = ".py" if not any(name.endswith(ext) for ext in (".md", ".txt", ".json")) else ""
-                path = workflow_dir / f"{name}{suffix}"
-                path.write_text(content)
-                published_artifacts[name] = str(path)
+            # Fallback for DynamicBuilder dict format
+            artifacts = builder_result.get("artifacts", {})
+            if isinstance(artifacts, dict):
+                for name, content in artifacts.items():
+                    suffix = ".py" if not any(name.endswith(ext) for ext in (".md", ".txt", ".json")) else ""
+                    path = workflow_dir / f"{name}{suffix}"
+                    path.write_text(content)
+                    published_artifacts[name] = str(path)
 
         recorder_payload = {
             "mission": mission,

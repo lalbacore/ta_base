@@ -182,8 +182,13 @@ class Builder:
         Run the builder with a context dict.
         Extracts design from context and delegates to act().
         """
+        # Check if the context itself is a design output (has status="designed")
+        if context.get("status") == "designed":
+            return self.act(context)
+
+        # Otherwise try to extract nested design
         design = context.get("architecture") or context.get("design")
-        
+
         # If we have a valid design, use act()
         if design and isinstance(design, dict) and design.get("status") == "designed":
             return self.act(design)

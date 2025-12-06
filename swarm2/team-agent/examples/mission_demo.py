@@ -8,6 +8,10 @@ import yaml
 import argparse
 from pathlib import Path
 from typing import Dict, Any, Optional
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -145,14 +149,14 @@ def print_detailed_results(results: dict):
 def run_simple_mission():
     """Run a simple text-based mission."""
     print_banner("🚀 SIMPLE MISSION: Text Input", "=")
-    
-    orchestrator = Orchestrator(team_id="simple_demo")
+
+    orchestrator = Orchestrator(output_dir="./team_output")
     mission_text = "Build a Python program that prints 'Hello, World!' with proper documentation"
-    
+
     print(f"📝 Mission: {mission_text}\n")
     print("⚙️  Executing workflow...\n")
-    
-    results = orchestrator.execute_mission(mission_text)
+
+    results = orchestrator.execute(mission_text)
     print_detailed_results(results)
 
 

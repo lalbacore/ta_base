@@ -3,11 +3,13 @@
     <router-view />
   </AppLayout>
   <Toast />
+  <ConfirmDialog />
 </template>
 
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Toast from 'primevue/toast'
+import ConfirmDialog from 'primevue/confirmdialog'
 </script>
 
 <style>

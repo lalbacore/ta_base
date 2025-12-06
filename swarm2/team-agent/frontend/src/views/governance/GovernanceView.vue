@@ -11,7 +11,7 @@
 
     <TabView>
       <!-- Policy Configuration Tab -->
-      <TabPanel header="Policy Configuration">
+      <TabPanel header="Active Policy">
         <Card>
           <template #content>
             <div v-if="policyConfig" class="policy-grid">
@@ -73,6 +73,117 @@
                 </div>
               </div>
             </div>
+          </template>
+        </Card>
+      </TabPanel>
+
+      <!-- Policy Management Tab -->
+      <TabPanel header="⚙️ Policy Management">
+        <Card>
+          <template #header>
+            <div class="policy-management-header">
+              <div>
+                <h2>Policy Management</h2>
+                <p>Create and manage governance policies (Government agents only)</p>
+              </div>
+              <Button
+                label="Create Policy"
+                icon="pi pi-plus"
+                @click="showPolicyDialog(null)"
+                severity="success"
+              />
+            </div>
+          </template>
+          <template #content>
+            <DataTable
+              :value="policies"
+              :paginator="true"
+              :rows="10"
+              responsiveLayout="scroll"
+              :loading="isLoadingPolicies"
+            >
+              <Column field="name" header="Policy Name" sortable>
+                <template #body="slotProps">
+                  <div class="policy-name-cell">
+                    <strong>{{ slotProps.data.name }}</strong>
+                    <Tag
+                      v-if="slotProps.data.is_active"
+                      severity="success"
+                      value="ACTIVE"
+                      class="active-badge"
+                    />
+                  </div>
+                </template>
+              </Column>
+              <Column field="description" header="Description">
+                <template #body="slotProps">
+                  <span class="description-text">{{ slotProps.data.description || '—' }}</span>
+                </template>
+              </Column>
+              <Column field="min_trust_score" header="Min Trust" sortable>
+                <template #body="slotProps">
+                  <ProgressBar
+                    :value="slotProps.data.min_trust_score"
+                    :showValue="true"
+                    style="width: 100px"
+                  />
+                </template>
+              </Column>
+              <Column field="max_cost_per_mission" header="Max Cost" sortable>
+                <template #body="slotProps">
+                  ${{ slotProps.data.max_cost_per_mission }}
+                </template>
+              </Column>
+              <Column field="allowed_languages" header="Languages">
+                <template #body="slotProps">
+                  <div class="language-chips">
+                    <Chip
+                      v-for="lang in slotProps.data.allowed_languages.slice(0, 2)"
+                      :key="lang"
+                      :label="lang"
+                      class="small-chip"
+                    />
+                    <Chip
+                      v-if="slotProps.data.allowed_languages.length > 2"
+                      :label="`+${slotProps.data.allowed_languages.length - 2}`"
+                      class="small-chip"
+                    />
+                  </div>
+                </template>
+              </Column>
+              <Column header="Actions" style="width: 200px">
+                <template #body="slotProps">
+                  <div class="action-buttons">
+                    <Button
+                      v-if="!slotProps.data.is_active"
+                      icon="pi pi-check"
+                      @click="activatePolicy(slotProps.data.id)"
+                      severity="success"
+                      text
+                      rounded
+                      v-tooltip.top="'Activate'"
+                    />
+                    <Button
+                      icon="pi pi-pencil"
+                      @click="showPolicyDialog(slotProps.data)"
+                      severity="info"
+                      text
+                      rounded
+                      v-tooltip.top="'Edit'"
+                    />
+                    <Button
+                      v-if="!slotProps.data.is_active"
+                      icon="pi pi-trash"
+                      @click="confirmDeletePolicy(slotProps.data)"
+                      severity="danger"
+                      text
+                      rounded
+                      v-tooltip.top="'Delete'"
+                    />
+                  </div>
+                </template>
+              </Column>
+            </DataTable>
           </template>
         </Card>
       </TabPanel>
@@ -248,12 +359,20 @@
         </Card>
       </TabPanel>
     </TabView>
+
+    <!-- Policy Editor Dialog -->
+    <PolicyEditorDialog
+      v-model:visible="showPolicyEditorDialog"
+      :policy="selectedPolicy"
+      @save="handleSavePolicy"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import Card from 'primevue/card'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -268,15 +387,23 @@ import MultiSelect from 'primevue/multiselect'
 import Message from 'primevue/message'
 import { useGovernanceStore } from '@/stores/governance.store'
 import governanceService from '@/services/governance.service'
-import type { ComplianceReport } from '@/types/governance.types'
+import PolicyEditorDialog from '@/components/governance/PolicyEditorDialog.vue'
+import type { ComplianceReport, Policy } from '@/types/governance.types'
 
 const toast = useToast()
+const confirm = useConfirm()
 const governanceStore = useGovernanceStore()
 
 const policyConfig = computed(() => governanceStore.policyConfig)
+const policies = computed(() => governanceStore.policies)
 const decisions = computed(() => governanceStore.decisions)
 const isChecking = ref(false)
+const isLoadingPolicies = ref(false)
 const complianceReport = ref<ComplianceReport | null>(null)
+
+// Policy Management State
+const showPolicyEditorDialog = ref(false)
+const selectedPolicy = ref<Policy | null>(null)
 
 const testMission = ref({
   min_trust_score: 80,
@@ -360,10 +487,100 @@ function formatDate(dateString: string): string {
   })
 }
 
+// Policy Management Functions
+
+function showPolicyDialog(policy: Policy | null) {
+  selectedPolicy.value = policy
+  showPolicyEditorDialog.value = true
+}
+
+async function handleSavePolicy(policyData: any) {
+  try {
+    if (selectedPolicy.value) {
+      // Update existing policy
+      await governanceStore.updatePolicy(selectedPolicy.value.id, policyData)
+      toast.add({
+        severity: 'success',
+        summary: 'Policy Updated',
+        detail: `Policy "${policyData.name}" has been updated`,
+        life: 3000
+      })
+    } else {
+      // Create new policy
+      await governanceStore.createPolicy(policyData)
+      toast.add({
+        severity: 'success',
+        summary: 'Policy Created',
+        detail: `Policy "${policyData.name}" has been created`,
+        life: 3000
+      })
+    }
+    await governanceStore.fetchPolicies()
+  } catch (error: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.response?.data?.error || 'Failed to save policy',
+      life: 5000
+    })
+  }
+}
+
+async function activatePolicy(policyId: number) {
+  try {
+    await governanceStore.activatePolicy(policyId)
+    toast.add({
+      severity: 'success',
+      summary: 'Policy Activated',
+      detail: 'The policy has been activated',
+      life: 3000
+    })
+  } catch (error: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Activation Failed',
+      detail: error.response?.data?.error || 'Failed to activate policy',
+      life: 5000
+    })
+  }
+}
+
+function confirmDeletePolicy(policy: Policy) {
+  confirm.require({
+    message: `Are you sure you want to delete the policy "${policy.name}"? This action cannot be undone.`,
+    header: 'Delete Policy',
+    icon: 'pi pi-exclamation-triangle',
+    acceptLabel: 'Delete',
+    rejectLabel: 'Cancel',
+    acceptClass: 'p-button-danger',
+    accept: () => deletePolicy(policy.id)
+  })
+}
+
+async function deletePolicy(policyId: number) {
+  try {
+    await governanceStore.deletePolicy(policyId)
+    toast.add({
+      severity: 'success',
+      summary: 'Policy Deleted',
+      detail: 'The policy has been deleted',
+      life: 3000
+    })
+  } catch (error: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Deletion Failed',
+      detail: error.response?.data?.error || 'Failed to delete policy',
+      life: 5000
+    })
+  }
+}
+
 onMounted(async () => {
   try {
     await Promise.all([
       governanceStore.fetchPolicyConfig(),
+      governanceStore.fetchPolicies(),
       governanceStore.fetchDecisions()
     ])
   } catch (error) {
@@ -623,5 +840,59 @@ onMounted(async () => {
 .policy-section :deep(.p-message small) {
   color: #64748b;
   font-size: 0.75rem;
+}
+
+/* Policy Management Styles */
+.policy-management-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.policy-management-header h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  color: #1e293b;
+}
+
+.policy-management-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.policy-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.active-badge {
+  font-size: 0.65rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.description-text {
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.language-chips {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.small-chip {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
 }
 </style>

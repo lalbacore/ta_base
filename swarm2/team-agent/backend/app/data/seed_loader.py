@@ -31,6 +31,9 @@ def seed_governance_policy():
 
         # Create default policy
         policy = GovernancePolicy(
+            name='Default Policy',
+            description='Default governance policy for Team Agent missions',
+            is_active=True,
             min_trust_score=75.0,
             require_security_review=True,
             allowed_languages=['python', 'javascript', 'typescript', 'go', 'rust'],
