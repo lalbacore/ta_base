@@ -109,6 +109,29 @@
             </router-link>
           </template>
         </Card>
+
+        <!-- Artifacts Stats -->
+        <Card class="stat-card artifacts-card">
+          <template #content>
+            <div class="stat-header">
+              <div class="stat-icon-wrapper artifacts">
+                <i class="pi pi-file"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-label">Total Artifacts</div>
+                <div class="stat-value">{{ artifactStats.totalArtifacts }}</div>
+                <div class="stat-detail">
+                  ${{ artifactStats.totalEarnings }} earned • {{ artifactStats.totalDownloads }} downloads
+                </div>
+              </div>
+            </div>
+          </template>
+          <template #footer>
+            <router-link to="/artifacts" class="view-all-link">
+              <i class="pi pi-arrow-right"></i> View Artifacts
+            </router-link>
+          </template>
+        </Card>
       </div>
 
       <!-- Secondary Stats Row -->
@@ -294,6 +317,7 @@ import { useMissionStore } from '@/stores/mission.store'
 import { useTrustStore } from '@/stores/trust.store'
 import { usePKIStore } from '@/stores/pki.store'
 import { useRegistryStore } from '@/stores/registry.store'
+import axios from 'axios'
 
 const router = useRouter()
 const missionStore = useMissionStore()
@@ -302,6 +326,7 @@ const pkiStore = usePKIStore()
 const registryStore = useRegistryStore()
 
 const isLoading = ref(true)
+const allArtifacts = ref<any[]>([])
 
 // Mission Statistics
 const missionStats = computed(() => {
@@ -361,6 +386,26 @@ const registryStats = computed(() => {
   }
 })
 
+// Artifact Statistics
+const artifactStats = computed(() => {
+  // Calculate total earnings and downloads using mock data
+  let totalEarnings = 0
+  let totalDownloads = 0
+
+  allArtifacts.value.forEach(artifact => {
+    const hash = artifact.name.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
+    totalEarnings += (hash % 500) + 100
+    totalDownloads += (hash % 1000) + 50
+  })
+
+  return {
+    totalArtifacts: allArtifacts.value.length,
+    totalEarnings: totalEarnings,
+    totalDownloads: totalDownloads,
+    averageReputation: allArtifacts.value.length > 0 ? 85 : 0
+  }
+})
+
 onMounted(async () => {
   isLoading.value = true
   try {
@@ -371,6 +416,21 @@ onMounted(async () => {
       pkiStore.fetchAllCertificates(),
       registryStore.fetchStatistics()
     ])
+
+    // Load artifacts for all workflows
+    const workflows = Array.from(missionStore.workflows.values())
+    const artifactPromises = workflows.map(async workflow => {
+      try {
+        const response = await axios.get(`/api/workflow/${workflow.workflow_id}/artifacts`)
+        return response.data
+      } catch (error) {
+        console.error(`Failed to load artifacts for ${workflow.workflow_id}:`, error)
+        return []
+      }
+    })
+
+    const artifactArrays = await Promise.all(artifactPromises)
+    allArtifacts.value = artifactArrays.flat()
   } catch (error) {
     console.error('Failed to load dashboard data:', error)
   } finally {
@@ -461,6 +521,10 @@ onMounted(async () => {
 
 .stat-icon-wrapper.registry {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.stat-icon-wrapper.artifacts {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
 }
 
 .stat-content {

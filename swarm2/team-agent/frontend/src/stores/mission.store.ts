@@ -94,6 +94,10 @@ export const useMissionStore = defineStore('mission', () => {
     })
   }
 
+  // Aliases for compatibility
+  const fetchMissions = listMissions
+  const fetchWorkflows = listWorkflows
+
   return {
     missions,
     workflows,
@@ -107,6 +111,8 @@ export const useMissionStore = defineStore('mission', () => {
     approveBreakpoint,
     rejectBreakpoint,
     listMissions,
-    listWorkflows
+    listWorkflows,
+    fetchMissions,
+    fetchWorkflows
   }
 })

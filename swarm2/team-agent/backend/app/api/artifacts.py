@@ -60,3 +60,18 @@ def export_manifest(workflow_id):
         return jsonify(manifest_text), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@artifacts_bp.route('/workflow/<workflow_id>/artifact/<artifact_name>/publish', methods=['POST'])
+def publish_artifact(workflow_id, artifact_name):
+    """Publish artifact to capability registry."""
+    try:
+        publish_data = request.get_json() or {}
+        result = artifacts_service.publish_to_registry(workflow_id, artifact_name, publish_data)
+
+        if result.get('success'):
+            return jsonify(result), 201
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
