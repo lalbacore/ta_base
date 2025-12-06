@@ -307,32 +307,25 @@ class PKIService:
         Returns:
             List of revoked certificate records
         """
-        revoked_certs = []
+        # Get revoked certificates directly from CRL database
+        # (they won't be in list_certificates() since those are active certs from files)
+        try:
+            # Get any provider to access the shared CRL manager
+            first_provider = next(iter(self.providers.values()))
 
-        if domain:
-            providers_to_check = [(domain, self.providers[domain])]
-        else:
-            providers_to_check = list(self.providers.items())
+            if hasattr(first_provider, 'crl_manager') and first_provider.crl_manager:
+                # Use CRL manager's list_revoked_certificates method
+                revoked_certs = first_provider.crl_manager.list_revoked_certificates(
+                    trust_domain=domain,
+                    limit=limit
+                )
+                return revoked_certs
+            else:
+                return []
 
-        for domain_name, provider in providers_to_check:
-            try:
-                # Get revoked certs from provider
-                domain_revoked = provider.list_certificates(TrustDomain(domain_name))
-
-                # Filter for revoked ones
-                for cert in domain_revoked:
-                    serial = cert.get('serial')
-                    if serial and provider.is_revoked(serial):
-                        revocation_info = provider.get_revocation_info(serial)
-                        if revocation_info:
-                            revocation_info['domain'] = domain_name
-                            revoked_certs.append(revocation_info)
-
-            except Exception as e:
-                print(f"Error getting revoked certificates for {domain_name}: {e}")
-                continue
-
-        return revoked_certs[:limit]
+        except Exception as e:
+            print(f"Error getting revoked certificates: {e}")
+            return []
 
     def get_provider_info(self, domain: str = None) -> Dict[str, Any]:
         """

@@ -52,7 +52,9 @@ class CRLManager:
         """
         self.db_path = db_path or Path(".team_agent/pki/crl.db")
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self.conn = sqlite3.connect(str(self.db_path))
+        # Allow cross-thread usage for Flask request handlers
+        # Safe because: 1) Writes are immediately committed, 2) No complex transactions
+        self.conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self.conn.row_factory = sqlite3.Row  # Access columns by name
         self._init_database()
 
