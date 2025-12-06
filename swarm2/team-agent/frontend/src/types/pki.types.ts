@@ -37,3 +37,28 @@ export interface CertificateAuditLog {
   timestamp: string
   details: any
 }
+
+export interface LifecycleStatus {
+  summary: {
+    expired: number
+    critical: number
+    expiring_soon: number
+    warning: number
+    valid: number
+  }
+  alerts: Array<{
+    domain: string
+    severity: 'expired' | 'critical' | 'expiring_soon' | 'warning'
+    message: string
+    days_until_expiry: number
+  }>
+  certificates_by_status: {
+    expired: Certificate[]
+    critical: Certificate[]
+    expiring_soon: Certificate[]
+    warning: Certificate[]
+    valid: Certificate[]
+  }
+  requires_action: number
+  total_certificates: number
+}

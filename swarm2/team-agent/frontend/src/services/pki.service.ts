@@ -1,5 +1,5 @@
 import apiClient from './api.client'
-import type { Certificate, CRLData, TrustDomain, RevocationInfo } from '@/types/pki.types'
+import type { Certificate, CRLData, TrustDomain, RevocationInfo, LifecycleStatus } from '@/types/pki.types'
 
 export class PKIService {
   async getAllCertificates(): Promise<Certificate[]> {
@@ -16,16 +16,41 @@ export class PKIService {
     await apiClient.post(`/pki/renew/${domain}`)
   }
 
-  async rotateCertificate(domain: TrustDomain): Promise<void> {
-    await apiClient.post(`/pki/rotate/${domain}`)
+  async rotateCertificate(domain: TrustDomain): Promise<any> {
+    const response = await apiClient.post(`/pki/certificate/${domain}/rotate`)
+    return response.data
   }
 
-  async revokeCertificate(serialNumber: string, reason: string): Promise<void> {
-    await apiClient.post('/pki/revoke', { serial_number: serialNumber, reason })
+  async revokeCertificate(serialNumber: string, reason: string, domain?: string): Promise<any> {
+    const response = await apiClient.post(`/pki/certificate/${serialNumber}/revoke`, {
+      reason,
+      revoked_by: 'admin',
+      domain
+    })
+    return response.data
   }
 
-  async getRevokedCertificates(): Promise<RevocationInfo[]> {
-    const response = await apiClient.get('/pki/revoked')
+  async getRevokedCertificates(domain?: string, limit = 100): Promise<RevocationInfo[]> {
+    const params = new URLSearchParams()
+    if (domain) params.append('domain', domain)
+    params.append('limit', limit.toString())
+
+    const response = await apiClient.get(`/pki/revoked?${params.toString()}`)
+    return response.data.revoked_certificates || []
+  }
+
+  async getLifecycleStatus(): Promise<LifecycleStatus> {
+    const response = await apiClient.get('/pki/lifecycle/status')
+    return response.data
+  }
+
+  async autoRenewCertificates(dryRun = false): Promise<any> {
+    const response = await apiClient.post('/pki/lifecycle/auto-renew', { dry_run: dryRun })
+    return response.data
+  }
+
+  async simulateRenewal(): Promise<any> {
+    const response = await apiClient.get('/pki/lifecycle/simulate')
     return response.data
   }
 
