@@ -1,46 +1,20 @@
 """
-Agent-to-Agent (A2A) communication and capability discovery.
+Agent2Agent (A2A) Protocol Implementation.
 
-This package provides:
-- Capability registry for publishing and discovering agent capabilities
-- A2A protocol for direct agent-to-agent communication
-- Smart contract integration for decentralized capability marketplace
-- Trust-based capability matching and ranking
+Provides client and server components for agent discovery and interoperability.
 """
 
-from .registry import (
-    CapabilityRegistry,
-    Capability,
-    CapabilityType,
-    CapabilityStatus,
-    Provider,
-    CapabilityRequirement,
-    CapabilityMatch,
-)
-
-from .protocol import (
-    A2AClient,
-    A2AServer,
-    A2AMessage,
-    A2ARequest,
-    MessageType,
-    RequestStatus,
-)
+from .client import A2AClient, AgentCard, CapabilityManifest
+from .discovery import AgentDiscovery, DiscoveryConfig
+from .matcher import AgentMatcher, MatchCriteria, MatchResult
 
 __all__ = [
-    # Registry
-    "CapabilityRegistry",
-    "Capability",
-    "CapabilityType",
-    "CapabilityStatus",
-    "Provider",
-    "CapabilityRequirement",
-    "CapabilityMatch",
-    # Protocol
-    "A2AClient",
-    "A2AServer",
-    "A2AMessage",
-    "A2ARequest",
-    "MessageType",
-    "RequestStatus",
+    'A2AClient',
+    'AgentCard',
+    'CapabilityManifest',
+    'AgentDiscovery',
+    'DiscoveryConfig',
+    'AgentMatcher',
+    'MatchCriteria',
+    'MatchResult'
 ]

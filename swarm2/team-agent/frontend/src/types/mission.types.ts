@@ -17,6 +17,7 @@ export interface MissionSpec {
   mission_id: string
   description: string
   required_capabilities: CapabilityRequirement[]
+  selected_agents?: string[]  // Optional: pre-selected agent IDs for mission
   max_cost?: number
   min_trust_score: number
   breakpoints: BreakpointType[]

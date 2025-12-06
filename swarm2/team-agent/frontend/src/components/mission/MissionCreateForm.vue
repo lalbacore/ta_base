@@ -84,6 +84,19 @@
         </small>
       </div>
 
+      <!-- Agent Discovery & Selection -->
+      <Panel header="Agent Selection (Optional)" toggleable>
+        <p class="panel-description">
+          Discover and select specific agents for this mission. If no agents are selected,
+          the system will automatically choose the best matching agents during execution.
+        </p>
+        <AgentDiscovery
+          v-model="form.selected_agents"
+          :min-trust-score="form.min_trust_score"
+          @agents-loaded="handleAgentsLoaded"
+        />
+      </Panel>
+
       <!-- Mission Parameters -->
       <div class="form-row">
         <div class="form-field">
@@ -190,6 +203,8 @@ import Slider from 'primevue/slider'
 import Panel from 'primevue/panel'
 import { useMissionStore } from '@/stores/mission.store'
 import type { MissionSpec, BreakpointType } from '@/types/mission.types'
+import type { AgentCard } from '@/types/agent.types'
+import AgentDiscovery from './AgentDiscovery.vue'
 
 const router = useRouter()
 const missionStore = useMissionStore()
@@ -219,6 +234,7 @@ const form = reactive({
     min_trust_score?: number
     max_cost?: number
   }>,
+  selected_agents: [] as string[],
   min_trust_score: 75,
   max_cost: undefined as number | undefined,
   breakpoints: [] as BreakpointType[],
@@ -265,6 +281,10 @@ function validateField(field: string) {
   }
 }
 
+function handleAgentsLoaded(agents: AgentCard[]) {
+  console.log(`Discovered ${agents.length} agents`)
+}
+
 async function handleSubmit() {
   // Validate all fields
   validateField('description')
@@ -280,6 +300,7 @@ async function handleSubmit() {
       mission_id: `mission_${Date.now()}`,
       description: form.description,
       required_capabilities: form.required_capabilities.filter(c => c.capability_type),
+      selected_agents: form.selected_agents.length > 0 ? form.selected_agents : undefined,
       max_cost: form.max_cost,
       min_trust_score: form.min_trust_score,
       breakpoints: form.breakpoints,
@@ -411,5 +432,12 @@ small.p-text-secondary {
 
 .mb-3 {
   margin-bottom: 0.75rem;
+}
+
+.panel-description {
+  margin: 0 0 1.5rem 0;
+  color: #64748b;
+  font-size: 0.875rem;
+  line-height: 1.5;
 }
 </style>
