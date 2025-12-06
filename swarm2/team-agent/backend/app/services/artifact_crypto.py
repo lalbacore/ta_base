@@ -17,7 +17,7 @@ import secrets
 # Add parent directory to path for PKI imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from swarms.team_agent.crypto import Signer, Verifier, TrustDomain
+from swarms.team_agent.crypto import Signer, Verifier, TrustDomain, PKIManager
 
 
 class ArtifactCrypto:
@@ -35,7 +35,17 @@ class ArtifactCrypto:
             trust_domain: PKI trust domain for signing (default: LOGGING)
         """
         self.trust_domain = trust_domain
-        self.signer = Signer(trust_domain=trust_domain)
+
+        # Get certificate and private key from PKI manager
+        pki = PKIManager()
+        cert_data = pki.get_certificate_chain(trust_domain)
+
+        # Initialize signer with certificate materials
+        self.signer = Signer(
+            private_key_pem=cert_data['key'],
+            certificate_pem=cert_data['cert'],
+            signer_id=f"artifact_crypto_{trust_domain.value}"
+        )
 
     def encrypt(
         self,
