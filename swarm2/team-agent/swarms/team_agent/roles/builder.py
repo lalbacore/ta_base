@@ -170,6 +170,11 @@ class Builder:
         }
 
         self.builds.append(build)
+
+        # Sign output if signer is available
+        if self.signer and CRYPTO_AVAILABLE:
+            build = self.signer.sign_dict(build)
+
         return build
 
     def run(self, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -192,7 +197,7 @@ class Builder:
         )
         code = gen_result.output.get("code", f"# Generated for: {mission}\npass") if gen_result.success else f"# {mission}\npass"
         
-        return {
+        result = {
             "status": "built",
             "build_id": str(uuid.uuid4()),
             "code": code,
@@ -208,6 +213,12 @@ class Builder:
             },
             "tools_used": ["code_generator"],
         }
+
+        # Sign output if signer is available
+        if self.signer and CRYPTO_AVAILABLE:
+            result = self.signer.sign_dict(result)
+
+        return result
 
     def describe(self) -> Dict[str, Any]:
         """

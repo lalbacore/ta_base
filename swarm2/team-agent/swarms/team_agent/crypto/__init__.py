@@ -9,6 +9,8 @@ from .ocsp import OCSPResponder, OCSPStatus
 from .lifecycle import CertificateLifecycleManager, CertificateStatus, NotificationLevel
 from .trust import AgentReputationTracker, EventType, TrustMetrics
 from .secrets import SecretsManager, SecretType, AccessLevel, SecretMetadata, SecretHandle
+from .manifest import ManifestGenerator
+from .artifacts import ArtifactSigner, create_artifact_manifest
 
 __all__ = [
     "PKIManager",
@@ -31,4 +33,7 @@ __all__ = [
     "AccessLevel",
     "SecretMetadata",
     "SecretHandle",
+    "ManifestGenerator",
+    "ArtifactSigner",
+    "create_artifact_manifest",
 ]

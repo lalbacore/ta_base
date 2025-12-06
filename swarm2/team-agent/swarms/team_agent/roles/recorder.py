@@ -11,11 +11,12 @@ from ..tools import ToolRegistry, ScoringTool
 
 # Import crypto modules (optional)
 try:
-    from swarms.team_agent.crypto import Signer
+    from swarms.team_agent.crypto import Signer, ManifestGenerator
     CRYPTO_AVAILABLE = True
 except ImportError:
     CRYPTO_AVAILABLE = False
     Signer = None
+    ManifestGenerator = None
 
 
 class Recorder:
@@ -53,6 +54,11 @@ class Recorder:
                 )
             except Exception:
                 pass
+
+        # Initialize manifest generator
+        self.manifest_generator = None
+        if CRYPTO_AVAILABLE and ManifestGenerator:
+            self.manifest_generator = ManifestGenerator()
 
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""
@@ -160,6 +166,40 @@ class Recorder:
             "tools_used": ["content_scorer"],
         }
         self.records.append(record)
+
+        # Generate comprehensive manifest if available
+        if self.manifest_generator:
+            role_outputs = {
+                "architect": design,
+                "builder": build,
+                "critic": review,
+                "governance": governance,
+                "recorder": record,
+            }
+
+            # Extract mission description from request or context
+            mission = payload.get("request", {}).get("mission", "Unknown mission") if isinstance(payload.get("request"), dict) else "Unknown mission"
+
+            # Generate artifacts list from build
+            artifacts = []
+            if build and isinstance(build, dict):
+                for artifact in build.get("artifacts", []):
+                    if isinstance(artifact, dict):
+                        artifacts.append({
+                            "type": artifact.get("type", "implementation"),
+                            "name": artifact.get("component", "unnamed"),
+                            "status": artifact.get("status", "unknown"),
+                        })
+
+            manifest = self.manifest_generator.generate_manifest(
+                workflow_id=self.workflow_id,
+                mission=mission,
+                role_outputs=role_outputs,
+                artifacts=artifacts
+            )
+
+            record["manifest"] = manifest
+            record["manifest_text"] = self.manifest_generator.export_manifest(manifest, format="text")
 
         # Sign output if signer is available
         if self.signer and CRYPTO_AVAILABLE:
