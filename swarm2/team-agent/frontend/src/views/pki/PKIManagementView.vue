@@ -7,11 +7,6 @@
           Manage certificates, monitor expiration, and maintain trust domains
         </p>
       </div>
-      <Button
-        label="Generate Certificate"
-        icon="pi pi-plus"
-        @click="showGenerateModal = true"
-      />
     </div>
 
     <!-- Lifecycle Alerts Component -->
@@ -63,13 +58,7 @@
             <i class="pi pi-shield empty-icon"></i>
             <h3>No Certificates Found</h3>
             <p v-if="statusFilter">No certificates match the selected status filter</p>
-            <p v-else>Generate a new certificate to get started</p>
-            <Button
-              label="Generate Certificate"
-              icon="pi pi-plus"
-              v-if="!statusFilter"
-              @click="showGenerateModal = true"
-            />
+            <p v-else>Certificates are automatically generated for all trust domains when the PKI initializes</p>
           </div>
         </div>
       </TabPanel>
@@ -79,13 +68,6 @@
         <RevokedCertificatesView ref="revokedCertsRef" />
       </TabPanel>
     </TabView>
-
-    <!-- Generate Certificate Modal -->
-    <GenerateCertificateModal
-      :is-open="showGenerateModal"
-      @close="showGenerateModal = false"
-      @generate="handleGenerate"
-    />
 
     <!-- Certificate Details Dialog -->
     <Dialog
@@ -237,7 +219,6 @@ import Dropdown from 'primevue/dropdown'
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import CertificateCard from '@/components/pki/CertificateCard.vue'
-import GenerateCertificateModal from '@/components/pki/GenerateCertificateModal.vue'
 import LifecycleAlerts from '@/components/pki/LifecycleAlerts.vue'
 import RevokedCertificatesView from '@/components/pki/RevokedCertificatesView.vue'
 import pkiService from '@/services/pki.service'
@@ -245,7 +226,6 @@ import pkiService from '@/services/pki.service'
 const toast = useToast()
 
 const isLoading = ref(false)
-const showGenerateModal = ref(false)
 const showDetailsDialog = ref(false)
 const showRotateDialog = ref(false)
 const showRevokeDialog = ref(false)
@@ -422,28 +402,6 @@ async function handleConfirmRevoke() {
     })
   } finally {
     isRevoking.value = false
-  }
-}
-
-async function handleGenerate(certData: any) {
-  try {
-    await pkiService.generateCertificate(certData)
-    toast.add({
-      severity: 'success',
-      summary: 'Certificate Generated',
-      detail: `New certificate for ${certData.domain} has been created`,
-      life: 3000
-    })
-    showGenerateModal.value = false
-    await loadCertificates()
-    lifecycleAlertsRef.value?.refresh()
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: 'Generation Failed',
-      detail: 'Failed to generate certificate',
-      life: 3000
-    })
   }
 }
 
