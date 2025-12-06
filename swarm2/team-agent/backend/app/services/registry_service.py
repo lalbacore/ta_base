@@ -51,10 +51,10 @@ class RegistryService:
             # Convert to dict format for API response
             capabilities = []
             for cap in db_capabilities:
-                # Parse JSON fields
+                # Parse JSON fields (SQLAlchemy JSON columns auto-deserialize, so check type first)
                 import json
-                domains = json.loads(cap.domains) if cap.domains else []
-                keywords = json.loads(cap.keywords) if cap.keywords else []
+                domains = cap.domains if isinstance(cap.domains, list) else (json.loads(cap.domains) if cap.domains else [])
+                keywords = cap.keywords if isinstance(cap.keywords, list) else (json.loads(cap.keywords) if cap.keywords else [])
 
                 capabilities.append({
                     'capability_id': cap.capability_id,

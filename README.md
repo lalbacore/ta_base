@@ -1,382 +1,497 @@
-# Team Agent - Modular AI Agent System
+# Team Agent - Decentralized Agent Marketplace
 
-A multi-agent orchestration framework implementing the **Intent → Capability → Governance** triangle for AI/Human collaborative workflows with enterprise-grade security, auditability, and interoperability.
+A multi-agent orchestration framework evolving into a **decentralized marketplace** for autonomous agent workflows on Ethereum Optimism L2, with enterprise-grade PKI security, capability-based architecture, and flexible payment systems.
 
----
-
-## 🎯 Core Concept
-
-Every workflow follows three principles:
-
-| Principle | Description |
-|-----------|-------------|
-| **Intent** | What the user/system wants to accomplish |
-| **Capability** | What agents can do to fulfill the intent |
-| **Governance** | Policy checks ensuring compliance and safety |
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/YOUR_ORG/team-agent)
+[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-56%2F56_passing-brightgreen.svg)](swarm2/team-agent/utils/tests/)
 
 ---
 
-## 🏗️ Architecture Overview
+## 💡 Why This Matters
+
+**Imagine a world where:**
+
+You need a complex legal contract drafted, cloud infrastructure deployed, and medical research analyzed - but you don't want to hire three different expensive consultants, wait weeks for delivery, or worry about whether they'll actually do good work.
+
+**Team Agent makes this possible** by creating a marketplace where specialized AI agents compete to help you, with:
+
+- ✅ **Transparent pricing** - See exactly what you'll pay, in whatever currency you prefer (dollars, crypto, even university research credits)
+- ✅ **Verified quality** - Every agent has a reputation score based on real performance, enforced by blockchain
+- ✅ **Permanent records** - All work is cryptographically signed and stored permanently, so you can prove who did what
+- ✅ **Specialization** - Instead of one generic AI, you get experts: a Legal AI that knows California employment law, an AWS AI that's deployed thousands of servers, a Research AI that's read every medical journal
+- ✅ **Community-driven** - Bad actors get penalized, good ones get rewarded, all decided transparently by the community
+
+### Real-World Use Cases
+
+**For Researchers:**
+> "I need to analyze 10,000 medical studies on a new treatment, design an experiment, and write a grant proposal."
+>
+> → Team Agent finds Literature Review AI + Experiment Design AI + Grant Writing AI, they collaborate on your project, and you pay with your university's research credits.
+
+**For Startups:**
+> "I need to deploy a scalable web app on AWS with auto-scaling, a database, and monitoring."
+>
+> → AWS Specialist AI generates complete infrastructure-as-code (Terraform), you review it, approve it, and it's deployed. All work is signed and auditable for compliance.
+
+**For Legal Teams:**
+> "I need 50 standard employment contracts customized for California law."
+>
+> → Legal Specialist AI generates them in minutes, Critic AI reviews for issues, all contracts are cryptographically signed for authenticity.
+
+### The Big Picture
+
+**Right now**, AI assistants are isolated - ChatGPT can't talk to Claude, your company's AI can't share knowledge with a university's AI, and there's no way to pay for or trust specialized AI services.
+
+**Team Agent changes this** by creating:
+1. **A marketplace** where specialized AIs advertise their skills
+2. **Blockchain verification** so you know the AI actually did the work (not a human pretending)
+3. **Flexible payments** - pay in crypto, dollars, research credits, or whatever the community accepts
+4. **Reputation systems** - AIs that do good work get more business, bad ones get penalized
+5. **Permanent records** - Everything is cryptographically signed and stored on IPFS, so you have proof
+
+**Think of it like Uber, but for AI services** - with blockchain ensuring nobody can cheat, and the community deciding what's valuable.
+
+---
+
+## 🎯 Technical Vision (For Developers)
+
+Team Agent is transforming from a standalone orchestrator into a **decentralized agent marketplace** where:
+
+- 🤝 **Agents discover each other** via Agent2Agent (A2A) protocol
+- 🔌 **External systems invoke capabilities** via Model Context Protocol (MCP)
+- ⛓️ **Workflows execute on-chain** via Ethereum Optimism L2 smart contracts
+- 📦 **Artifacts stored permanently** on IPFS/Filecoin
+- 💰 **Flexible payments** supporting ETH, OP, USDC, custom tokens, and alternative value stores
+- 🔬 **Research assistant platform** for scientists and academic institutions
+
+See **[Decentralized Marketplace Vision](swarm2/team-agent/docs/DECENTRALIZED_MARKETPLACE_VISION.md)** for the complete roadmap.
+
+---
+
+## 🏗️ Current Architecture (Phase 1: Foundation)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              EXTERNAL SYSTEMS                                │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐      │
-│  │   MCP    │  │   A2A    │  │  SIEM/   │  │   Key    │  │  Policy  │      │
-│  │ Clients  │  │  Agents  │  │   SOC    │  │  Vault   │  │  Engine  │      │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘      │
-│       │             │             │             │             │             │
-└───────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────────┘
-        │             │             │             │             │
-        ▼             ▼             ▼             ▼             ▼
+│                              MISSION INPUT                                   │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                           INTEGRATION LAYER                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐        │
-│  │ MCP Server  │  │  A2A Bus    │  │ Log Router  │  │ Crypto Svc  │        │
-│  │ (Tools API) │  │ (Agent Msg) │  │ (SIEM/CEF)  │  │ (Sign/Enc)  │        │
-│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘        │
-│         │                │                │                │                │
-└─────────┼────────────────┼────────────────┼────────────────┼────────────────┘
-          │                │                │                │
-          ▼                ▼                ▼                ▼
+│                           ORCHESTRATOR                                       │
+│  • PKI Manager (3-tier CA hierarchy: Government, Execution, Logging)         │
+│  • Agent Manager (Registration & tracking)                                  │
+│  • Capability Registry (Dynamic discovery)                                  │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                            ORCHESTRATOR                                      │
-│         Coordinates workflow: Design → Build → Review → Record               │
+│                      WORKFLOW EXECUTION PIPELINE                             │
+│                                                                              │
+│  Phase 1: Architecture                                                       │
 │  ┌────────────────────────────────────────────────────────────────┐         │
-│  │                    TURING TAPE (Audit Trail)                   │         │
-│  │  [Intent] → [Design] → [Build] → [Review] → [Approve] → [Sign] │         │
+│  │  Architect (EXECUTION domain)                                  │         │
+│  │  - Analyzes requirements and designs system architecture       │         │
 │  └────────────────────────────────────────────────────────────────┘         │
+│                                 ▼                                            │
+│  Phase 2: Implementation                                                     │
+│  ┌────────────────────────────────────────────────────────────────┐         │
+│  │  DynamicBuilder + Specialist Selection                         │         │
+│  │  Current specialists:                                          │         │
+│  │  • Legal Specialist (contracts, legal documents)               │         │
+│  │  • AWS Cloud Specialist (Terraform, CloudFormation, boto3)     │         │
+│  │  • Azure Cloud Specialist (ARM, Terraform, Azure SDK)          │         │
+│  │  • GCP Cloud Specialist (Deployment Manager, gcloud)           │         │
+│  │  • OCI Cloud Specialist (OCI CLI, Terraform)                   │         │
+│  └────────────────────────────────────────────────────────────────┘         │
+│                                 ▼                                            │
+│  Phase 3: Review                                                             │
+│  ┌────────────────────────────────────────────────────────────────┐         │
+│  │  Critic (EXECUTION domain)                                     │         │
+│  │  - Reviews code/documents, identifies issues, scores quality   │         │
+│  └────────────────────────────────────────────────────────────────┘         │
+│                                 ▼                                            │
+│  Phase 4: Recording                                                          │
+│  ┌────────────────────────────────────────────────────────────────┐         │
+│  │  Recorder (LOGGING domain)                                     │         │
+│  │  - Publishes artifacts, creates audit trail, signs outputs     │         │
+│  └────────────────────────────────────────────────────────────────┘         │
+│                                                                              │
+│  Optional: Governance (GOVERNMENT domain)                                    │
+│  • Pre-build policy checks • Post-review compliance verification            │
 └─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-          ┌─────────────────────────┼─────────────────────────┐
-          ▼                         ▼                         ▼
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│    ARCHITECT    │      │     BUILDER     │      │     CRITIC      │
-│   Designs the   │─────▶│   Implements    │─────▶│    Reviews      │
-│    solution     │      │    the code     │      │    quality      │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
-          │                         │                         │
-          ▼                         ▼                         ▼
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│   GOVERNANCE    │      │    RECORDER     │      │   CAPABILITY    │
-│  Policy checks  │      │   Audit trail   │      │    Registry     │
-│   & approval    │      │   & signing     │      │   & routing     │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
+                                 ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        ARTIFACTS & AUDIT TRAIL                               │
+│  • Generated code/documents                                                  │
+│  • Workflow JSON record                                                      │
+│  • TuringTape (JSONL append-only log - cryptographically signed)             │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🔐 Security & Compliance Architecture
+## 🔐 PKI Infrastructure
 
-### Cryptographic Controls
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    CRYPTOGRAPHIC SERVICES                        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐       │
-│  │   Signing    │    │  Encryption  │    │    PKI       │       │
-│  │   Service    │    │   Service    │    │  Manager     │       │
-│  │  ✅ ACTIVE   │    │  🔲 PLANNED  │    │  ✅ ACTIVE   │       │
-│  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘       │
-│         │                   │                   │                │
-│         ▼                   ▼                   ▼                │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │                    3-TIER CA HIERARCHY                   │    │
-│  │  Root CA (air-gapped) → Intermediate CAs → End Certs    │    │
-│  │  • Government CA  • Execution CA  • Logging CA          │    │
-│  │  • CRL System     • OCSP Responder                      │    │
-│  └─────────────────────────────────────────────────────────┘    │
-│                               │                                  │
-│                               ▼                                  │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │               KEY VAULT INTEGRATION (Future)             │    │
-│  │  • HashiCorp Vault    • AWS KMS    • Azure Key Vault    │    │
-│  │  • GCP KMS            • HSM        • Local Dev Keys     │    │
-│  └─────────────────────────────────────────────────────────┘    │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-
-SIGNING FLOW (Implemented):
-┌────────┐    ┌────────────┐    ┌─────────┐    ┌──────────┐    ┌──────────┐
-│ Action │───▶│ Hash (SHA) │───▶│  Sign   │───▶│  Verify  │───▶│  Record  │
-│ Output │    │  256/512   │    │ (RSA-   │    │  + CRL/  │    │ to Tape  │
-│        │    │            │    │  2048)  │    │  OCSP    │    │          │
-└────────┘    └────────────┘    └─────────┘    └──────────┘    └──────────┘
-
-ENCRYPTION FLOW (Planned):
-┌────────┐    ┌────────────┐    ┌─────────┐    ┌──────────┐
-│  Data  │───▶│  Classify  │───▶│ Encrypt │───▶│  Store   │
-│ Input  │    │  (PII/PHI) │    │(AES-256)│    │ Secure   │
-└────────┘    └────────────┘    └─────────┘    └──────────┘
-```
-
-### Data Classification & Handling
-
-| Classification | Examples | Encryption | Retention | Access |
-|---------------|----------|------------|-----------|--------|
-| **Public** | Docs, guides | Optional | 7 years | All |
-| **Internal** | Designs, code | At-rest | 5 years | Team |
-| **Confidential** | API keys, configs | At-rest + Transit | 3 years | Role-based |
-| **Restricted** | PII, PHI, secrets | At-rest + Transit + Field | 1 year | Need-to-know |
-
----
-
-## 📊 Logging & Observability
-
-### Log Flow Architecture
+Three-tier certificate hierarchy with cryptographic signing on all operations:
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                      AGENT OPERATIONS                            │
-│  Architect │ Builder │ Critic │ Governance │ Recorder           │
-└──────┬─────┴────┬────┴───┬────┴─────┬──────┴────┬───────────────┘
-       │          │        │          │           │
-       ▼          ▼        ▼          ▼           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    STRUCTURED LOG EMITTER                        │
-│  • JSON-structured events                                        │
-│  • Correlation IDs (workflow_id, trace_id, span_id)             │
-│  • Timestamp (ISO 8601 UTC)                                      │
-│  • Classification tags                                           │
-└──────────────────────────────┬──────────────────────────────────┘
-                               │
-          ┌────────────────────┼────────────────────┐
-          ▼                    ▼                    ▼
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│   LOCAL LOGS    │  │   LOG ROUTER    │  │  TURING TAPE    │
-│  (JSONL files)  │  │   (Fluentd/     │  │ (Immutable      │
-│                 │  │    Vector)      │  │  Audit Trail)   │
-└─────────────────┘  └────────┬────────┘  └─────────────────┘
-                              │
-       ┌──────────────────────┼──────────────────────┐
-       ▼                      ▼                      ▼
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│    SIEM     │      │  METRICS    │      │   ALERTS    │
-│  Splunk     │      │  Datadog    │      │  PagerDuty  │
-│  Sentinel   │      │  Prometheus │      │  OpsGenie   │
-│  QRadar     │      │  Grafana    │      │  Slack      │
-│  Elastic    │      │  CloudWatch │      │  Teams      │
-└─────────────┘      └─────────────┘      └─────────────┘
+Root CA (self-signed, 10-year validity)
+├── Government/Control Plane CA (5-year) → Governance agent
+├── Execution Plane CA (5-year) → Architect, Builder, Critic
+└── Logging/Artifact Plane CA (5-year) → Recorder
 ```
 
-### Log Event Schema
+**All workflow operations are signed:**
+- ✅ TuringTape entries
+- ✅ Agent outputs
+- ✅ Artifact manifests
+- ✅ Audit logs
 
-```json
-{
-  "timestamp": "2024-11-24T15:30:00.000Z",
-  "level": "INFO",
-  "workflow_id": "wf_20241124_153000",
-  "trace_id": "abc123",
-  "span_id": "def456",
-  "agent": "builder",
-  "action": "code_generation",
-  "capability": "hrt_guide_generator",
-  "classification": "internal",
-  "duration_ms": 1250,
-  "status": "success",
-  "governance": {
-    "policy_checked": true,
-    "approved": true,
-    "approver": "governance_agent"
-  },
-  "signature": "sha256:abc123..."
-}
-```
-
-### SIEM Integration Formats
-
-| Target | Format | Transport |
-|--------|--------|-----------|
-| Splunk | HEC JSON | HTTPS |
-| Sentinel | CEF | Syslog/HTTPS |
-| QRadar | LEEF | Syslog |
-| Elastic | ECS JSON | HTTPS |
-| Datadog | JSON | Agent/HTTPS |
-
----
-
-## 🔗 Interoperability
-
-### Model Context Protocol (MCP)
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    MCP SERVER (Team Agent)                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  EXPOSED TOOLS:                                                  │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │ • generate_document(type, params) → Document               │ │
-│  │ • run_workflow(mission_yaml) → WorkflowResult              │ │
-│  │ • check_governance(action, context) → ApprovalResult       │ │
-│  │ • query_capabilities(domain) → CapabilityList              │ │
-│  │ • get_audit_trail(workflow_id) → TuringTape                │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-│  RESOURCES:                                                      │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │ • missions:// - Available mission templates                │ │
-│  │ • capabilities:// - Registered capabilities                │ │
-│  │ • workflows:// - Running/completed workflows               │ │
-│  │ • policies:// - Governance policies                        │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       MCP CLIENTS                                │
-│  • Claude Desktop    • VS Code Copilot    • Custom Agents       │
-│  • Cursor            • Continue           • Automation Scripts  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Agent-to-Agent (A2A) Protocol
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    A2A MESSAGE BUS                               │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  MESSAGE TYPES:                                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
-│  │   REQUEST   │  │  RESPONSE   │  │   EVENT     │              │
-│  │  (Task Req) │  │ (Task Resp) │  │ (Broadcast) │              │
-│  └─────────────┘  └─────────────┘  └─────────────┘              │
-│                                                                  │
-│  ROUTING:                                                        │
-│  ┌────────────────────────────────────────────────────────────┐ │
-│  │ • Direct: agent://architect/design                         │ │
-│  │ • Broadcast: agent://*/notify                              │ │
-│  │ • Capability: capability://medical/generate                │ │
-│  │ • External: a2a://external-system/endpoint                 │ │
-│  └────────────────────────────────────────────────────────────┘ │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-
-A2A MESSAGE SCHEMA:
-┌─────────────────────────────────────────────────────────────────┐
-│ {                                                                │
-│   "id": "msg_uuid",                                             │
-│   "type": "request|response|event",                             │
-│   "from": "agent://builder",                                    │
-│   "to": "agent://critic",                                       │
-│   "correlation_id": "workflow_123",                             │
-│   "timestamp": "2024-11-24T15:30:00Z",                          │
-│   "payload": { ... },                                           │
-│   "signature": "sha256:...",                                    │
-│   "ttl": 300                                                    │
-│ }                                                                │
-└─────────────────────────────────────────────────────────────────┘
-```
+**Test Coverage:** 56/56 tests passing (including 17 PKI tests)
 
 ---
 
 ## 🚀 Quick Start
 
+### Prerequisites
 ```bash
-cd swarm2/team-agent
-python examples/simple_demo.py
+# Python 3.11+
+python --version
+
+# Node.js 20+ (for frontend)
+node --version
 ```
+
+### Installation & Setup
+```bash
+# Navigate to main directory
+cd swarm2/team-agent
+
+# Install Python dependencies
+pip install -r requirements.txt
+pip install -e .
+
+# Run tests to verify installation
+pytest utils/tests/ -v
+
+# Expected: 56/56 tests passing
+```
+
+### Run Your First Mission
+```bash
+# Simple demo
+python examples/simple_demo.py
+
+# Interactive mode
+python examples/interactive_demo.py
+
+# Mission-based execution
+python examples/mission_demo.py --simple
+```
+
+### Start the Web UI
+```bash
+# Terminal 1: Backend
+cd swarm2/team-agent/backend
+python app.py
+
+# Terminal 2: Frontend
+cd swarm2/team-agent/frontend
+npm install
+npm run dev
+
+# Open http://localhost:5173
+```
+
+---
 
 ## 📁 Project Structure
 
 ```
 ta_base/
-├── swarm2/team-agent/          # Main implementation
-│   ├── swarms/team_agent/      # Agent roles & orchestrator
-│   │   ├── roles/              # Architect, Builder, Critic, etc.
-│   │   ├── capabilities/       # Domain-specific generators
-│   │   ├── crypto/             # PKI, signing, CRL, OCSP ✅
-│   │   ├── mcp/                # MCP server & client
-│   │   ├── agents/             # A2A communication
-│   │   ├── state/              # HITL, Turing tape
-│   │   └── orchestrator.py     # Workflow coordinator
-│   ├── examples/               # Demo scripts
-│   ├── scripts/                # Utility scripts
-│   ├── missions/               # YAML mission definitions
-│   ├── utils/tests/            # Test suites (52 crypto tests)
-│   ├── output/                 # Generated artifacts
-│   └── PKI_FEATURE_SUMMARY.md  # Detailed PKI documentation
-├── base/                       # Base agent classes
-├── governance/                 # Policy framework
-└── workflows/                  # Workflow definitions
+├── README.md (this file)
+│
+└── swarm2/team-agent/                # Main implementation
+    ├── swarms/team_agent/            # Core system
+    │   ├── roles/                    # Architect, Builder, Critic, Recorder, Governance
+    │   ├── specialists/              # Domain-specific agents (Legal, AWS, Azure, GCP, OCI)
+    │   ├── capabilities/             # Capability implementations
+    │   │   ├── cloud/                # Cloud infrastructure (AWS, Azure, GCP, OCI)
+    │   │   ├── medical/              # Medical documentation
+    │   │   └── legal/                # Legal document generation
+    │   ├── crypto/                   # PKI, signing, verification, CRL, OCSP
+    │   ├── mcp/                      # Model Context Protocol (MCP) server
+    │   ├── state/                    # TuringTape, HITL coordination
+    │   ├── orchestrator.py           # Main workflow coordinator
+    │   └── agent_manager.py          # Agent registration & tracking
+    │
+    ├── backend/                      # Flask API server
+    │   ├── app/
+    │   │   ├── api/                  # REST endpoints
+    │   │   ├── models/               # Database models
+    │   │   ├── services/             # Business logic
+    │   │   └── database.py           # SQLAlchemy setup
+    │   └── app.py                    # Flask application entry
+    │
+    ├── frontend/                     # Vue.js + PrimeVue UI
+    │   ├── src/
+    │   │   ├── views/                # Page components
+    │   │   ├── components/           # Reusable components
+    │   │   └── router/               # Vue Router setup
+    │   └── package.json
+    │
+    ├── docs/                         # Comprehensive documentation
+    │   ├── DECENTRALIZED_MARKETPLACE_VISION.md  # Complete architecture plan
+    │   ├── GITHUB_WORKFLOW.md        # PR/issue management guide
+    │   ├── QUICK_START_GITHUB.md     # GitHub CLI quick reference
+    │   └── PKI_ENHANCEMENTS_COMPLETE.md  # PKI documentation
+    │
+    ├── scripts/                      # Utility scripts
+    │   ├── cleanup_duplicate_agents.py  # Database maintenance
+    │   └── create_prs.sh             # Automated PR creation
+    │
+    ├── examples/                     # Demo scripts
+    ├── missions/                     # YAML mission definitions
+    ├── utils/tests/                  # Test suite (56 tests)
+    └── output/                       # Generated artifacts
 ```
+
+---
 
 ## 📚 Documentation
 
-| Document | Description |
-|----------|-------------|
-| [Team Agent README](swarm2/team-agent/README.md) | Detailed usage & API |
-| [Architecture](swarm2/team-agent/ARCHITECTURE.md) | System design |
-| [Development Guide](swarm2/team-agent/DEVELOPMENT.md) | Contributing |
-| [Changelog](swarm2/team-agent/CHANGELOG.md) | Version history |
+| Document | Description | Status |
+|----------|-------------|--------|
+| **[Decentralized Marketplace Vision](swarm2/team-agent/docs/DECENTRALIZED_MARKETPLACE_VISION.md)** | Complete 36-week roadmap for blockchain integration | ✅ Complete |
+| **[GitHub Workflow Guide](swarm2/team-agent/docs/GITHUB_WORKFLOW.md)** | PR/issue management, labels, milestones | ✅ Complete |
+| **[Quick Start (GitHub)](swarm2/team-agent/docs/QUICK_START_GITHUB.md)** | GitHub CLI reference for contributors | ✅ Complete |
+| **[CLAUDE.md](swarm2/team-agent/CLAUDE.md)** | Development guide for Claude Code | ✅ Complete |
+| **[PKI Enhancements](swarm2/team-agent/docs/PKI_ENHANCEMENTS_COMPLETE.md)** | PKI infrastructure details | ✅ Complete |
+
+---
+
+## ✅ Current Status (v1.1.0)
+
+### Implemented (Phase 1: Foundation)
+| Component | Status | Details |
+|-----------|--------|---------|
+| **Core Agents** | ✅ Complete | 4 role agents + 5 specialists |
+| **PKI Infrastructure** | ✅ Complete | 3-tier CA, signing, CRL, OCSP |
+| **Agent Manager** | ✅ Complete | Registration, tracking, trust scores |
+| **Capability Registry** | ✅ Complete | Dynamic discovery, keyword matching |
+| **Cloud Specialists** | ✅ Complete | AWS, Azure, GCP, OCI provisioning |
+| **Legal Specialist** | ✅ Complete | Contract and legal document generation |
+| **Web Frontend** | ✅ Complete | Vue.js + PrimeVue UI |
+| **Backend API** | ✅ Complete | Flask + SQLAlchemy REST API |
+| **Test Suite** | ✅ Complete | 56/56 tests passing |
+| **Database** | ✅ Complete | Agent cards, capabilities, mappings |
+
+### In Progress (Phase 2: Weeks 1-4)
+| Component | Status | Target |
+|-----------|--------|--------|
+| **A2A Protocol** | 🔲 Planned | `.well-known/agent.json` endpoint |
+| **MCP Server** | 🔲 Planned | HTTP/WebSocket capability invocation |
+| **Agent Discovery** | 🔲 Planned | External agent card discovery |
+
+### Roadmap (Phase 3-6: Weeks 5-36)
+| Phase | Component | Timeline |
+|-------|-----------|----------|
+| **Phase 3** | Ethereum Optimism L2 Integration | Weeks 5-20 |
+| | • Smart contracts (3 contracts + DAO) | Weeks 5-12 |
+| | • IPFS artifact storage | Weeks 13-16 |
+| | • Blockchain client integration | Weeks 17-20 |
+| **Phase 4** | Flexible Payment System | Weeks 21-24 |
+| | • Multi-token support (ETH, OP, USDC) | Week 21 |
+| | • Custom value stores | Week 22 |
+| **Phase 5** | Research Assistant Platform | Weeks 25-32 |
+| | • Research specialists (5 agents) | Weeks 25-28 |
+| | • Academic payment models | Weeks 29-32 |
+| **Phase 6** | Security & Mainnet Launch | Weeks 33-36 |
+| | • Smart contract audit | Week 33-34 |
+| | • Mainnet deployment | Week 35-36 |
+
+See **[full roadmap](swarm2/team-agent/docs/DECENTRALIZED_MARKETPLACE_VISION.md)** for details.
+
+---
 
 ## 🧪 Example Workflows
 
-| Mission | Command | Output |
-|---------|---------|--------|
-| Hello World | `python examples/quick_test.py` | Basic workflow |
-| Calculator | `python examples/simple_demo.py` | Code generation |
-| HRT Guide | `python scripts/generate_hrt_guide.py` | 20-page PDF |
-| Interactive | `python examples/interactive_demo.py` | REPL mode |
+### Code Generation
+```python
+from swarms.team_agent.orchestrator import Orchestrator
 
-## ✅ Current Status (v0.3.0)
+orchestrator = Orchestrator()
+result = orchestrator.execute("Create a Python REST API for user management")
 
-| Component | Status |
-|-----------|--------|
-| Core Agents | ✅ 5 roles implemented |
-| Test Suite | ✅ 223+ tests (171 core + 52 crypto) |
-| Capability Registry | ✅ Domain routing |
-| PDF Generation | ✅ Working |
-| Governance | ✅ Policy enforcement |
-| **PKI Infrastructure** | ✅ 3-tier CA hierarchy |
-| **Certificate Signing** | ✅ Signer/Verifier with chain validation |
-| **CRL System** | ✅ Certificate revocation + delta CRLs |
-| **OCSP Responder** | ✅ Real-time status + REST API |
-| MCP Server | 🔲 Stub only |
-| A2A Protocol | 🔲 Stub only |
-| SIEM Integration | 🔲 Planned |
-| Key Vault | 🔲 Planned |
+# → Architect designs API structure
+# → Builder generates FastAPI code
+# → Critic reviews code quality
+# → Recorder publishes artifacts
+```
 
-## 🔮 Roadmap
+### Cloud Infrastructure
+```python
+orchestrator = Orchestrator()
+result = orchestrator.execute(
+    "Deploy a scalable web application on AWS with auto-scaling and RDS database"
+)
 
-### Phase 1: Core (Current)
-- [x] Multi-agent orchestration
-- [x] Capability registry
-- [x] Governance framework
-- [x] Audit trail (Turing tape)
+# → AWS Specialist selected (keyword matching: "AWS")
+# → Generates Terraform + CloudFormation + boto3 code
+# → Full infrastructure as code
+```
 
-### Phase 2: LLM Integration
-- [ ] Claude/GPT-4 integration
-- [ ] Local model support (Ollama)
-- [ ] Prompt management
-- [ ] Cost tracking
+### Legal Documents
+```python
+result = orchestrator.execute("Generate an employment contract for California")
 
-### Phase 3: Interoperability
-- [ ] MCP server implementation
-- [ ] A2A protocol implementation
-- [ ] External agent federation
-- [ ] Webhook integrations
+# → Legal Specialist selected
+# → Generates comprehensive employment contract
+# → Includes state-specific clauses
+```
 
-### Phase 4: Enterprise Security (In Progress)
-- [x] **PKI infrastructure** (3-tier CA hierarchy)
-- [x] **Certificate signing & verification**
-- [x] **Certificate revocation lists (CRL)**
-- [x] **OCSP responder** (real-time status checking)
-- [ ] Key vault integration (HashiCorp, AWS KMS)
-- [ ] Field-level encryption
-- [ ] SIEM log shipping
-- [ ] SOC alert integration
-- [ ] Compliance reporting (SOC2, HIPAA)
+---
 
-### Phase 5: Scale
-- [ ] Kubernetes deployment
-- [ ] Horizontal scaling
-- [ ] Multi-region support
-- [ ] Workflow persistence
+## 🔮 Future Vision
+
+### Decentralized Agent Marketplace
+
+**Team Agent is evolving into a marketplace where:**
+
+1. **Agent Discovery** (Phase 2)
+   - Agents publish capabilities via A2A protocol
+   - External systems discover and invoke via MCP server
+   - Dynamic capability matching and routing
+
+2. **Blockchain Execution** (Phase 3)
+   - Workflows execute on Ethereum Optimism L2
+   - Smart contracts manage workflow state transitions
+   - IPFS storage for permanent artifact availability
+
+3. **Flexible Payments** (Phase 4)
+   - Multi-token support: ETH, OP, USDC, custom tokens
+   - Alternative value stores (research credits, compute time, "magic jelly beans")
+   - DAO governance for custom payment methods
+
+4. **Research Platform** (Phase 5)
+   - Specialized agents for academic research
+   - Literature review, data analysis, experiment design
+   - Grant-funded workflows and open science bounties
+
+5. **DAO Governance** (Phase 6)
+   - Reputation staking and slashing
+   - Community-driven policy enforcement
+   - Decentralized trust scoring
+
+**Read the full vision:** [Decentralized Marketplace Architecture](swarm2/team-agent/docs/DECENTRALIZED_MARKETPLACE_VISION.md)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See our [GitHub Workflow Guide](swarm2/team-agent/docs/GITHUB_WORKFLOW.md) for:
+
+- Branch naming conventions
+- PR templates and labels
+- Commit message format
+- Review process
+- Milestone planning
+
+### Quick Contribution Guide
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feat/your-feature-name
+   ```
+3. **Make changes and commit**
+   ```bash
+   git commit -m "feat(component): add new feature"
+   ```
+4. **Push and create PR**
+   ```bash
+   git push origin feat/your-feature-name
+   gh pr create --template feature.md
+   ```
+
+See **[Quick Start (GitHub)](swarm2/team-agent/docs/QUICK_START_GITHUB.md)** for detailed examples.
+
+---
+
+## 🧑‍💻 Development Setup
+
+### Backend Development
+```bash
+cd swarm2/team-agent/backend
+pip install -r requirements.txt
+python app.py
+
+# API available at http://localhost:5002
+```
+
+### Frontend Development
+```bash
+cd swarm2/team-agent/frontend
+npm install
+npm run dev
+
+# UI available at http://localhost:5173
+```
+
+### Run Tests
+```bash
+cd swarm2/team-agent
+
+# All tests
+pytest utils/tests/ -v
+
+# Specific test suite
+pytest utils/tests/test_pki.py -v
+
+# With coverage
+pytest utils/tests/ -v --cov=swarms --cov=utils
+```
+
+### Code Quality
+```bash
+# Format code
+black swarms/ utils/ backend/ --line-length 100
+
+# Sort imports
+isort swarms/ utils/ backend/ --profile black
+
+# Type checking
+mypy swarms/ utils/ backend/
+```
+
+---
+
+## 📊 Project Stats
+
+- **Total Lines of Code:** ~15,000+
+- **Test Coverage:** 56/56 tests passing (100% core functionality)
+- **Agents:** 4 role agents + 5 specialist agents = 9 total
+- **Capabilities:** 6+ registered (Legal, AWS, Azure, GCP, OCI, HRT Guide)
+- **Documentation:** 5 comprehensive guides (2,500+ lines)
+- **Smart Contracts:** 5 planned (WorkflowConductor, CapabilityMarketplace, ReputationDAO, PaymentRouter, CustomValueRegistry)
+
+---
+
+## 🌟 Key Features
+
+✅ **Multi-Agent Orchestration** - 4-phase workflow (Architect → Builder → Critic → Recorder)
+✅ **Capability-Driven Architecture** - Dynamic specialist selection via keyword matching
+✅ **Enterprise PKI Security** - 3-tier CA hierarchy with cryptographic signing
+✅ **Cloud Infrastructure Specialists** - AWS, Azure, GCP, OCI provisioning
+✅ **Legal Document Generation** - Contracts, agreements, compliance documents
+✅ **Web Dashboard** - Modern Vue.js + PrimeVue frontend
+✅ **Comprehensive Testing** - 56 tests covering core functionality and PKI
+🔲 **A2A Protocol** - Agent discovery and federation (Phase 2)
+🔲 **MCP Server** - External capability invocation (Phase 2)
+🔲 **Blockchain Integration** - Optimism L2 smart contracts (Phase 3)
+🔲 **IPFS Storage** - Decentralized artifact storage (Phase 3)
+🔲 **Flexible Payments** - Multi-token and custom value stores (Phase 4)
+🔲 **Research Platform** - Academic and scientific agents (Phase 5)
 
 ---
 
@@ -386,6 +501,25 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-*Founded on the Intent → Capability → Governance triangle concept.*
+## 🙏 Acknowledgments
 
-*Enterprise-ready AI orchestration with security, auditability, and interoperability built-in.*
+- **Ethereum Optimism** for L2 blockchain infrastructure
+- **IPFS/Filecoin** for decentralized storage
+- **OpenAI** and **Anthropic** for LLM technology
+- **Vue.js** and **PrimeVue** for frontend framework
+- **Flask** and **SQLAlchemy** for backend architecture
+
+---
+
+## 📧 Contact & Support
+
+- **Documentation:** [swarm2/team-agent/docs/](swarm2/team-agent/docs/)
+- **Issues:** Use GitHub issue templates (bug reports, feature requests)
+- **Discussions:** GitHub Discussions for questions and ideas
+- **Contributing:** See [GitHub Workflow Guide](swarm2/team-agent/docs/GITHUB_WORKFLOW.md)
+
+---
+
+**Team Agent**: Building the future of decentralized autonomous agent collaboration.
+
+*From standalone orchestrator to decentralized marketplace - one capability at a time.*
