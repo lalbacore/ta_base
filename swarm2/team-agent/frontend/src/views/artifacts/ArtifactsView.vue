@@ -92,6 +92,14 @@
                     @click="viewArtifact(workflow.workflow_id, artifact)"
                   />
                   <Button
+                    label="Verify"
+                    icon="pi pi-shield"
+                    size="small"
+                    severity="info"
+                    outlined
+                    @click="verifyCryptoChain(workflow.workflow_id, artifact)"
+                  />
+                  <Button
                     label="Publish"
                     icon="pi pi-upload"
                     size="small"
@@ -132,7 +140,7 @@
       @close="showCryptoChain = false"
     />
 
-    <!-- Artifact Detail Dialog (Deprecated - now using Crypto Chain) -->
+    <!-- Artifact Detail Dialog - Shows artifact content -->
     <Dialog
       v-model:visible="showDetailDialog"
       :header="selectedArtifact?.name"
@@ -230,7 +238,13 @@ async function loadArtifacts() {
 function viewArtifact(workflowId: string, artifact: any) {
   selectedArtifact.value = artifact
   selectedWorkflowId.value = workflowId
-  showCryptoChain.value = true
+  showDetailDialog.value = true  // Show content dialog instead of crypto chain
+}
+
+function verifyCryptoChain(workflowId: string, artifact: any) {
+  selectedArtifact.value = artifact
+  selectedWorkflowId.value = workflowId
+  showCryptoChain.value = true  // Show crypto chain verification
 }
 
 async function publishArtifact(workflowId: string, artifact: any) {
