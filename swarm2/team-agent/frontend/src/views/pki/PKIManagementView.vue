@@ -122,6 +122,66 @@
       @generate="handleGenerate"
     />
 
+    <!-- Certificate Details Dialog -->
+    <Dialog
+      v-model:visible="showDetailsDialog"
+      modal
+      :header="`Certificate Details - ${selectedCert?.domain}`"
+      :style="{ width: '700px' }"
+    >
+      <div class="cert-details" v-if="selectedCert">
+        <div class="details-grid">
+          <div class="detail-row">
+            <span class="detail-label">Domain:</span>
+            <span class="detail-value">{{ selectedCert.domain }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value">
+              <span :class="'status-badge status-' + selectedCert.status">
+                {{ selectedCert.status }}
+              </span>
+            </span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Serial Number:</span>
+            <span class="detail-value mono">{{ selectedCert.serial }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Subject:</span>
+            <span class="detail-value mono">{{ selectedCert.subject }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Issuer:</span>
+            <span class="detail-value mono">{{ selectedCert.issuer }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Valid From:</span>
+            <span class="detail-value">{{ selectedCert.not_before }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Valid Until:</span>
+            <span class="detail-value">{{ selectedCert.not_after }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Days Until Expiry:</span>
+            <span class="detail-value">{{ selectedCert.days_until_expiry }} days</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Provider:</span>
+            <span class="detail-value">{{ selectedCert.provider }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Provider Type:</span>
+            <span class="detail-value">{{ selectedCert.provider_type }}</span>
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <Button label="Close" @click="showDetailsDialog = false" />
+      </template>
+    </Dialog>
+
     <!-- Revoke Confirmation Dialog -->
     <Dialog
       v-model:visible="showRevokeDialog"
@@ -185,6 +245,7 @@ const pkiStore = usePKIStore()
 
 const isLoading = ref(false)
 const showGenerateModal = ref(false)
+const showDetailsDialog = ref(false)
 const showRevokeDialog = ref(false)
 const isRevoking = ref(false)
 const selectedCert = ref<any>(null)
@@ -293,7 +354,8 @@ async function handleGenerate(certData: any) {
 
 function handleViewDetails(cert: any) {
   console.log('View details:', cert)
-  // TODO: Show detailed certificate modal
+  selectedCert.value = cert
+  showDetailsDialog.value = true
 }
 
 onMounted(async () => {
@@ -506,5 +568,71 @@ onMounted(async () => {
 
 .cert-info strong {
   color: #1e293b;
+}
+
+/* Certificate Details Dialog */
+.cert-details {
+  padding: 0.5rem 0;
+}
+
+.details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.detail-value {
+  color: #1e293b;
+  font-size: 0.875rem;
+  word-break: break-all;
+}
+
+.detail-value.mono {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8125rem;
+  background: #f8fafc;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-valid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-expiring_soon {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-expired {
+  background: #fee2e2;
+  color: #991b1b;
 }
 </style>

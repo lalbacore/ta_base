@@ -4,7 +4,7 @@ import type { Certificate, CRLData, TrustDomain, RevocationInfo } from '@/types/
 export class PKIService {
   async getAllCertificates(): Promise<Certificate[]> {
     const response = await apiClient.get('/pki/status')
-    return response.data
+    return response.data.certificates || []
   }
 
   async getCertificate(domain: TrustDomain): Promise<Certificate> {
