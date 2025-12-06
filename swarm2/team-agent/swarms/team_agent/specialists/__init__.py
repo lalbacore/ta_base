@@ -19,6 +19,7 @@ from .legal_specialist import LegalSpecialist
 from .aws_specialist import AWSSpecialist
 from .azure_specialist import AzureSpecialist
 from .gcp_specialist import GCPSpecialist
+from .oci_specialist import OCISpecialist
 
 __all__ = [
     "BaseSpecialist",
@@ -26,4 +27,5 @@ __all__ = [
     "AWSSpecialist",
     "AzureSpecialist",
     "GCPSpecialist",
+    "OCISpecialist",
 ]

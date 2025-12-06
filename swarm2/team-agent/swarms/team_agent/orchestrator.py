@@ -40,11 +40,12 @@ except ImportError:
     LegalSpecialist = None
 
 try:
-    from swarms.team_agent.specialists import AWSSpecialist, AzureSpecialist, GCPSpecialist
+    from swarms.team_agent.specialists import AWSSpecialist, AzureSpecialist, GCPSpecialist, OCISpecialist
 except ImportError:
     AWSSpecialist = None
     AzureSpecialist = None
     GCPSpecialist = None
+    OCISpecialist = None
 
 
 class Orchestrator:
@@ -138,6 +139,16 @@ class Orchestrator:
                 self.logger.info("Registered GCPSpecialist")
             except Exception as e:
                 self.logger.error(f"Failed to register GCPSpecialist: {e}")
+
+        # Register OCISpecialist
+        if OCISpecialist:
+            try:
+                oci_specialist = OCISpecialist()
+                self.agent_manager.register_specialist(oci_specialist)
+                specialists_registered += 1
+                self.logger.info("Registered OCISpecialist")
+            except Exception as e:
+                self.logger.error(f"Failed to register OCISpecialist: {e}")
 
         # Register HRTSpecialist (future - when implemented)
         # if HRTSpecialist:
