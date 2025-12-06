@@ -13,7 +13,7 @@
         <div class="nav-links">
           <NavLink to="/" icon="📊">Dashboard</NavLink>
           <NavLink to="/missions" icon="🎯">Missions</NavLink>
-          <NavLink to="/trust" icon="🔒">Trust Scoring</NavLink>
+          <NavLink to="/agents" icon="🤖">Agents</NavLink>
           <NavLink to="/pki" icon="🔐">PKI Management</NavLink>
           <NavLink to="/registry" icon="📋">Registry</NavLink>
           <NavLink to="/governance" icon="⚖️">Governance</NavLink>

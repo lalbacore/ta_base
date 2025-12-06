@@ -58,8 +58,8 @@
             </div>
           </template>
           <template #footer>
-            <router-link to="/trust" class="view-all-link">
-              <i class="pi pi-arrow-right"></i> View Trust Dashboard
+            <router-link to="/agents" class="view-all-link">
+              <i class="pi pi-arrow-right"></i> View Agent Dashboard
             </router-link>
           </template>
         </Card>
@@ -213,10 +213,10 @@
               class="action-button"
             />
             <Button
-              label="View Trust Scores"
+              label="View Agents"
               icon="pi pi-chart-bar"
               severity="help"
-              @click="() => $router.push('/trust')"
+              @click="() => $router.push('/agents')"
               class="action-button"
             />
           </div>
@@ -314,19 +314,19 @@ import Tag from 'primevue/tag'
 import ProgressBar from 'primevue/progressbar'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useMissionStore } from '@/stores/mission.store'
-import { useTrustStore } from '@/stores/trust.store'
 import { usePKIStore } from '@/stores/pki.store'
 import { useRegistryStore } from '@/stores/registry.store'
+import agentsService from '@/services/agents.service'
 import axios from 'axios'
 
 const router = useRouter()
 const missionStore = useMissionStore()
-const trustStore = useTrustStore()
 const pkiStore = usePKIStore()
 const registryStore = useRegistryStore()
 
 const isLoading = ref(true)
 const allArtifacts = ref<any[]>([])
+const agentsStats = ref<any>(null)
 
 // Mission Statistics
 const missionStats = computed(() => {
@@ -346,20 +346,29 @@ const missionStats = computed(() => {
   }
 })
 
-// Trust Statistics
+// Trust Statistics (from Agents)
 const trustStats = computed(() => {
-  const agents = Array.from(trustStore.agents.values())
-  const avgScore = agents.length > 0
-    ? agents.reduce((sum, a) => sum + a.trust_score, 0) / agents.length
-    : 0
-  
+  if (!agentsStats.value) {
+    return {
+      totalAgents: 0,
+      averageScore: 0,
+      highTrust: 0,
+      mediumTrust: 0,
+      lowTrust: 0,
+      securityIncidents: 0
+    }
+  }
+
+  const agents = agentsStats.value.top_agents || []
+  const avgScore = agentsStats.value.average_trust_score || 0
+
   return {
-    totalAgents: agents.length,
+    totalAgents: agentsStats.value.total_agents || 0,
     averageScore: avgScore,
     highTrust: agents.filter(a => a.trust_score >= 90).length,
     mediumTrust: agents.filter(a => a.trust_score >= 75 && a.trust_score < 90).length,
     lowTrust: agents.filter(a => a.trust_score < 75).length,
-    securityIncidents: agents.reduce((sum, a) => sum + a.security_incidents, 0)
+    securityIncidents: 0  // Not tracked in new agent system
   }
 })
 
@@ -409,10 +418,18 @@ const artifactStats = computed(() => {
 onMounted(async () => {
   isLoading.value = true
   try {
+    // Fetch agent stats separately since it uses a different service pattern
+    const agentsPromise = agentsService.getSystemStats().then(data => {
+      agentsStats.value = data
+    }).catch(error => {
+      console.error('Failed to fetch agent stats:', error)
+      agentsStats.value = null
+    })
+
     await Promise.all([
       missionStore.fetchMissions(),
       missionStore.fetchWorkflows(),
-      trustStore.fetchAllAgents(),
+      agentsPromise,
       pkiStore.fetchAllCertificates(),
       registryStore.fetchStatistics()
     ])

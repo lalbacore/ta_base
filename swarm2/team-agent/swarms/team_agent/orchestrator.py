@@ -22,6 +22,9 @@ from utils.capabilities.dynamic_builder import DynamicBuilder
 # PKI imports
 from swarms.team_agent.crypto import PKIManager, TrustDomain
 
+# Agent Manager
+from swarms.team_agent.agent_manager import AgentManager
+
 try:
     from utils.capabilities import HRTGuideCapability
 except ImportError:
@@ -29,6 +32,12 @@ except ImportError:
         from swarms.team_agent.capabilities.medical.hrt_guide import HRTGuideCapability
     except Exception:
         HRTGuideCapability = None
+
+# Import specialist agents (new agent-capability model)
+try:
+    from swarms.team_agent.specialists import LegalSpecialist
+except ImportError:
+    LegalSpecialist = None
 
 
 class Orchestrator:
@@ -43,6 +52,14 @@ class Orchestrator:
         self.logger = get_logger("orchestrator")
         os.makedirs(self.output_dir, exist_ok=True)
 
+        # Initialize databases (backend.db, trust.db, registry.db)
+        try:
+            from app.database import init_backend_db
+            init_backend_db()
+            self.logger.info("Backend databases initialized")
+        except Exception as e:
+            self.logger.warning(f"Could not initialize backend databases: {e}")
+
         # Initialize PKI infrastructure
         self.pki_manager = PKIManager()
         self.pki_manager.initialize_pki()
@@ -56,17 +73,45 @@ class Orchestrator:
         }
 
         self.capability_registry = CapabilityRegistry()
-        self._register_default_capabilities()
-        self.dynamic_builder = DynamicBuilder(registry=self.capability_registry)
-        self.logger.info("Orchestrator initialized with capability system and PKI")
 
-    def _register_default_capabilities(self):
-        if HRTGuideCapability:
+        # Initialize Agent Manager for workflow agent tracking
+        self.agent_manager = AgentManager()
+
+        # Initialize DynamicBuilder with agent_manager for specialist selection
+        self.dynamic_builder = DynamicBuilder(
+            registry=self.capability_registry,
+            agent_manager=self.agent_manager
+        )
+
+        # Register specialist agents (new agent-capability model)
+        self._register_specialist_agents()
+
+        self.logger.info("Orchestrator initialized with agent-capability system, PKI, and agent management")
+
+    def _register_specialist_agents(self):
+        """Register specialist agents with their capabilities."""
+        specialists_registered = 0
+
+        # Register LegalSpecialist
+        if LegalSpecialist:
             try:
-                self.capability_registry.register(HRTGuideCapability())
-            except Exception:
-                pass
-        self.logger.info(f"Registered {len(self.capability_registry.list_capabilities())} capabilities")
+                legal_specialist = LegalSpecialist()
+                self.agent_manager.register_specialist(legal_specialist)
+                specialists_registered += 1
+                self.logger.info("Registered LegalSpecialist")
+            except Exception as e:
+                self.logger.error(f"Failed to register LegalSpecialist: {e}")
+
+        # Register HRTSpecialist (future - when implemented)
+        # if HRTSpecialist:
+        #     try:
+        #         hrt_specialist = HRTSpecialist()
+        #         self.agent_manager.register_specialist(hrt_specialist)
+        #         specialists_registered += 1
+        #     except Exception as e:
+        #         self.logger.error(f"Failed to register HRTSpecialist: {e}")
+
+        self.logger.info(f"Registered {specialists_registered} specialist agents")
 
     def execute(self, mission: str) -> dict:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -78,10 +123,7 @@ class Orchestrator:
             self.current_workflow_id,
             cert_chain=self.cert_chains[TrustDomain.EXECUTION]
         )
-        builder = Builder(
-            self.current_workflow_id,
-            cert_chain=self.cert_chains[TrustDomain.EXECUTION]
-        )
+        # Note: No longer creating Builder - using DynamicBuilder instead
         critic = Critic(
             self.current_workflow_id,
             cert_chain=self.cert_chains[TrustDomain.EXECUTION]
@@ -99,7 +141,14 @@ class Orchestrator:
         except Exception:
             pass
 
-        final_record = self._execute_workflow(mission, architect, builder, critic, recorder, governance)
+        # Register workflow agents in agent_cards table
+        self.agent_manager.ensure_registered(architect)
+        self.agent_manager.ensure_registered(critic)
+        self.agent_manager.ensure_registered(recorder)
+        if governance:
+            self.agent_manager.ensure_registered(governance)
+
+        final_record = self._execute_workflow(mission, architect, critic, recorder, governance)
         return {"workflow_id": self.current_workflow_id, "final_record": final_record}
 
     def _prepare_context(self, base: dict | str) -> dict:
@@ -115,39 +164,73 @@ class Orchestrator:
         ctx = self._prepare_context(payload)
         return agent.run(ctx)
 
-    def _execute_workflow(self, mission: str, architect, builder, critic, recorder, governance=None) -> dict:
+    def _execute_workflow(self, mission: str, architect, critic, recorder, governance=None) -> dict:
         self.logger.info(f"Starting workflow execution: {mission}")
 
         # Phase 1
         self.logger.info("Phase 1: Architecture")
         architect_output = self._run_agent(architect, {"mission": mission})
+        self.agent_manager.track_invocation(
+            architect.id, self.current_workflow_id, architect_output, success=True
+        )
 
         # Optional governance pre-check
         if governance:
             try:
-                self._run_agent(governance, {"stage": "pre_build", "architecture": architect_output})
-            except Exception:
-                pass
+                governance_pre = self._run_agent(governance, {"stage": "pre_build", "architecture": architect_output})
+                self.agent_manager.track_invocation(
+                    governance.id, self.current_workflow_id, governance_pre, success=True
+                )
+            except Exception as e:
+                self.agent_manager.track_invocation(
+                    governance.id, self.current_workflow_id, None, success=False, error=str(e)
+                )
 
         # Phase 2
         self.logger.info("Phase 2: Implementation")
-        # Use actual Builder agent with LLM-powered code generation
-        builder_result = self._run_agent(builder, architect_output)
+        # Set workflow ID on DynamicBuilder for specialist agent instantiation
+        self.dynamic_builder.set_workflow_id(self.current_workflow_id)
+
+        # Use DynamicBuilder with specialist agent selection
+        architecture_str = json.dumps(architect_output, default=str) if isinstance(architect_output, dict) else str(architect_output)
+        builder_result = self.dynamic_builder.run(mission=mission, architecture=architecture_str)
+
+        # Track specialist/capability invocation
+        agent_used = builder_result.get("agent_used", "FallbackBuilder")
+        capability_used = builder_result.get("capability_used", "fallback")
+
+        # Track as specialist agent if metadata includes agent_id
+        metadata = builder_result.get("metadata", {})
+        agent_id = metadata.get("agent_id")
+
+        if agent_id:
+            # Specialist agent was used - track the agent
+            self.agent_manager.track_invocation(
+                agent_id, self.current_workflow_id, builder_result, success=True
+            )
+        else:
+            # Fallback was used - track as pseudo-agent
+            self.agent_manager.track_invocation(
+                f"capability_{capability_used}", self.current_workflow_id, builder_result, success=True
+            )
 
         # Phase 3: Review
         self.logger.info("Phase 3: Review")
 
-        # Extract code from builder result
-        # Builder returns generated_code list with component code
-        generated_code = builder_result.get("generated_code", [])
-        if generated_code:
-            # Combine all component code for review
-            code = "\n\n".join(item.get("code", "") for item in generated_code)
+        # Extract code/content from builder result
+        # DynamicBuilder returns artifacts as a list
+        artifacts = builder_result.get("artifacts", [])
+        if isinstance(artifacts, list) and artifacts:
+            # Combine all artifact content for review
+            code = "\n\n".join(artifact.get("content", "") for artifact in artifacts)
+        elif isinstance(artifacts, dict):
+            # Fallback for old dict format
+            code = artifacts.get("primary_code", "")
         else:
-            # Fallback for dict format (DynamicBuilder)
-            artifacts = builder_result.get("artifacts", {})
-            if isinstance(artifacts, dict):
-                code = artifacts.get("primary_code", "")
+            # Legacy Builder format with generated_code
+            generated_code = builder_result.get("generated_code", [])
+            if generated_code:
+                code = "\n\n".join(item.get("code", "") for item in generated_code)
             else:
                 code = ""
 
@@ -158,17 +241,25 @@ class Orchestrator:
             "code": code,
         }
         critic_output = self._run_agent(critic, critic_payload)
+        self.agent_manager.track_invocation(
+            critic.id, self.current_workflow_id, critic_output, success=True
+        )
 
         # Optional governance post-review
         if governance:
             try:
-                self._run_agent(governance, {
+                governance_post = self._run_agent(governance, {
                     "stage": "post_review",
                     "review": critic_output,
                     "implementation": builder_result
                 })
-            except Exception:
-                pass
+                self.agent_manager.track_invocation(
+                    governance.id, self.current_workflow_id, governance_post, success=True
+                )
+            except Exception as e:
+                self.agent_manager.track_invocation(
+                    governance.id, self.current_workflow_id, None, success=False, error=str(e)
+                )
 
         # Phase 4: Recording/Publishing
         self.logger.info("Phase 4: Recording/Publishing")
@@ -177,33 +268,47 @@ class Orchestrator:
 
         published_artifacts = {}
 
-        # Check if Builder generated code
-        generated_code = builder_result.get("generated_code", [])
-        if generated_code:
-            # Write out code from Builder's generated_code list
-            for item in generated_code:
-                component = item.get("component", "unknown")
-                code = item.get("code", "")
-                if code:
-                    filename = f"{component}.py"
+        # Handle DynamicBuilder artifacts (list format)
+        artifacts = builder_result.get("artifacts", [])
+        if isinstance(artifacts, list) and artifacts:
+            # Write out artifacts from DynamicBuilder's list
+            for artifact in artifacts:
+                filename = artifact.get("filename", artifact.get("name", "unknown") + ".txt")
+                content = artifact.get("content", "")
+                if content:
                     path = workflow_dir / filename
-                    path.write_text(code)
-                    published_artifacts[component] = str(path)
-
-            # Use first component as primary code
-            if generated_code:
-                published_artifacts["primary_code"] = published_artifacts.get(
-                    generated_code[0].get("component", "unknown"), ""
-                )
-        else:
-            # Fallback for DynamicBuilder dict format
-            artifacts = builder_result.get("artifacts", {})
-            if isinstance(artifacts, dict):
-                for name, content in artifacts.items():
-                    suffix = ".py" if not any(name.endswith(ext) for ext in (".md", ".txt", ".json")) else ""
-                    path = workflow_dir / f"{name}{suffix}"
                     path.write_text(content)
-                    published_artifacts[name] = str(path)
+                    published_artifacts[artifact.get("name", "unknown")] = str(path)
+
+            # Use first artifact as primary
+            if artifacts:
+                published_artifacts["primary_artifact"] = published_artifacts.get(
+                    artifacts[0].get("name", "unknown"), ""
+                )
+        # Handle legacy dict format
+        elif isinstance(artifacts, dict):
+            for name, content in artifacts.items():
+                suffix = ".py" if not any(name.endswith(ext) for ext in (".md", ".txt", ".json")) else ""
+                path = workflow_dir / f"{name}{suffix}"
+                path.write_text(content)
+                published_artifacts[name] = str(path)
+        # Handle legacy Builder generated_code format
+        else:
+            generated_code = builder_result.get("generated_code", [])
+            if generated_code:
+                for item in generated_code:
+                    component = item.get("component", "unknown")
+                    code = item.get("code", "")
+                    if code:
+                        filename = f"{component}.py"
+                        path = workflow_dir / filename
+                        path.write_text(code)
+                        published_artifacts[component] = str(path)
+
+                if generated_code:
+                    published_artifacts["primary_code"] = published_artifacts.get(
+                        generated_code[0].get("component", "unknown"), ""
+                    )
 
         recorder_payload = {
             "mission": mission,
@@ -212,7 +317,10 @@ class Orchestrator:
             "review": critic_output,
             "artifacts": published_artifacts
         }
-        self._run_agent(recorder, recorder_payload)
+        recorder_output = self._run_agent(recorder, recorder_payload)
+        self.agent_manager.track_invocation(
+            recorder.id, self.current_workflow_id, recorder_output, success=True
+        )
 
         return {
             "workflow_id": self.current_workflow_id,

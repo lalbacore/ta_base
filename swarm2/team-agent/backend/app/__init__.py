@@ -32,6 +32,7 @@ def create_app():
     from app.api.artifacts import artifacts_bp
     from app.api.crypto_chain import crypto_chain_bp
     from app.api.logs import logs_bp
+    from app.api.agents import agents_bp
 
     app.register_blueprint(mission_bp, url_prefix='/api/mission')
     app.register_blueprint(trust_bp, url_prefix='/api/trust')
@@ -41,6 +42,7 @@ def create_app():
     app.register_blueprint(artifacts_bp, url_prefix='/api')
     app.register_blueprint(crypto_chain_bp, url_prefix='/api/crypto-chain')
     app.register_blueprint(logs_bp, url_prefix='/api')
+    app.register_blueprint(agents_bp, url_prefix='/api/agents')
 
     # Register WebSocket handlers
     from app.websocket import workflow_handler, trust_handler, pki_handler

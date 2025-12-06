@@ -26,10 +26,10 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: 'Mission Details' }
   },
   {
-    path: '/trust',
-    name: 'Trust',
-    component: () => import('@/views/trust/TrustDashboardView.vue'),
-    meta: { title: 'Trust Scoring' }
+    path: '/agents',
+    name: 'Agents',
+    component: () => import('@/views/agents/AgentsView.vue'),
+    meta: { title: 'Agent Manager' }
   },
   {
     path: '/pki',

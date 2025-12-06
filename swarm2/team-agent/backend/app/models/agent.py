@@ -5,6 +5,8 @@ Models:
 - AgentCard: Registered agent with capabilities and configuration
 - AgentTemplate: Pre-configured agent templates
 - AgentInvocation: Historical record of agent executions
+- CapabilityRegistry: Catalog of available capabilities
+- AgentCapabilityMapping: Relationship between agents and capabilities
 """
 from sqlalchemy import Column, Integer, String, Float, Boolean, JSON, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
@@ -219,4 +221,127 @@ class AgentInvocation(Base, TimestampMixin):
             'rating': self.rating,
             'feedback': self.feedback,
             'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class CapabilityRegistry(Base, TimestampMixin):
+    """
+    Registry of available capabilities (tools, functions, modules).
+
+    Capabilities are reusable components that agents can invoke to perform
+    domain-specific tasks (e.g., legal document generation, code analysis).
+
+    Tracks:
+    - Capability metadata (name, type, domains, keywords)
+    - Implementation details (module path, class name)
+    - Version and status for lifecycle management
+
+    Used for:
+    - Capability discovery by keywords/domains
+    - Agent-capability mapping
+    - Dynamic capability loading
+    """
+    __tablename__ = 'capability_registry'
+
+    # Identity
+    capability_id = Column(String, primary_key=True)
+    capability_name = Column(String, nullable=False, index=True)
+    capability_type = Column(String, nullable=False, index=True)  # document_generation, code_generation, analysis
+    description = Column(Text)
+    version = Column(String, default="1.0.0", nullable=False)
+
+    # Discovery metadata
+    domains = Column(JSON)  # ["legal", "contracts", "compliance"]
+    keywords = Column(JSON)  # ["nda", "contract", "privacy", "gdpr"]
+    tags = Column(JSON)  # Additional searchable tags
+
+    # Implementation
+    module_path = Column(String, nullable=False)  # Python module path
+    class_name = Column(String, nullable=False)  # Class to instantiate
+
+    # Lifecycle
+    status = Column(String, default="active", index=True)  # active, deprecated
+    author = Column(String)
+    license = Column(String, default="MIT")
+
+    # Relationships
+    agent_mappings = relationship('AgentCapabilityMapping', back_populates='capability', cascade='all, delete-orphan')
+
+    def __repr__(self):
+        return (f"<CapabilityRegistry(id={self.capability_id}, name='{self.capability_name}', "
+                f"type={self.capability_type}, status={self.status})>")
+
+    def to_dict(self):
+        """Convert to dictionary for API responses."""
+        return {
+            'capability_id': self.capability_id,
+            'capability_name': self.capability_name,
+            'capability_type': self.capability_type,
+            'description': self.description,
+            'version': self.version,
+            'domains': self.domains,
+            'keywords': self.keywords,
+            'tags': self.tags,
+            'module_path': self.module_path,
+            'class_name': self.class_name,
+            'status': self.status,
+            'author': self.author,
+            'license': self.license,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class AgentCapabilityMapping(Base, TimestampMixin):
+    """
+    Maps agents to capabilities they can use.
+
+    Defines the relationship between agents (who) and capabilities (what they can do).
+    An agent can use multiple capabilities, and a capability can be used by multiple agents.
+
+    Tracks:
+    - Which capabilities each agent uses
+    - Priority/preference for capability selection
+    - Performance metrics per agent-capability combination
+    - Primary vs. secondary capabilities
+
+    Used for:
+    - Agent capability discovery
+    - Performance tracking per agent-capability pair
+    - Capability selection by agent
+    """
+    __tablename__ = 'agent_capabilities'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    agent_id = Column(String, ForeignKey('agent_cards.agent_id'), nullable=False, index=True)
+    capability_id = Column(String, ForeignKey('capability_registry.capability_id'), nullable=False, index=True)
+
+    # Capability metadata
+    is_primary = Column(Boolean, default=False)  # Is this the agent's primary capability?
+    priority = Column(Integer, default=1)  # Order of preference (1=highest)
+
+    # Performance tracking
+    times_used = Column(Integer, default=0)
+    success_rate = Column(Float, default=0.0)
+
+    # Relationships
+    agent = relationship('AgentCard', foreign_keys=[agent_id])
+    capability = relationship('CapabilityRegistry', back_populates='agent_mappings')
+
+    def __repr__(self):
+        return (f"<AgentCapabilityMapping(agent={self.agent_id}, capability={self.capability_id}, "
+                f"primary={self.is_primary}, priority={self.priority})>")
+
+    def to_dict(self):
+        """Convert to dictionary for API responses."""
+        return {
+            'id': self.id,
+            'agent_id': self.agent_id,
+            'capability_id': self.capability_id,
+            'is_primary': self.is_primary,
+            'priority': self.priority,
+            'times_used': self.times_used,
+            'success_rate': self.success_rate,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
