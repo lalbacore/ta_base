@@ -124,7 +124,15 @@
       </div>
     </div>
 
-    <!-- Artifact Detail Dialog -->
+    <!-- Crypto Chain Modal -->
+    <CryptoChainModal
+      :is-open="showCryptoChain"
+      :workflow-id="selectedWorkflowId"
+      :artifact-name="selectedArtifact?.name || ''"
+      @close="showCryptoChain = false"
+    />
+
+    <!-- Artifact Detail Dialog (Deprecated - now using Crypto Chain) -->
     <Dialog
       v-model:visible="showDetailDialog"
       :header="selectedArtifact?.name"
@@ -173,6 +181,7 @@ import Dialog from 'primevue/dialog'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useMissionStore } from '@/stores/mission.store'
 import { useRegistryStore } from '@/stores/registry.store'
+import CryptoChainModal from '@/components/artifacts/CryptoChainModal.vue'
 import axios from 'axios'
 
 const router = useRouter()
@@ -181,7 +190,9 @@ const registryStore = useRegistryStore()
 
 const isLoading = ref(true)
 const showDetailDialog = ref(false)
+const showCryptoChain = ref(false)
 const selectedArtifact = ref<any>(null)
+const selectedWorkflowId = ref<string>('')
 const workflowArtifacts = ref<Map<string, any[]>>(new Map())
 
 const workflowsWithArtifacts = computed(() => {
@@ -218,7 +229,8 @@ async function loadArtifacts() {
 
 function viewArtifact(workflowId: string, artifact: any) {
   selectedArtifact.value = artifact
-  showDetailDialog.value = true
+  selectedWorkflowId.value = workflowId
+  showCryptoChain.value = true
 }
 
 async function publishArtifact(workflowId: string, artifact: any) {

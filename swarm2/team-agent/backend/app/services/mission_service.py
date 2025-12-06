@@ -55,15 +55,21 @@ class MissionService:
         self.missions[mission_id] = {
             'mission_id': mission_id,
             'description': description,
-            'status': 'submitted',
+            'status': 'pending',
             'submitted_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat(),
             **mission_data
         }
 
         # Execute mission in background thread
         def execute_mission():
             try:
+                # Update status to running
                 self.missions[mission_id]['status'] = 'running'
+                self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
+                self.missions[mission_id]['started_at'] = datetime.now().isoformat()
+
+                # Execute the mission
                 results = self.orchestrator.execute(description)
                 workflow_id = results.get('workflow_id')
 
@@ -72,19 +78,26 @@ class MissionService:
                     'workflow_id': workflow_id,
                     'mission_id': mission_id,
                     'status': 'completed',
+                    'created_at': datetime.now().isoformat(),
                     'completed_at': datetime.now().isoformat()
                 }
 
+                # Update mission with workflow info
                 self.missions[mission_id]['workflow_id'] = workflow_id
                 self.missions[mission_id]['status'] = 'completed'
+                self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
+                self.missions[mission_id]['completed_at'] = datetime.now().isoformat()
+
             except Exception as e:
                 self.missions[mission_id]['status'] = 'failed'
                 self.missions[mission_id]['error'] = str(e)
+                self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
+                self.missions[mission_id]['failed_at'] = datetime.now().isoformat()
 
         thread = threading.Thread(target=execute_mission, daemon=True)
         thread.start()
 
-        return {'mission_id': mission_id, 'status': 'submitted'}
+        return {'mission_id': mission_id, 'status': 'pending'}
 
     def list_missions(self) -> List[Dict[str, Any]]:
         """List all missions."""
@@ -96,7 +109,7 @@ class MissionService:
 
     def get_workflow_status(self, workflow_id: str) -> Optional[Dict[str, Any]]:
         """
-        Get workflow status and progress by reading from filesystem.
+        Get workflow status and progress by reading from filesystem and mission state.
 
         Args:
             workflow_id: Workflow identifier or mission identifier
@@ -104,43 +117,109 @@ class MissionService:
         Returns:
             Workflow status dict or None
         """
+        mission_id = workflow_id
+        mission = None
+        actual_workflow_id = workflow_id
+
         # If this is a mission_id, look up the associated workflow_id
         if workflow_id.startswith('mission_'):
             mission = self.missions.get(workflow_id)
             if not mission:
                 return None
 
+            mission_id = workflow_id
             # Check if workflow_id has been created yet
             if 'workflow_id' in mission:
-                workflow_id = mission['workflow_id']
-            else:
-                # Mission is still running, return pending status
-                return {
-                    'workflow_id': workflow_id,
-                    'mission_id': workflow_id,
-                    'status': mission.get('status', 'pending'),
-                    'progress': 0,
-                    'current_stage': 'initializing',
-                    'artifacts_count': 0,
-                    'created_at': mission.get('submitted_at', datetime.now().isoformat())
-                }
+                actual_workflow_id = mission['workflow_id']
+        else:
+            # This is a workflow_id, try to find the mission
+            for mid, m in self.missions.items():
+                if m.get('workflow_id') == workflow_id:
+                    mission = m
+                    mission_id = mid
+                    break
 
-        workflow_dir = Path(self.orchestrator.output_dir) / workflow_id
+        # Get mission status if available
+        mission_status = mission.get('status', 'unknown') if mission else 'unknown'
+
+        # If mission is still pending or running without a workflow_id yet
+        if mission and mission_status in ['pending', 'running'] and 'workflow_id' not in mission:
+            progress = 0
+            current_stage = 'initializing'
+
+            # If running, estimate progress
+            if mission_status == 'running':
+                # Check how long it's been running (rough estimate)
+                started_at = mission.get('started_at')
+                if started_at:
+                    elapsed = (datetime.now() - datetime.fromisoformat(started_at)).total_seconds()
+                    # Rough estimate: 30 seconds = 25% progress
+                    progress = min(int((elapsed / 30) * 25), 25)
+                current_stage = 'executing'
+
+            return {
+                'workflow_id': mission_id,
+                'mission_id': mission_id,
+                'status': mission_status,
+                'progress': progress,
+                'current_stage': current_stage,
+                'artifacts_count': 0,
+                'created_at': mission.get('submitted_at', datetime.now().isoformat()),
+                'updated_at': mission.get('updated_at', datetime.now().isoformat()),
+                'started_at': mission.get('started_at'),
+                'stages': []
+            }
+
+        # If mission failed before creating workflow
+        if mission and mission_status == 'failed':
+            return {
+                'workflow_id': mission_id,
+                'mission_id': mission_id,
+                'status': 'failed',
+                'progress': 0,
+                'current_stage': 'failed',
+                'artifacts_count': 0,
+                'error': mission.get('error'),
+                'created_at': mission.get('submitted_at', datetime.now().isoformat()),
+                'updated_at': mission.get('updated_at', datetime.now().isoformat()),
+                'failed_at': mission.get('failed_at'),
+                'stages': []
+            }
+
+        # Check filesystem for completed workflow
+        workflow_dir = Path(self.orchestrator.output_dir) / actual_workflow_id
 
         if not workflow_dir.exists():
+            # Workflow ID exists but no output directory yet
+            if mission:
+                return {
+                    'workflow_id': actual_workflow_id,
+                    'mission_id': mission_id,
+                    'status': mission_status,
+                    'progress': 50,
+                    'current_stage': 'processing',
+                    'artifacts_count': 0,
+                    'created_at': mission.get('submitted_at', datetime.now().isoformat()),
+                    'updated_at': mission.get('updated_at', datetime.now().isoformat()),
+                    'stages': []
+                }
             return None
 
         # Count artifacts
         artifacts = list(workflow_dir.glob('*.py'))
 
         return {
-            'workflow_id': workflow_id,
-            'status': 'completed',
+            'workflow_id': actual_workflow_id,
+            'mission_id': mission_id if mission else actual_workflow_id,
+            'status': mission_status if mission else 'completed',
             'progress': 100,
             'current_stage': 'completed',
             'artifacts_count': len(artifacts),
             'output_dir': str(workflow_dir),
-            'created_at': datetime.fromtimestamp(workflow_dir.stat().st_ctime).isoformat()
+            'created_at': mission.get('submitted_at') if mission else datetime.fromtimestamp(workflow_dir.stat().st_ctime).isoformat(),
+            'updated_at': mission.get('updated_at') if mission else datetime.now().isoformat(),
+            'completed_at': mission.get('completed_at') if mission else datetime.fromtimestamp(workflow_dir.stat().st_mtime).isoformat(),
+            'stages': []
         }
 
     def list_workflows(self) -> List[Dict[str, Any]]:

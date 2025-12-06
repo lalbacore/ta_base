@@ -1,0 +1,71 @@
+# PKI Provider Configuration
+#
+# This file configures which PKI provider to use for certificate management.
+# Supported types: self-signed, acme (Let's Encrypt), blockchain, enterprise (custom)
+#
+# You can specify a default provider for all domains, or override per domain.
+
+# Default provider for all trust domains
+# Used unless overridden in domain_providers below
+default_provider:
+  type: self-signed
+  base_dir: ~/.team_agent/pki
+  force_reinit: false
+
+# Per-domain provider overrides (optional)
+# Uncomment to use different providers for different trust domains
+#
+# domain_providers:
+#   # Government domain - internal governance (self-signed)
+#   government:
+#     type: self-signed
+#     base_dir: ~/.team_agent/pki
+#     force_reinit: false
+#
+#   # Execution domain - decentralized agents (blockchain)
+#   execution:
+#     type: blockchain
+#     blockchain_type: ethereum
+#     rpc_url: http://localhost:8545
+#     contract_address: "0x1234567890abcdef1234567890abcdef12345678"
+#     private_key_env: BLOCKCHAIN_PRIVATE_KEY  # Read from environment variable
+#
+#   # Logging domain - public-facing API (Let's Encrypt)
+#   logging:
+#     type: acme
+#     email: admin@teamagent.example.com
+#     staging: false  # Use production Let's Encrypt
+#     domain_name: logs.teamagent.example.com
+#     challenge_type: http-01  # or dns-01
+
+# Provider-specific global configurations
+providers:
+  # Self-signed CA settings
+  self-signed:
+    root_ca_validity_days: 3650  # 10 years
+    intermediate_ca_validity_days: 1825  # 5 years
+    cert_validity_days: 1825  # 5 years
+    key_size: 2048
+
+  # ACME/Let's Encrypt settings (when implemented)
+  acme:
+    staging: false  # Use Let's Encrypt production
+    challenge_type: http-01  # or dns-01
+    auto_renew_threshold_days: 30
+    cert_validity_days: 90  # Let's Encrypt maximum
+
+  # Blockchain PKI settings (when implemented)
+  blockchain:
+    gas_price: auto
+    confirmation_blocks: 3
+    timeout_seconds: 300
+    smart_contract_version: "1.0"
+
+# Migration settings
+migration:
+  # When switching providers, old certificates can be:
+  # - 'revoke': Revoke old certificates immediately
+  # - 'grace': Allow grace period (both old and new valid)
+  # - 'manual': Require manual intervention
+  old_cert_handling: grace
+  grace_period_days: 7
