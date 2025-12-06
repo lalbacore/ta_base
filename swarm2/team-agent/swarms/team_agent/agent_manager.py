@@ -335,13 +335,17 @@ class AgentManager:
                 # Get specialist metadata
                 metadata = specialist_instance.get_metadata()
 
-                # Check if already registered
+                # Check if already registered by class_name (not agent_id, which is random)
+                # This prevents duplicate specialists on restart
                 existing = session.query(self._AgentCard).filter_by(
-                    agent_id=metadata["agent_id"]
+                    class_name=metadata["class_name"],
+                    agent_type="specialist"
                 ).first()
 
                 if existing:
-                    self.logger.debug(f"Specialist {metadata['agent_name']} already registered")
+                    self.logger.debug(f"Specialist {metadata['agent_name']} already registered (reusing {existing.agent_id})")
+                    # Update the specialist instance to use the existing agent_id
+                    specialist_instance.id = existing.agent_id
                     return existing
 
                 # Register primary capability in capability_registry
