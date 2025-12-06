@@ -400,6 +400,8 @@ class A2AClient:
 
         return matches
 
+    def clear_cache(self):
+        """Clear all cached data."""
         self._agent_cache.clear()
         self._capability_cache.clear()
 
@@ -450,4 +452,3 @@ class A2AClient:
             return response.json()
         except requests.RequestException as e:
             raise ConnectionError(f"Invocation failed: {e}")
-
