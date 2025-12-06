@@ -94,5 +94,8 @@ backend/logs/
 debug_*.py
 test_llm_*.py
 
+# Deprecated/old directories
+demo_output/
+
 # External directories
 ../../target_test1/
