@@ -1,8 +1,9 @@
 """
-Crypto Chain API - Visualize cryptographic provenance of artifacts.
+Crypto Chain API - Visualize cryptographic provenance of artifacts and workflows.
 """
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, Response
 from app.services.crypto_chain_service import crypto_chain_service
+from app.services.crypto_manifest_service import crypto_manifest_service
 
 crypto_chain_bp = Blueprint('crypto_chain', __name__)
 
@@ -122,5 +123,112 @@ def simulate_chain_break(workflow_id, artifact_name, break_type):
 
         return jsonify(chain), 200
 
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+# ============================================================================
+# Workflow Crypto Manifest Endpoints - PKI Mesh Journey Tracking
+# ============================================================================
+
+@crypto_chain_bp.route('/workflow/<workflow_id>/manifest', methods=['GET'])
+def get_workflow_crypto_manifest(workflow_id):
+    """
+    Get the complete cryptographic manifest for a workflow.
+
+    Shows the PKI mesh journey through all stages:
+    - Mission creation
+    - Orchestrator (GOVERNMENT trust domain)
+    - Architect (EXECUTION trust domain)
+    - Builder (EXECUTION trust domain)
+    - Critic (EXECUTION trust domain)
+    - Recorder (LOGGING trust domain)
+    - Artifact publishing (LOGGING trust domain)
+
+    Returns:
+        Crypto manifest with:
+        - Timeline of all Turing Tape entries
+        - Trust domain flow
+        - PKI mesh topology
+        - Signature verification status
+        - Chain integrity analysis
+        - Weak links identification
+    """
+    try:
+        manifest = crypto_manifest_service.get_workflow_manifest(
+            workflow_id=workflow_id,
+            verify_signatures=True
+        )
+        return jsonify(manifest), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@crypto_chain_bp.route('/workflow/<workflow_id>/manifest/text', methods=['GET'])
+def get_workflow_crypto_manifest_text(workflow_id):
+    """
+    Get displayable/loggable text format of crypto manifest.
+
+    Returns plain text suitable for console or log output.
+    """
+    try:
+        manifest = crypto_manifest_service.get_workflow_manifest(
+            workflow_id=workflow_id,
+            verify_signatures=True
+        )
+
+        displayable_chain = manifest.get('displayable_chain', [])
+        text_output = '\n'.join(displayable_chain)
+
+        return Response(text_output, mimetype='text/plain'), 200
+    except Exception as e:
+        return Response(f"Error: {str(e)}", mimetype='text/plain'), 500
+
+
+@crypto_chain_bp.route('/workflow/<workflow_id>/trust-flow', methods=['GET'])
+def get_workflow_trust_flow(workflow_id):
+    """
+    Get just the trust domain flow for a workflow.
+
+    Returns simplified view showing which trust domains signed each stage.
+    """
+    try:
+        manifest = crypto_manifest_service.get_workflow_manifest(
+            workflow_id=workflow_id,
+            verify_signatures=False  # Skip verification for faster response
+        )
+
+        return jsonify({
+            'workflow_id': workflow_id,
+            'trust_flow': manifest.get('trust_flow', []),
+            'pki_mesh': manifest.get('pki_mesh', {})
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@crypto_chain_bp.route('/workflow/<workflow_id>/integrity', methods=['GET'])
+def get_workflow_integrity(workflow_id):
+    """
+    Get cryptographic integrity status for a workflow.
+
+    Returns:
+        - Overall integrity score (0-100)
+        - Chain completeness
+        - Signature validity
+        - Weak links
+        - Missing stages
+    """
+    try:
+        manifest = crypto_manifest_service.get_workflow_manifest(
+            workflow_id=workflow_id,
+            verify_signatures=True
+        )
+
+        return jsonify({
+            'workflow_id': workflow_id,
+            'integrity': manifest.get('integrity', {}),
+            'weak_links': manifest.get('weak_links', [])
+        }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500

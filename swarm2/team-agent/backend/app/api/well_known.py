@@ -110,7 +110,12 @@ def get_agent_card():
                     'license': agent.license,
                     'tags': agent.tags if isinstance(agent.tags, list) else [],
                     'created_at': agent.created_at.isoformat() if agent.created_at else None,
-                    'updated_at': agent.updated_at.isoformat() if agent.updated_at else None
+                    'updated_at': agent.updated_at.isoformat() if agent.updated_at else None,
+                    'endpoints': {
+                        'well_known': f"{request.url_root.rstrip('/')}/.well-known/agent.json",
+                        'mcp_server': f"{request.url_root.rstrip('/')}/mcp",
+                        'blockchain_registry': os.getenv('AGENT_REGISTRY_ADDRESS', '')
+                    }
                 }
 
                 agent_cards.append(agent_card)

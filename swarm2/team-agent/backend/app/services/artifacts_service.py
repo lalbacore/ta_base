@@ -59,7 +59,11 @@ class ArtifactsService:
         for artifact_path in workflow_dir.glob('*'):
             if artifact_path.is_file():
                 # Read file content and calculate checksum
-                content = artifact_path.read_text() if artifact_path.suffix in ['.py', '.txt', '.md', '.json'] else None
+                # Safe reading with error handling
+                try:
+                    content = artifact_path.read_text(encoding='utf-8', errors='replace') if artifact_path.suffix in ['.py', '.txt', '.md', '.json'] else None
+                except Exception:
+                    content = None
                 checksum = hashlib.sha256(artifact_path.read_bytes()).hexdigest()
 
                 artifacts.append({

@@ -43,6 +43,7 @@ class AgentCard:
 
     # Registry metadata
     registry_url: str = ""
+    endpoints: Dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -68,7 +69,8 @@ class AgentCard:
             'tags': self.tags,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'registry_url': self.registry_url
+            'registry_url': self.registry_url,
+            'endpoints': self.endpoints
         }
 
 
@@ -215,7 +217,8 @@ class A2AClient:
                     tags=agent_data['tags'],
                     created_at=agent_data.get('created_at'),
                     updated_at=agent_data.get('updated_at'),
-                    registry_url=registry_url
+                    registry_url=registry_url,
+                    endpoints=agent_data.get('endpoints', {})
                 )
                 agents.append(agent)
 
@@ -401,3 +404,51 @@ class A2AClient:
         """Clear all cached data."""
         self._agent_cache.clear()
         self._capability_cache.clear()
+
+    def invoke(
+        self, 
+        agent: AgentCard, 
+        capability_id: str, 
+        payload: Dict[str, Any],
+        api_key: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Invoke a capability on a remote agent.
+
+        Args:
+            agent: The target agent card
+            capability_id: ID of the capability to invoke
+            payload: Input payload for the capability
+            api_key: Optional API key for authentication
+
+        Returns:
+            Result dictionary
+        """
+        # Determine MCP endpoint
+        mcp_base = agent.endpoints.get('mcp_server')
+        if not mcp_base:
+            # Fallback to registry root + /mcp if available
+            if agent.registry_url:
+                mcp_base = f"{agent.registry_url.rstrip('/')}/mcp"
+            else:
+                raise ValueError("Agent has no MCP endpoint configured")
+        
+        # Construct invocation URL
+        url = f"{mcp_base}/tools/{capability_id}/invoke"
+        
+        headers = {}
+        if api_key:
+            headers['X-API-Key'] = api_key
+            
+        try:
+            response = requests.post(
+                url, 
+                json=payload, 
+                headers=headers,
+                timeout=self.timeout,
+                verify=self.verify_ssl
+            )
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            raise ConnectionError(f"Invocation failed: {e}")

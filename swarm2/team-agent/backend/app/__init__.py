@@ -45,6 +45,9 @@ def create_app():
     app.register_blueprint(logs_bp, url_prefix='/api')
     app.register_blueprint(agents_bp, url_prefix='/api/agents')
     app.register_blueprint(well_known_bp)  # No prefix - .well-known at root
+    
+    from swarms.team_agent.mcp.server import mcp_bp
+    app.register_blueprint(mcp_bp)
 
     # Register WebSocket handlers
     from app.websocket import workflow_handler, trust_handler, pki_handler
