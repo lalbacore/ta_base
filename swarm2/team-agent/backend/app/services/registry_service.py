@@ -17,11 +17,11 @@ class RegistryService:
     """
 
     def __init__(self):
-        # TODO: Initialize registry when ready
-        # from swarms.team_agent.a2a.registry import CapabilityRegistry
-        # self.registry = CapabilityRegistry()
+        # Initialize actual registry
+        from swarms.team_agent.a2a.registry import CapabilityRegistry
+        self.registry = CapabilityRegistry()
 
-        # Load seed data
+        # Load seed data for fallback/mock data
         self.capabilities = {cap['capability_id']: cap for cap in SAMPLE_CAPABILITIES}
         self.providers = {p['provider_id']: p for p in SAMPLE_PROVIDERS}
 
@@ -193,33 +193,36 @@ class RegistryService:
             del self.capabilities[capability_id]
 
     def get_statistics(self) -> Dict[str, Any]:
-        """Get registry statistics."""
-        # TODO: Get from registry
+        """Get registry statistics from actual database."""
+        # Get actual statistics from registry
+        stats = self.registry.get_statistics()
 
-        total_capabilities = len(self.capabilities)
-        total_providers = len(self.providers)
+        # Map registry structure to API structure
+        capabilities_stats = stats.get('capabilities', {})
+        providers_stats = stats.get('providers', {})
 
-        # Count by type
-        types_count = {}
-        for cap in self.capabilities.values():
-            cap_type = cap['capability_type']
-            types_count[cap_type] = types_count.get(cap_type, 0) + 1
-
-        # Average metrics
-        caps = list(self.capabilities.values())
-        avg_trust = sum(c['trust_score'] for c in caps) / total_capabilities if total_capabilities > 0 else 0
-        avg_price = sum(c['price'] for c in caps) / total_capabilities if total_capabilities > 0 else 0
-        avg_reputation = sum(c['reputation'] for c in caps) / total_capabilities if total_capabilities > 0 else 0
-        total_invocations = sum(c['invocations'] for c in caps)
+        # Get capabilities by type from actual database
+        import sqlite3
+        from pathlib import Path
+        capabilities_by_type = {}
+        db_path = Path.home() / '.team_agent' / 'registry.db'
+        if db_path.exists():
+            with sqlite3.connect(str(db_path)) as conn:
+                cursor = conn.execute("""
+                    SELECT capability_type, COUNT(*) as count
+                    FROM capabilities
+                    GROUP BY capability_type
+                """)
+                capabilities_by_type = {row[0]: row[1] for row in cursor.fetchall()}
 
         return {
-            'total_capabilities': total_capabilities,
-            'total_providers': total_providers,
-            'capabilities_by_type': types_count,
-            'average_trust_score': round(avg_trust, 1),
-            'average_price': round(avg_price, 2),
-            'average_reputation': round(avg_reputation, 2),
-            'total_invocations': total_invocations
+            'total_capabilities': capabilities_stats.get('total', 0),
+            'total_providers': providers_stats.get('total', 0),
+            'capabilities_by_type': capabilities_by_type,
+            'average_trust_score': round(providers_stats.get('average_trust_score', 0.0), 1),
+            'average_price': 0.0,  # Not available in current registry
+            'average_reputation': round(capabilities_stats.get('average_reputation', 0.0), 1),
+            'total_invocations': capabilities_stats.get('total_invocations', 0)
         }
 
 
