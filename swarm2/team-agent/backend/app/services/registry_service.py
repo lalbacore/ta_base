@@ -17,13 +17,15 @@ class RegistryService:
     """
 
     def __init__(self):
-        # Initialize actual registry
-        from swarms.team_agent.a2a.registry import CapabilityRegistry
-        self.registry = CapabilityRegistry()
+        # Initialize database access
+        from app.database import get_backend_session
+        from app.models.agent import CapabilityRegistry as CapabilityRegistryModel
+        self._get_session = get_backend_session
+        self._CapabilityRegistry = CapabilityRegistryModel
 
-        # Load seed data for fallback/mock data
-        self.capabilities = {cap['capability_id']: cap for cap in SAMPLE_CAPABILITIES}
-        self.providers = {p['provider_id']: p for p in SAMPLE_PROVIDERS}
+        # Load seed data for fallback (only used if database is empty)
+        self.capabilities_fallback = {cap['capability_id']: cap for cap in SAMPLE_CAPABILITIES}
+        self.providers_fallback = {p['provider_id']: p for p in SAMPLE_PROVIDERS}
 
     def get_capabilities(self, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """
@@ -36,8 +38,45 @@ class RegistryService:
         - tags: Search by tags (comma-separated or list)
         - search: Search in name and description
         """
-        # TODO: Get from registry.list_capabilities(filters)
-        capabilities = list(self.capabilities.values())
+        # Get capabilities from database
+        with self._get_session() as session:
+            query = session.query(self._CapabilityRegistry).filter_by(status="active")
+
+            # Apply database-level filters
+            if filters and 'capability_type' in filters and filters['capability_type']:
+                query = query.filter_by(capability_type=filters['capability_type'])
+
+            db_capabilities = query.all()
+
+            # Convert to dict format for API response
+            capabilities = []
+            for cap in db_capabilities:
+                # Parse JSON fields
+                import json
+                domains = json.loads(cap.domains) if cap.domains else []
+                keywords = json.loads(cap.keywords) if cap.keywords else []
+
+                capabilities.append({
+                    'capability_id': cap.capability_id,
+                    'name': cap.capability_name,
+                    'capability_type': cap.capability_type,
+                    'description': cap.description,
+                    'version': cap.version,
+                    'domains': domains,
+                    'tags': keywords,  # Use keywords as tags for now
+                    'module_path': cap.module_path,
+                    'class_name': cap.class_name,
+                    'status': cap.status,
+                    'created_at': cap.created_at.isoformat() if cap.created_at else None,
+                    # Default values for fields not in database yet
+                    'trust_score': 95,  # Could be computed from agent_capabilities.success_rate
+                    'price': 0.0,  # Free for now
+                    'invocations': 0,  # Could be summed from agent_capabilities.times_used
+                    'success_rate': 1.0,
+                    'reputation': 5.0,
+                    'provider_id': 'team_agent',
+                    'provider_name': 'Team Agent'
+                })
 
         if not filters:
             # Sort by trust score by default
@@ -194,36 +233,35 @@ class RegistryService:
 
     def get_statistics(self) -> Dict[str, Any]:
         """Get registry statistics from actual database."""
-        # Get actual statistics from registry
-        stats = self.registry.get_statistics()
+        with self._get_session() as session:
+            from sqlalchemy import func
 
-        # Map registry structure to API structure
-        capabilities_stats = stats.get('capabilities', {})
-        providers_stats = stats.get('providers', {})
+            # Get total capabilities count
+            total_capabilities = session.query(func.count(self._CapabilityRegistry.capability_id)).scalar()
 
-        # Get capabilities by type from actual database
-        import sqlite3
-        from pathlib import Path
-        capabilities_by_type = {}
-        db_path = Path.home() / '.team_agent' / 'registry.db'
-        if db_path.exists():
-            with sqlite3.connect(str(db_path)) as conn:
-                cursor = conn.execute("""
-                    SELECT capability_type, COUNT(*) as count
-                    FROM capabilities
-                    GROUP BY capability_type
-                """)
-                capabilities_by_type = {row[0]: row[1] for row in cursor.fetchall()}
+            # Get capabilities by type
+            capabilities_by_type_query = session.query(
+                self._CapabilityRegistry.capability_type,
+                func.count(self._CapabilityRegistry.capability_id)
+            ).group_by(self._CapabilityRegistry.capability_type).all()
 
-        return {
-            'total_capabilities': capabilities_stats.get('total', 0),
-            'total_providers': providers_stats.get('total', 0),
-            'capabilities_by_type': capabilities_by_type,
-            'average_trust_score': round(providers_stats.get('average_trust_score', 0.0), 1),
-            'average_price': 0.0,  # Not available in current registry
-            'average_reputation': round(capabilities_stats.get('average_reputation', 0.0), 1),
-            'total_invocations': capabilities_stats.get('total_invocations', 0)
-        }
+            capabilities_by_type = {row[0]: row[1] for row in capabilities_by_type_query}
+
+            # Get agent statistics (for invocations and success rate)
+            from app.models.agent import AgentCard
+            total_invocations = session.query(func.sum(AgentCard.total_invocations)).scalar() or 0
+            avg_success_rate = session.query(func.avg(AgentCard.success_rate)).scalar() or 0.0
+            avg_trust_score = session.query(func.avg(AgentCard.trust_score)).scalar() or 0.0
+
+            return {
+                'total_capabilities': total_capabilities,
+                'total_providers': 1,  # Currently only 'team_agent' provider
+                'capabilities_by_type': capabilities_by_type,
+                'average_trust_score': round(avg_trust_score, 1),
+                'average_price': 0.0,  # All capabilities are free currently
+                'average_reputation': round(avg_success_rate * 5.0, 1),  # Map success_rate to 0-5 scale
+                'total_invocations': total_invocations
+            }
 
 
 # Singleton instance
