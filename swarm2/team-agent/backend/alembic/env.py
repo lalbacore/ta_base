@@ -15,6 +15,7 @@ from app.models.base import Base
 from app.database import BACKEND_DB
 # Import all models so Alembic can detect them
 from app.models import governance  # noqa: F401
+from app.models import agent  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
