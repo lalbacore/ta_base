@@ -335,7 +335,16 @@ class AgentManager:
                 # Get specialist metadata
                 metadata = specialist_instance.get_metadata()
 
-                # Register primary capability in capability_registry FIRST
+                # Check if already registered
+                existing = session.query(self._AgentCard).filter_by(
+                    agent_id=metadata["agent_id"]
+                ).first()
+
+                if existing:
+                    self.logger.debug(f"Specialist {metadata['agent_name']} already registered")
+                    return existing
+
+                # Register primary capability in capability_registry
                 primary_cap = specialist_instance.get_primary_capability()
                 cap_metadata = primary_cap.get_metadata()
 
@@ -351,8 +360,8 @@ class AgentManager:
                         capability_type=cap_metadata.get("type", "document_generation"),
                         description=cap_metadata.get("description", ""),
                         version=cap_metadata.get("version", "1.0.0"),
-                        domains=cap_metadata.get("domains", []),  # SQLAlchemy JSON column handles encoding
-                        keywords=specialist_instance.get_keywords() if hasattr(specialist_instance, 'get_keywords') else [],  # SQLAlchemy JSON column handles encoding
+                        domains=json.dumps(cap_metadata.get("domains", [])),
+                        keywords=json.dumps(specialist_instance.get_keywords() if hasattr(specialist_instance, 'get_keywords') else []),
                         module_path=cap_metadata.get("module_path", ""),
                         class_name=primary_cap.__class__.__name__,
                         status="active"
@@ -360,39 +369,7 @@ class AgentManager:
                     session.add(cap_record)
                     self.logger.info(f"Registered capability: {capability_id}")
 
-                # Check if agent card already exists (prevents duplicates on restart)
-                existing_agent = session.query(self._AgentCard).filter_by(
-                    class_name=metadata["class_name"],
-                    agent_type="specialist"
-                ).first()
-
-                if existing_agent:
-                    self.logger.debug(f"Specialist {metadata['agent_name']} already registered (reusing {existing_agent.agent_id})")
-                    # Update the specialist instance to use the existing agent_id
-                    specialist_instance.id = existing_agent.agent_id
-
-                    # Ensure agent-capability mapping exists
-                    existing_mapping = session.query(AgentCapabilityMapping).filter_by(
-                        agent_id=existing_agent.agent_id,
-                        capability_id=capability_id
-                    ).first()
-
-                    if not existing_mapping:
-                        mapping = AgentCapabilityMapping(
-                            agent_id=existing_agent.agent_id,
-                            capability_id=capability_id,
-                            is_primary=True,
-                            priority=1,
-                            times_used=0,
-                            success_rate=0.0
-                        )
-                        session.add(mapping)
-                        session.commit()
-                        self.logger.info(f"Created missing mapping for {metadata['agent_name']} to {capability_id}")
-
-                    return existing_agent
-
-                # Create new agent card
+                # Create agent card for specialist
                 card = self._AgentCard(
                     agent_id=metadata["agent_id"],
                     agent_name=metadata["agent_name"],
@@ -481,27 +458,10 @@ class AgentManager:
                 for row in rows:
                     try:
                         keywords_json = row[5]  # keywords column
-
-                        # Handle keywords - may be list (new format) or JSON string (old format)
-                        if isinstance(keywords_json, list):
-                            # SQLAlchemy JSON column already parsed it
-                            keywords = keywords_json
-                        elif isinstance(keywords_json, str):
-                            # Raw SQL query returns string - need to parse
-                            keywords = json.loads(keywords_json)
-                            # Handle double-encoded JSON (legacy data)
-                            if isinstance(keywords, str):
-                                keywords = json.loads(keywords)
-                        else:
-                            keywords = []
+                        keywords = json.loads(keywords_json) if keywords_json else []
 
                         # Check if any keyword matches mission
-                        matched_keywords = [kw for kw in keywords if isinstance(kw, str) and kw.lower() in mission_lower]
-                        if matched_keywords:
-                            self.logger.info(
-                                f"Keywords matched for {row[1]}: {matched_keywords}"
-                            )
-
+                        if any(kw.lower() in mission_lower for kw in keywords):
                             # Dynamically import and instantiate specialist
                             module = importlib.import_module(row[2])  # module_path
                             specialist_class = getattr(module, row[3])  # class_name
@@ -517,10 +477,6 @@ class AgentManager:
                             )
 
                             return specialist
-                        else:
-                            self.logger.debug(
-                                f"No keyword match for {row[1]}"
-                            )
 
                     except Exception as e:
                         self.logger.error(f"Error loading specialist {row[1]}: {e}")

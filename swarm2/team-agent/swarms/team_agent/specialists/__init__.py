@@ -10,6 +10,7 @@ Available Specialists:
 - AWSSpecialist: AWS cloud infrastructure provisioning (Terraform, CloudFormation, boto3)
 - AzureSpecialist: Azure cloud infrastructure provisioning (Terraform, ARM, Azure SDK)
 - GCPSpecialist: GCP cloud infrastructure provisioning (Terraform, Deployment Manager, gcloud)
+- OCISpecialist: Oracle Cloud Infrastructure provisioning (Terraform, OCI CLI, OCI SDK)
 - MedicalSpecialist: Medical documentation (future)
 - FinancialSpecialist: Financial reports and analysis (future)
 """
