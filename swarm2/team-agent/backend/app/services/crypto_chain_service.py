@@ -14,7 +14,7 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from swarms.team_agent.crypto.trust import AgentReputationTracker, EventType
-from swarms.team_agent.a2a.registry import CapabilityRegistry
+from app.models.agent import CapabilityRegistry
 from swarms.team_agent.crypto.artifacts import ArtifactSigner
 
 
