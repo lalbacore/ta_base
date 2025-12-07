@@ -17,7 +17,7 @@ from enum import Enum
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
-from app.storage import (
+from backend.app.storage import (
     StorageProvider,
     StorageType,
     StorageResult,
@@ -25,7 +25,7 @@ from app.storage import (
     LocalStorageProvider,
     IPFSStorageProvider
 )
-from app.services.artifact_crypto import ArtifactCrypto, encrypt_and_sign, verify_and_decrypt
+from backend.app.services.artifact_crypto import ArtifactCrypto, encrypt_and_sign, verify_and_decrypt
 from swarms.team_agent.crypto import TrustDomain, Signer, Verifier
 
 

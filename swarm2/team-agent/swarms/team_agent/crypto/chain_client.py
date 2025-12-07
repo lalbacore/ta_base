@@ -204,6 +204,7 @@ class ChainClient:
         except Exception as e:
             print(f"Failed to publish artifacts: {e}")
             return None
+<<<<<<< HEAD
     
     def hire_agent(self, capability_id: bytes, fee: int) -> Optional[str]:
         """
