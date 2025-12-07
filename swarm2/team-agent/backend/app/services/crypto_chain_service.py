@@ -14,8 +14,8 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
 
 from swarms.team_agent.crypto.trust import AgentReputationTracker, EventType
-from app.models.agent import CapabilityRegistry
-from swarms.team_agent.crypto.artifacts import ArtifactSigner
+from swarms.team_agent.a2a.registry import CapabilityRegistry
+from swarms.team_agent.crypto.artifacts import ArtifactSigner, create_artifact_manifest
 
 
 class CryptoChainService:
@@ -220,15 +220,18 @@ class CryptoChainService:
                     content = f.read()
                     checksum = hashlib.sha256(content).hexdigest()
 
+                # Sign the file (even if signer is None, it creates the structure)
+                signed_artifact = self.artifact_signer.sign_file(str(artifact_path))
+                
                 # Create manifest
-                manifest = self.artifact_signer.create_artifact_manifest(
-                    artifact_path=str(artifact_path),
-                    artifact_type=artifact_name.split('.')[-1],
+                manifest = create_artifact_manifest(
+                    artifacts=[signed_artifact],
                     workflow_id=workflow_id
                 )
 
                 verified = True
-                signature = manifest.get('signature', 'signed')[:16] + "..."
+                # Use manifest checksum as signature proxy for visualization if not signed
+                signature = manifest.get('signature', manifest.get('manifest_checksum', 'unsigned'))[:16] + "..."
             except Exception as e:
                 print(f"Error creating manifest: {e}")
 
@@ -246,18 +249,41 @@ class CryptoChainService:
     def _get_registry_node(self, capability_id: str) -> Dict[str, Any]:
         """Get registry publishing node."""
         # Check if capability exists in registry
-        capability = self.registry.get_capability(capability_id)
+        capability = None
+        try:
+            if hasattr(self.registry, 'get_capability'):
+                # Handle tuple return from a2a registry
+                result = self.registry.get_capability(capability_id)
+                if result and isinstance(result, tuple):
+                    capability = result[0] # Extract capability from (cap, prov) tuple
+                else:
+                    capability = result
+            elif hasattr(self.registry, 'get'):
+                # Handle simple registry
+                capability = self.registry.get(capability_id)
+        except Exception as e:
+            print(f"Registry lookup failed: {e}")
+            capability = None
 
+        # Helper to safely get attribute or item
+        def get_val(obj, key, default=None):
+            if obj is None: return default
+            if isinstance(obj, dict): return obj.get(key, default)
+            return getattr(obj, key, default)
+
+        status = get_val(capability, "status")
+        if hasattr(status, "value"): status = status.value # Handle Enum
+        
         return {
             "id": f"registry_{capability_id}",
             "type": "registry",
             "label": "Registry Entry",
             "capability_id": capability_id,
             "published": capability is not None,
-            "status": capability.get("status") if capability else "pending",
-            "reputation": capability.get("reputation", 0) if capability else 0,
-            "total_invocations": capability.get("total_invocations", 0) if capability else 0,
-            "published_at": capability.get("created_at") if capability else None
+            "status": status if status else "pending",
+            "reputation": get_val(capability, "reputation", 0),
+            "total_invocations": get_val(capability, "total_invocations", 0),
+            "published_at": get_val(capability, "created_at")
         }
 
     def _get_verification_node(self, manifest_node: Dict, registry_node: Dict) -> Dict[str, Any]:

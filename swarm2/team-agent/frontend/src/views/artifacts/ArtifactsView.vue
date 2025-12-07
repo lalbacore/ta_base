@@ -62,6 +62,12 @@
                           <i class="pi pi-shield"></i>
                           {{ artifact.sha256_checksum?.substring(0, 12) }}...
                         </span>
+                        <Tag 
+                          :severity="getProvenanceSeverity(artifact.provenance_score)" 
+                          v-tooltip="'Provenance Score: ' + (artifact.provenance_score * 100) + '% AI Generated'"
+                        >
+                          {{ getProvenanceLabel(artifact.provenance_score) }}
+                        </Tag>
                       </div>
                     </div>
                   </div>
@@ -140,40 +146,63 @@
       @close="showCryptoChain = false"
     />
 
+    <!-- Publish Artifact Modal -->
+    <PublishArtifactModal
+      v-if="showPublishModal"
+      :is-open="showPublishModal"
+      :workflow-id="selectedWorkflowId"
+      :artifact-name="selectedArtifact?.name || ''"
+      @close="showPublishModal = false"
+      @published="handleArtifactPublished"
+    />
+
     <!-- Artifact Detail Dialog - Shows artifact content -->
     <Dialog
       v-model:visible="showDetailDialog"
       :header="selectedArtifact?.name"
-      :style="{ width: '70vw' }"
+      :style="{ width: '80vw', maxWidth: '1200px' }"
       modal
     >
       <div v-if="selectedArtifact" class="artifact-detail">
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="label">File Type:</span>
-            <span class="value">{{ selectedArtifact.type }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Size:</span>
-            <span class="value">{{ formatBytes(selectedArtifact.size) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="label">Verified:</span>
-            <Tag severity="success">
-              <i class="pi pi-check"></i> Yes
-            </Tag>
-          </div>
-          <div class="detail-item">
-            <span class="label">SHA256 Checksum:</span>
-            <span class="value checksum-full">{{ selectedArtifact.sha256_checksum }}</span>
-          </div>
-        </div>
+        <TabView>
+            <!-- Original Details Tab -->
+            <TabPanel header="Details">
+                <div class="detail-grid">
+                  <div class="detail-item">
+                    <span class="label">File Type:</span>
+                    <span class="value">{{ selectedArtifact.type }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Size:</span>
+                    <span class="value">{{ formatBytes(selectedArtifact.size) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Verified:</span>
+                    <Tag severity="success">
+                      <i class="pi pi-check"></i> Yes
+                    </Tag>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">SHA256 Checksum:</span>
+                    <span class="value checksum-full">{{ selectedArtifact.sha256_checksum }}</span>
+                  </div>
+                </div>
 
-        <!-- Content Preview -->
-        <div v-if="selectedArtifact.content" class="content-preview">
-          <h4>Content Preview</h4>
-          <pre><code>{{ selectedArtifact.content }}</code></pre>
-        </div>
+                <!-- Content Preview -->
+                <div v-if="selectedArtifact.content" class="content-preview">
+                  <h4>Content Preview</h4>
+                  <pre><code>{{ selectedArtifact.content }}</code></pre>
+                </div>
+            </TabPanel>
+
+            <!-- Turing Tape Tab -->
+            <TabPanel header="Turing Tape Logs">
+                <div class="turing-tape-container">
+                    <div v-if="loadingTuringTape">Loading cryptographic chain...</div>
+                    <pre v-else class="turing-tape-log">{{ turingTapeContent }}</pre>
+                </div>
+            </TabPanel>
+        </TabView>
       </div>
     </Dialog>
   </div>
@@ -181,27 +210,33 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Tag from 'primevue/tag'
 import Dialog from 'primevue/dialog'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
 import ProgressSpinner from 'primevue/progressspinner'
 import { useMissionStore } from '@/stores/mission.store'
 import { useRegistryStore } from '@/stores/registry.store'
 import CryptoChainModal from '@/components/artifacts/CryptoChainModal.vue'
+import PublishArtifactModal from '@/components/artifacts/PublishArtifactModal.vue'
 import axios from 'axios'
 
-const router = useRouter()
+// const router = useRouter() // Unused
 const missionStore = useMissionStore()
-const registryStore = useRegistryStore()
+// const registryStore = useRegistryStore() // Unused
 
 const isLoading = ref(true)
 const showDetailDialog = ref(false)
 const showCryptoChain = ref(false)
+const showPublishModal = ref(false)
 const selectedArtifact = ref<any>(null)
 const selectedWorkflowId = ref<string>('')
 const workflowArtifacts = ref<Map<string, any[]>>(new Map())
+const loadingTuringTape = ref(false)
+const turingTapeContent = ref('')
 
 const workflowsWithArtifacts = computed(() => {
   const workflows = Array.from(missionStore.workflows.values())
@@ -238,7 +273,21 @@ async function loadArtifacts() {
 function viewArtifact(workflowId: string, artifact: any) {
   selectedArtifact.value = artifact
   selectedWorkflowId.value = workflowId
-  showDetailDialog.value = true  // Show content dialog instead of crypto chain
+  showDetailDialog.value = true
+  fetchTuringTape(workflowId)
+}
+
+async function fetchTuringTape(workflowId: string) {
+    loadingTuringTape.value = true
+    try {
+        const response = await axios.get(`/api/crypto-chain/workflow/${workflowId}/manifest/text`)
+        turingTapeContent.value = response.data
+    } catch (e) {
+        console.error("Failed to fetch Turing Tape", e)
+        turingTapeContent.value = "Failed to load cryptographic chain logs."
+    } finally {
+        loadingTuringTape.value = false
+    }
 }
 
 function verifyCryptoChain(workflowId: string, artifact: any) {
@@ -247,33 +296,21 @@ function verifyCryptoChain(workflowId: string, artifact: any) {
   showCryptoChain.value = true  // Show crypto chain verification
 }
 
-async function publishArtifact(workflowId: string, artifact: any) {
-  try {
-    const response = await axios.post(
-      `/api/workflow/${workflowId}/artifact/${artifact.name}/publish`,
-      {
-        capability_type: 'code_generation',
-        description: `Generated code artifact: ${artifact.name}`,
-        price: 50.0
-      }
-    )
+function publishArtifact(workflowId: string, artifact: any) {
+  selectedArtifact.value = artifact
+  selectedWorkflowId.value = workflowId
+  showPublishModal.value = true
+}
 
-    if (response.data.success) {
-      alert(`✅ Successfully published ${artifact.name} to registry!\n\nCapability ID: ${response.data.capability_id}`)
-      console.log('Published artifact:', response.data)
-
-      // Refresh registry statistics and capabilities
-      await Promise.all([
-        registryStore.fetchStatistics(),
-        registryStore.fetchCapabilities()
-      ])
-    } else {
-      alert(`❌ Failed to publish: ${response.data.error}`)
+function handleArtifactPublished(result: any) {
+    // Show success message with storage details
+    let message = `✅ Published to ${result.storage_backend.toUpperCase()}!\n\nID: ${result.storage_identifier}`
+    if (result.encrypted) {
+        message += `\n\n🔒 ENCRYPTED\nKey: ${result.encryption_key || 'Derived from password'}`
+        if (result.warning) message += `\n${result.warning}`
     }
-  } catch (error: any) {
-    console.error('Error publishing artifact:', error)
-    alert(`❌ Error publishing artifact: ${error.response?.data?.error || error.message}`)
-  }
+    alert(message)
+    console.log('Publication result:', result)
 }
 
 function getFileIcon(type: string): string {
@@ -309,6 +346,18 @@ function getStatusSeverity(status: string): string {
     'pending': 'secondary'
   }
   return severityMap[status] || 'secondary'
+}
+
+function getProvenanceLabel(score: number): string {
+  if (score === 1.0) return 'AI Native'
+  if (score >= 0.5) return 'Hybrid'
+  return 'Human Native'
+}
+
+function getProvenanceSeverity(score: number): string {
+  if (score === 1.0) return 'success'
+  if (score >= 0.5) return 'warning'
+  return 'info'
 }
 
 // Mock data generators

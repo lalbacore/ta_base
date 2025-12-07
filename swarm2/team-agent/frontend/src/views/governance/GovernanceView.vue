@@ -358,7 +358,91 @@
           </template>
         </Card>
       </TabPanel>
+
+      <!-- Certificate Management Tab (Break the Mesh) -->
+      <TabPanel header="🔐 Certificate Management">
+        <Card>
+          <template #header>
+            <div class="checker-header">
+              <i class="pi pi-lock"></i>
+              <h2>Crypto Chain Management</h2>
+              <p>Manage PKI certificates and revocation (Danger Zone)</p>
+            </div>
+          </template>
+          <template #content>
+            <DataTable :value="certificatesList" :loading="isLoadingCertificates" responsiveLayout="scroll">
+              <Column field="domain" header="Trust Domain" sortable>
+                <template #body="slotProps">
+                  <div class="domain-badge">
+                    <i :class="getDomainIcon(slotProps.data.domain)"></i>
+                    <span>{{ formatDomain(slotProps.data.domain) }}</span>
+                  </div>
+                </template>
+              </Column>
+              <Column field="serial" header="Serial Number">
+                <template #body="slotProps">
+                  <code class="serial-code" v-tooltip="slotProps.data.serial">
+                    {{ shortenSerial(slotProps.data.serial) }}
+                  </code>
+                </template>
+              </Column>
+              <Column field="status" header="Status" sortable>
+                <template #body="slotProps">
+                  <Tag :severity="getStatusSeverity(slotProps.data.status)" :value="formatStatus(slotProps.data.status)" />
+                </template>
+              </Column>
+              <Column field="not_after" header="Expires">
+                 <template #body="slotProps">
+                  {{ formatDate(slotProps.data.not_after) }}
+                </template>
+              </Column>
+              <Column header="Actions">
+                <template #body="slotProps">
+                  <Button 
+                    v-if="slotProps.data.status === 'valid' || slotProps.data.status === 'expiring_soon'"
+                    label="Revoke" 
+                    icon="pi pi-ban" 
+                    severity="danger" 
+                    class="p-button-sm p-button-outlined"
+                    @click="confirmRevocation(slotProps.data)"
+                    v-tooltip="'Permanently invalidate this certificate'"
+                  />
+                  <span v-else class="text-gray-500 italic">Revoked</span>
+                </template>
+              </Column>
+            </DataTable>
+          </template>
+        </Card>
+      </TabPanel>
     </TabView>
+
+    <!-- Revocation Dialog -->
+    <Dialog v-model:visible="showRevokeDialog" header="Confirm Certificate Revocation" :modal="true" class="p-fluid" :style="{ width: '450px' }">
+      <div class="confirmation-content">
+        <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem; color: #ef4444" />
+        <div v-if="selectedCertificate">
+          <p class="mb-3">Are you sure you want to revoke the certificate for <strong>{{ formatDomain(selectedCertificate.domain) }}</strong>?</p>
+          <p class="text-red-500 font-bold mb-4">⚠️ This action cannot be undone. "Breaking the Mesh" will invalidate all artifacts signed by this chain.</p>
+          
+          <div class="field">
+            <label for="reason">Revocation Reason</label>
+            <Dropdown 
+              id="reason" 
+              v-model="revocationReason" 
+              :options="revocationReasons" 
+              optionLabel="label" 
+              optionValue="value" 
+              placeholder="Select a reason" 
+              class="w-full"
+            />
+          </div>
+        </div>
+      </div>
+      <template #footer>
+        <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="showRevokeDialog = false" />
+        <Button label="Revoke Certificate" icon="pi pi-ban" class="p-button-danger" @click="executeRevocation" :loading="isRevoking" />
+      </template>
+    </Dialog>
 
     <!-- Policy Editor Dialog -->
     <PolicyEditorDialog
@@ -387,12 +471,16 @@ import MultiSelect from 'primevue/multiselect'
 import Message from 'primevue/message'
 import { useGovernanceStore } from '@/stores/governance.store'
 import governanceService from '@/services/governance.service'
+import { usePKIStore } from '@/stores/pki.store'
 import PolicyEditorDialog from '@/components/governance/PolicyEditorDialog.vue'
 import type { ComplianceReport, Policy } from '@/types/governance.types'
+import Dialog from 'primevue/dialog'
+import Dropdown from 'primevue/dropdown'
 
 const toast = useToast()
 const confirm = useConfirm()
 const governanceStore = useGovernanceStore()
+const pkiStore = usePKIStore()
 
 const policyConfig = computed(() => governanceStore.policyConfig)
 const policies = computed(() => governanceStore.policies)
@@ -485,6 +573,83 @@ function formatDate(dateString: string): string {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+
+// PKI Management
+const isLoadingCertificates = ref(false)
+const showRevokeDialog = ref(false)
+const selectedCertificate = ref<any>(null)
+const isRevoking = ref(false)
+const revocationReason = ref('UNSPECIFIED')
+
+const certificatesList = computed(() => Array.from(pkiStore.certificates.values()))
+
+const revocationReasons = [
+  { label: 'Unspecified', value: 'UNSPECIFIED' },
+  { label: 'Key Compromise', value: 'KEY_COMPROMISE' },
+  { label: 'CA Compromise', value: 'CA_COMPROMISE' },
+  { label: 'Affiliation Changed', value: 'AFFILIATION_CHANGED' },
+  { label: 'Superseded', value: 'SUPERSEDED' },
+  { label: 'Cessation of Operation', value: 'CESSATION_OF_OPERATION' },
+]
+
+function getDomainIcon(domain: string): string {
+  const map: Record<string, string> = {
+    government: 'pi pi-verified',
+    execution: 'pi pi-cog',
+    logging: 'pi pi-book'
+  }
+  return map[domain] || 'pi pi-file'
+}
+
+function formatDomain(domain: string): string {
+  return domain.charAt(0).toUpperCase() + domain.slice(1)
+}
+
+function shortenSerial(serial: string): string {
+  return serial ? `${serial.substring(0, 8)}...` : 'Unknown'
+}
+
+function getStatusSeverity(status: string): string {
+  switch (status) {
+    case 'valid': return 'success'
+    case 'expiring_soon': return 'warning'
+    case 'expired': 
+    case 'revoked': return 'danger'
+    default: return 'info'
+  }
+}
+
+function confirmRevocation(cert: any) {
+  selectedCertificate.value = cert
+  revocationReason.value = 'UNSPECIFIED'
+  showRevokeDialog.value = true
+}
+
+async function executeRevocation() {
+  if (!selectedCertificate.value) return
+  
+  isRevoking.value = true
+  try {
+    await pkiStore.revokeCertificate(selectedCertificate.value.serial, revocationReason.value)
+    toast.add({
+      severity: 'success',
+      summary: 'Certificate Revoked',
+      detail: 'The certificate has been permanently revoked.',
+      life: 5000
+    })
+    showRevokeDialog.value = false
+  } catch (error: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Revocation Failed',
+      detail: error.body?.error || 'Failed to revoke certificate',
+      life: 5000
+    })
+  } finally {
+    isRevoking.value = false
+  }
 }
 
 // Policy Management Functions
@@ -581,7 +746,8 @@ onMounted(async () => {
     await Promise.all([
       governanceStore.fetchPolicyConfig(),
       governanceStore.fetchPolicies(),
-      governanceStore.fetchDecisions()
+      governanceStore.fetchDecisions(),
+      pkiStore.fetchAllCertificates()
     ])
   } catch (error) {
     console.error('Failed to load governance data:', error)
@@ -794,6 +960,22 @@ onMounted(async () => {
   gap: 0.5rem;
   font-weight: 600;
   color: #1e293b;
+}
+
+.domain-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.serial-code {
+    font-family: monospace;
+    background: #f1f5f9;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #475569;
 }
 
 .summary-stat i {

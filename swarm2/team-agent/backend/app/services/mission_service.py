@@ -281,6 +281,49 @@ class MissionService:
         # Not implemented yet - would require breakpoint support
         return None
 
+    def get_governance_stats(self) -> Dict[str, Any]:
+        """
+        Get statistics on governance decisions (AI vs HITL).
+        
+        Returns:
+            Dict with counts for ai_approved, human_approved, rejected, etc.
+        """
+        from app.database import get_backend_session
+        from app.models.governance import GovernanceDecision
+        
+        stats = {
+            'total_decisions': 0,
+            'ai_approved': 0,
+            'human_approved': 0,
+            'rejected': 0,
+            'autonomy_ratio': 0.0
+        }
+        
+        try:
+            with get_backend_session() as session:
+                decisions = session.query(GovernanceDecision).all()
+                stats['total_decisions'] = len(decisions)
+                
+                for d in decisions:
+                    if d.decision == 'rejected':
+                        stats['rejected'] += 1
+                    elif 'Auto-approved' in (d.reason or ''):
+                        stats['ai_approved'] += 1
+                    elif 'Human' in (d.reason or ''):
+                        stats['human_approved'] += 1
+                    else:
+                        # Fallback for legacy data
+                        stats['ai_approved'] += 1
+
+                total_approved = stats['ai_approved'] + stats['human_approved']
+                if total_approved > 0:
+                    stats['autonomy_ratio'] = stats['ai_approved'] / total_approved
+                    
+        except Exception as e:
+            print(f"Error calculating governance stats: {e}")
+            
+        return stats
+
     def _read_workflow_stages(self, workflow_id: str) -> List[Dict[str, Any]]:
         """
         Read workflow stages from turing tape.

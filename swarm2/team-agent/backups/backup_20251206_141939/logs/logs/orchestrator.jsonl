@@ -1,0 +1,576 @@
+{"timestamp": "2025-12-06T09:36:22.904554Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:36:23.090176Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:36:23.114392Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:36:23.114427Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:36:23.114459Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T09:36:23.114493Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_013623"}
+{"timestamp": "2025-12-06T09:36:23.224627Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a non-disclosure agreement for a software development partnership"}
+{"timestamp": "2025-12-06T09:36:23.224656Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T09:36:23.230268Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T09:36:23.231748Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T09:36:23.235065Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T09:36:51.481449Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:36:51.657550Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:36:51.673758Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:36:51.673790Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:36:51.673815Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T09:36:51.673859Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_013651"}
+{"timestamp": "2025-12-06T09:36:51.776240Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a non-disclosure agreement for a software development partnership"}
+{"timestamp": "2025-12-06T09:36:51.776295Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T09:36:51.782823Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T09:36:51.784116Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T09:36:51.788140Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T09:38:07.366244Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:38:07.541799Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:38:07.560879Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:38:07.560928Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:38:07.560957Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T09:38:08.751630Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:38:08.923937Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:38:08.940022Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:38:08.940067Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:38:08.940096Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T09:54:17.079579Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:54:17.250239Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:54:17.268390Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:54:17.268468Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:54:17.268586Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T09:57:43.769760Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T09:57:43.951625Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T09:57:43.968493Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T09:57:43.968534Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T09:57:43.968568Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:07:41.800728Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:07:41.990405Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:07:42.005040Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:07:42.005103Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:07:42.005140Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:14:10.109417Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:14:10.293491Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:14:10.307173Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:14:10.307248Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:14:10.307290Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:14:24.808049Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:14:24.998037Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:14:25.015425Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:14:25.015496Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:14:25.015539Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:15:00.314847Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:15:00.499918Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:15:00.515051Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:15:00.515109Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:15:00.515148Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:15:01.777143Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:15:01.955874Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:15:01.968330Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:15:01.968380Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:15:01.968416Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:17:54.077166Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:17:54.256071Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:17:54.271803Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:17:54.271851Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:17:54.271877Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:17:54.271911Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_021754"}
+{"timestamp": "2025-12-06T10:17:54.379182Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:17:54.379221Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:17:54.388118Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:17:54.391276Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:17:54.394843Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:19:26.156894Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:19:26.333100Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:19:26.347351Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:19:26.347400Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:19:26.347427Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:19:26.347461Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_021926"}
+{"timestamp": "2025-12-06T10:19:26.453989Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:19:26.454023Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:19:26.460617Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:19:26.463539Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:19:26.467848Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:20:17.628032Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:20:17.799802Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:20:17.813229Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:20:17.813282Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:20:17.813310Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:20:17.813345Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_022017"}
+{"timestamp": "2025-12-06T10:20:17.918919Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:20:17.918952Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:20:17.925324Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:20:17.927878Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:20:17.932174Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:20:26.179557Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:20:26.351704Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:20:26.365446Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:20:26.365495Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:20:26.365525Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:20:26.365561Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_022026"}
+{"timestamp": "2025-12-06T10:20:26.475479Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:20:26.475509Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:20:26.481949Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:20:26.484642Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:20:26.488010Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:20:56.246914Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:20:56.427035Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:20:56.440597Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:20:56.440641Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:20:56.440667Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:20:56.440700Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_022056"}
+{"timestamp": "2025-12-06T10:20:56.551196Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:20:56.551233Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:20:56.558386Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:20:56.560846Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:20:56.564780Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:22:54.287793Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:22:54.459530Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:22:54.474183Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:22:54.474233Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:22:54.474262Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:22:54.474298Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_022254"}
+{"timestamp": "2025-12-06T10:22:54.579811Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:22:54.579847Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:22:54.586693Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:22:54.588354Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:22:54.592417Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T10:24:04.825695Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T10:24:05.000610Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T10:24:05.016590Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T10:24:05.016645Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 1 specialist agents"}
+{"timestamp": "2025-12-06T10:24:05.016676Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T10:24:05.016717Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_022405"}
+{"timestamp": "2025-12-06T10:24:05.127610Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Build a Python calculator with add, subtract, multiply, and divide"}
+{"timestamp": "2025-12-06T10:24:05.127640Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T10:24:05.133950Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T10:24:05.135137Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T10:24:05.139442Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T16:57:38.944298Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T16:57:39.121855Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T16:57:39.141132Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T16:57:39.142975Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T16:57:39.144247Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T16:57:39.145474Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T16:57:39.146611Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T16:57:39.146642Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T16:57:39.146668Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T16:57:40.261358Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T16:57:40.427669Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T16:57:40.442694Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T16:57:40.444235Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T16:57:40.446135Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T16:57:40.447325Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T16:57:40.448383Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T16:57:40.448408Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T16:57:40.448432Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T18:52:46.119658Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T18:52:46.301498Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T18:52:46.315251Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T18:52:46.316840Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T18:52:46.318119Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T18:52:46.319501Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T18:52:46.321427Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T18:52:46.321469Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T18:52:46.321516Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T18:53:22.572557Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T18:53:22.753282Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T18:53:22.767614Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T18:53:22.773000Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T18:53:22.776801Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T18:53:22.778931Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T18:53:22.780885Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T18:53:22.780928Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T18:53:22.780966Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T20:48:24.497487Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T20:48:24.685779Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T20:48:24.704532Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T20:48:24.706889Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T20:48:24.708752Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T20:48:24.710594Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T20:48:24.713087Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T20:48:24.713125Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T20:48:24.713171Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T20:48:39.602279Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T20:48:39.782088Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T20:48:39.801462Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T20:48:39.802851Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T20:48:39.804542Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T20:48:39.806105Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T20:48:39.807468Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T20:48:39.807498Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T20:48:39.807525Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:19:21.845873Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:19:22.035521Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:19:22.055949Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:19:22.057970Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:19:22.059854Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:19:22.061113Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:19:22.062324Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:19:22.062365Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:19:22.062397Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:19:23.599462Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:19:23.778631Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:19:23.797243Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:19:23.798642Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:19:23.799876Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:19:23.801149Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:19:23.802336Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:19:23.802367Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:19:23.802395Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:20:59.752386Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:20:59.944077Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:20:59.967809Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:20:59.970288Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:20:59.972086Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:20:59.973954Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:20:59.976367Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:20:59.976401Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:20:59.976435Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:21:42.363355Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:21:42.546469Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:21:42.563618Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:21:42.565529Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:21:42.567411Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:21:42.571171Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:21:42.575698Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:21:42.575726Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:21:42.575753Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:22:27.979316Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:22:28.164049Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:22:28.181953Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:22:28.184517Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:22:28.186690Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:22:28.188554Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:22:28.190289Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:22:28.190363Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:22:28.190422Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:23:36.485033Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:23:36.670677Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:23:36.689650Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:23:36.692016Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:23:36.694210Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:23:36.695724Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:23:36.697892Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:23:36.697946Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:23:36.698008Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:24:17.800441Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:24:17.988791Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:24:18.007790Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:24:18.010468Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:24:18.012293Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:24:18.014094Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:24:18.015770Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:24:18.015834Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:24:18.015900Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:30:56.581001Z", "level": "WARNING", "agent": "orchestrator", "workflow_id": "unknown", "message": "Could not initialize backend databases: No module named 'app.models.mission'"}
+{"timestamp": "2025-12-06T21:30:56.774360Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:30:56.777028Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:30:56.777096Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:30:56.777141Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:30:56.777182Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:30:56.777224Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:30:56.777271Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:30:56.777307Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:31:35.686056Z", "level": "WARNING", "agent": "orchestrator", "workflow_id": "unknown", "message": "Could not initialize backend databases: No module named 'app.models.mission'"}
+{"timestamp": "2025-12-06T21:31:35.885252Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:31:35.887914Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:31:35.887964Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:31:35.888003Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:31:35.888044Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:31:35.888079Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:31:35.888116Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:31:35.888141Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:32:39.540585Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:32:39.723986Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:32:39.737255Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:32:39.738667Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:32:39.739918Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:32:39.741191Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:32:39.742261Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:32:39.742288Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:32:39.742314Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:32:41.284191Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:32:41.474218Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:32:41.490908Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:32:41.493380Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:32:41.495043Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:32:41.496583Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:32:41.498405Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:32:41.498440Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:32:41.498474Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:46:32.823538Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:46:33.056069Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:46:33.075104Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:46:33.079395Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:46:33.084721Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:46:33.086772Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:46:33.088484Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:46:33.088522Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:46:33.088555Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:46:34.454940Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:46:34.650714Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:46:34.667804Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:46:34.669627Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:46:34.671085Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:46:34.672414Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:46:34.674391Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:46:34.674521Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:46:34.674561Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:48:30.376219Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:48:30.562335Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:48:30.574986Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:48:30.577405Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:48:30.578649Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:48:30.579889Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:48:30.581684Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:48:30.581723Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:48:30.581751Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:49:18.350324Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_134918"}
+{"timestamp": "2025-12-06T21:49:18.478924Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a Non-Disclosure Agreement for an external contractor. Ensure it includes standard confidentiality clauses and is signed by the LegalSpecialist."}
+{"timestamp": "2025-12-06T21:49:18.478984Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:49:18.492510Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:49:18.495471Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:49:18.499507Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:49:43.429234Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_134943"}
+{"timestamp": "2025-12-06T21:49:43.559799Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a Non-Disclosure Agreement for an external contractor. Ensure it includes standard confidentiality clauses and is signed by the LegalSpecialist."}
+{"timestamp": "2025-12-06T21:49:43.559861Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:49:43.565608Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:49:43.567545Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:49:43.574296Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:51:23.716028Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:23.897214Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:23.906025Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:23.908991Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:23.910746Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:23.913250Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:23.915182Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:23.915248Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:23.915306Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:23.915404Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135123"}
+{"timestamp": "2025-12-06T21:51:24.039498Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-12-06T21:51:24.039583Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:51:24.054263Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:51:24.065059Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:51:24.069931Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:51:24.088265Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:24.269398Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:24.273813Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.275549Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.277419Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.279043Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.280580Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:24.280637Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:24.280696Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:24.280761Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135124"}
+{"timestamp": "2025-12-06T21:51:24.392957Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-12-06T21:51:24.393026Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:51:24.397967Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:51:24.418750Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:24.597484Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:24.601847Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.603473Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.605033Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.606634Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.608134Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:24.608192Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:24.608245Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:24.611297Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:24.789492Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:24.793306Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.794907Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.798793Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.800302Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:24.802275Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:24.802364Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:24.802531Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:55.318910Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:55.503913Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:55.518833Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:55.524832Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:55.527120Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:55.532799Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:55.535295Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:55.535356Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:55.535416Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:55.535510Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135155"}
+{"timestamp": "2025-12-06T21:51:55.655458Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-12-06T21:51:55.655898Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:51:55.667660Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:51:55.674529Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:51:55.681758Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:51:55.693778Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:55.877017Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:55.881210Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:55.883282Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.033793Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:56.232939Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:56.240859Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.243364Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.246241Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.248164Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.250062Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:56.250123Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:56.250182Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:51:56.253698Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:51:56.439710Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:51:56.443999Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.450272Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.452222Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.454342Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:51:56.456446Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:51:56.456511Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:51:56.456569Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:52:38.406795Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:52:38.591246Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:52:38.601665Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.604068Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.606044Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.607812Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.610455Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:52:38.610536Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:52:38.610605Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:52:38.610702Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135238"}
+{"timestamp": "2025-12-06T21:52:38.725750Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-12-06T21:52:38.725816Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:52:38.734345Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:52:38.737864Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:52:38.742407Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:52:38.751795Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:52:38.928475Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:52:38.933243Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.935173Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.936721Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.938203Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:52:38.939644Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:52:38.939702Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:52:38.939758Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:52:38.939824Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135238"}
+{"timestamp": "2025-12-06T21:52:39.052100Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate hormone replacement therapy guide"}
+{"timestamp": "2025-12-06T21:52:39.052172Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:52:39.057328Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:52:39.080273Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:52:39.255858Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:52:39.260321Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.261917Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.263464Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.265049Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.266903Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:52:39.266963Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:52:39.267020Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:52:39.269993Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:52:39.449224Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:52:39.454513Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.456179Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.458500Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.460355Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:52:39.462111Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:52:39.462178Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:52:39.462237Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:53:00.876351Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135300"}
+{"timestamp": "2025-12-06T21:53:01.007413Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a Non-Disclosure Agreement for an external contractor. Ensure it includes standard confidentiality clauses and is signed by the LegalSpecialist."}
+{"timestamp": "2025-12-06T21:53:01.007461Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:53:01.012309Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:53:01.014735Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:53:01.018246Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:54:48.615326Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T21:54:48.798588Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T21:54:48.811491Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T21:54:48.813549Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T21:54:48.815453Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T21:54:48.816957Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T21:54:48.818381Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T21:54:48.818413Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T21:54:48.818446Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T21:54:54.758973Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135454"}
+{"timestamp": "2025-12-06T21:54:54.888051Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a Non-Disclosure Agreement for an external contractor. Ensure it includes standard confidentiality clauses and is signed by the LegalSpecialist."}
+{"timestamp": "2025-12-06T21:54:54.888099Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:54:54.896228Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:54:54.899252Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:54:54.907262Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:55:34.766853Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135534"}
+{"timestamp": "2025-12-06T21:55:34.906010Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Starting workflow execution: Generate a Non-Disclosure Agreement for an external contractor. Ensure it includes standard confidentiality clauses and is signed by the LegalSpecialist."}
+{"timestamp": "2025-12-06T21:55:34.906054Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 1: Architecture"}
+{"timestamp": "2025-12-06T21:55:34.912333Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 2: Implementation"}
+{"timestamp": "2025-12-06T21:55:34.922396Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 3: Review"}
+{"timestamp": "2025-12-06T21:55:34.927171Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Phase 4: Recording/Publishing"}
+{"timestamp": "2025-12-06T21:58:09.497722Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135809"}
+{"timestamp": "2025-12-06T21:58:09.498285Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:58:09.499651Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:58:09.499722Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T21:58:23.884802Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135823"}
+{"timestamp": "2025-12-06T21:58:23.885496Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:58:23.886966Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:58:23.887049Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T21:58:51.221651Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T21:58:51.223025Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T21:58:51.237868Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T21:58:51.238366Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T21:58:51.250665Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T21:58:51.250882Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T21:58:51.260207Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T21:58:51.269475Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135851"}
+{"timestamp": "2025-12-06T21:58:51.270068Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:58:51.271749Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:58:51.271824Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T21:58:58.126292Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T21:58:58.127578Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T21:58:58.135874Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T21:58:58.136371Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T21:58:58.145392Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T21:58:58.145598Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T21:58:58.154884Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T21:58:58.166553Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135858"}
+{"timestamp": "2025-12-06T21:58:58.167252Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:58:58.169624Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:58:58.169868Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T21:59:23.865660Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135923"}
+{"timestamp": "2025-12-06T21:59:23.866307Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:59:23.867700Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:59:23.867792Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T21:59:27.323123Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T21:59:27.324458Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T21:59:27.332737Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T21:59:27.332876Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T21:59:27.340784Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T21:59:27.340910Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T21:59:27.349185Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T21:59:41.701231Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T21:59:41.702032Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T21:59:41.707841Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T21:59:41.707965Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T21:59:41.714778Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T21:59:41.714923Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T21:59:41.722053Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T21:59:58.937961Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T21:59:58.938866Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T21:59:58.949896Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T21:59:58.950050Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T21:59:58.958908Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T21:59:58.959077Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T21:59:58.967080Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T21:59:58.981151Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Created new workflow wf_20251206_135958"}
+{"timestamp": "2025-12-06T21:59:58.981800Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: architect"}
+{"timestamp": "2025-12-06T21:59:58.983141Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: architect"}
+{"timestamp": "2025-12-06T21:59:58.983237Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: builder"}
+{"timestamp": "2025-12-06T22:00:39.830648Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: builder"}
+{"timestamp": "2025-12-06T22:00:39.832458Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: critic"}
+{"timestamp": "2025-12-06T22:00:39.843673Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: critic"}
+{"timestamp": "2025-12-06T22:00:39.843845Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: governance"}
+{"timestamp": "2025-12-06T22:00:39.852989Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: governance"}
+{"timestamp": "2025-12-06T22:00:39.853382Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Executing stage: recorder"}
+{"timestamp": "2025-12-06T22:00:39.873093Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Completed stage: recorder"}
+{"timestamp": "2025-12-06T22:03:19.119557Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T22:03:19.302904Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T22:03:19.315442Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T22:03:19.317052Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T22:03:19.318581Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T22:03:19.320227Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T22:03:19.321439Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T22:03:19.321467Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T22:03:19.321494Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}
+{"timestamp": "2025-12-06T22:05:07.001088Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Backend databases initialized"}
+{"timestamp": "2025-12-06T22:05:07.193821Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "PKI infrastructure initialized"}
+{"timestamp": "2025-12-06T22:05:07.210933Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered LegalSpecialist"}
+{"timestamp": "2025-12-06T22:05:07.213097Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AWSSpecialist"}
+{"timestamp": "2025-12-06T22:05:07.214815Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered AzureSpecialist"}
+{"timestamp": "2025-12-06T22:05:07.216836Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered GCPSpecialist"}
+{"timestamp": "2025-12-06T22:05:07.218728Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered OCISpecialist"}
+{"timestamp": "2025-12-06T22:05:07.218772Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Registered 5 specialist agents"}
+{"timestamp": "2025-12-06T22:05:07.218811Z", "level": "INFO", "agent": "orchestrator", "workflow_id": "unknown", "message": "Orchestrator initialized with agent-capability system, PKI, and agent management"}

@@ -18,6 +18,7 @@
           <NavLink to="/registry" icon="📋">Registry</NavLink>
           <NavLink to="/governance" icon="⚖️">Governance</NavLink>
           <NavLink to="/artifacts" icon="📦">Artifacts</NavLink>
+          <NavLink to="/providers" icon="🌐">Networks</NavLink>
           <NavLink to="/logs" icon="📝">Logs</NavLink>
         </div>
       </nav>

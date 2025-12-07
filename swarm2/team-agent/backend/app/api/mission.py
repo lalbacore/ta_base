@@ -46,6 +46,28 @@ def list_missions():
         return jsonify({'error': str(e)}), 500
 
 
+@mission_bp.route('/stats', methods=['GET'])
+def get_mission_stats():
+    """
+    Get aggregated mission and governance statistics.
+    Includes AI vs HITL metrics.
+    """
+    try:
+        # Get base mission stats
+        missions = mission_service.list_missions()
+        
+        # Get governance stats
+        gov_stats = mission_service.get_governance_stats()
+        
+        return jsonify({
+            'missions_count': len(missions),
+            'governance': gov_stats,
+            'timestamp': __import__('datetime').datetime.utcnow().isoformat() + 'Z'
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @mission_bp.route('/<mission_id>', methods=['GET'])
 def get_mission(mission_id):
     """Get mission details."""

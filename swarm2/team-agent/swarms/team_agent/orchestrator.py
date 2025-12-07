@@ -24,6 +24,7 @@ from swarms.team_agent.crypto import PKIManager, TrustDomain
 
 # Agent Manager
 from swarms.team_agent.agent_manager import AgentManager
+from swarms.team_agent.state.turing_tape import TuringTape
 
 try:
     from utils.capabilities import HRTGuideCapability
@@ -165,6 +166,10 @@ class Orchestrator:
         self.current_workflow_id = f"wf_{timestamp}"
         self.logger.info(f"Created new workflow {self.current_workflow_id}")
 
+        # Initialize Turing Tape for this workflow
+        self.tape = TuringTape(workflow_id=self.current_workflow_id)
+        self.tape.append("orchestrator", "workflow_start", {"mission": mission})
+
         # Create agents with their respective certificate chains
         architect = Architect(
             self.current_workflow_id,
@@ -220,6 +225,7 @@ class Orchestrator:
         self.agent_manager.track_invocation(
             architect.id, self.current_workflow_id, architect_output, success=True
         )
+        self.tape.append("architect", "design_complete", architect_output)
 
         # Optional governance pre-check
         if governance:
@@ -228,6 +234,7 @@ class Orchestrator:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, governance_pre, success=True
                 )
+                self.tape.append("governance", "policy_check_pre_build", governance_pre)
             except Exception as e:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, None, success=False, error=str(e)
@@ -260,6 +267,8 @@ class Orchestrator:
             self.agent_manager.track_invocation(
                 f"capability_{capability_used}", self.current_workflow_id, builder_result, success=True
             )
+        
+        self.tape.append("builder", "build_complete", builder_result)
 
         # Phase 3: Review
         self.logger.info("Phase 3: Review")
@@ -291,6 +300,7 @@ class Orchestrator:
         self.agent_manager.track_invocation(
             critic.id, self.current_workflow_id, critic_output, success=True
         )
+        self.tape.append("critic", "review_complete", critic_output)
 
         # Optional governance post-review
         if governance:
@@ -303,6 +313,7 @@ class Orchestrator:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, governance_post, success=True
                 )
+                self.tape.append("governance", "policy_check_post_review", governance_post)
             except Exception as e:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, None, success=False, error=str(e)
@@ -368,6 +379,7 @@ class Orchestrator:
         self.agent_manager.track_invocation(
             recorder.id, self.current_workflow_id, recorder_output, success=True
         )
+        self.tape.append("recorder", "published", recorder_output)
 
         return {
             "workflow_id": self.current_workflow_id,

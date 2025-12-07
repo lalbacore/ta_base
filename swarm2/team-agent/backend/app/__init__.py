@@ -46,6 +46,9 @@ def create_app():
     app.register_blueprint(agents_bp, url_prefix='/api/agents')
     app.register_blueprint(well_known_bp)  # No prefix - .well-known at root
     
+    from app.api.provider import provider_bp
+    app.register_blueprint(provider_bp, url_prefix='/api/provider')
+    
     from swarms.team_agent.mcp.server import mcp_bp
     app.register_blueprint(mcp_bp)
 

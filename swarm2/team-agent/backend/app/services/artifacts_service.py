@@ -73,7 +73,8 @@ class ArtifactsService:
                     'sha256_checksum': checksum,
                     'verified': True,
                     'content': content,
-                    'type': artifact_path.suffix[1:] if artifact_path.suffix else 'unknown'
+                    'type': artifact_path.suffix[1:] if artifact_path.suffix else 'unknown',
+                    'provenance_score': 0.0 if 'manual' in artifact_path.name.lower() else (0.8 if artifact_path.suffix in ['.md', '.txt'] else 1.0)
                 })
 
         return artifacts
