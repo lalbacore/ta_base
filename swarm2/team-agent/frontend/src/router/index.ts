@@ -60,6 +60,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Logs',
     component: () => import('@/views/logs/LogsView.vue'),
     meta: { title: 'Logs' }
+  },
+  {
+    path: '/providers',
+    name: 'Providers',
+    component: () => import('@/views/providers/ProvidersView.vue'),
+    meta: { title: 'Multi-Provider Infrastructure' }
   }
 ]
 

@@ -46,39 +46,42 @@ def simulate_chain_break(workflow_id, artifact_name, break_type):
         # Simulate the break based on type
         if break_type == 'trust_violation':
             # Reduce agent trust score
-            for node in chain['graph']['nodes']:
-                if node['type'] == 'agent':
-                    node['trust_score'] = 45.0
-                    node['status'] = 'untrusted'
+            agent_node = next((n for n in chain['graph']['nodes'] if n['type'] == 'agent'), None)
+            if agent_node:
+                agent_node['trust_score'] = 45.0
+                agent_node['status'] = 'untrusted'
 
-            chain['trust_violations'].append({
-                'type': 'low_trust_score',
-                'severity': 'critical',
-                'message': 'Agent trust score below threshold (45 < 75)',
-                'node_id': next(n['id'] for n in chain['graph']['nodes'] if n['type'] == 'agent')
-            })
+                chain['trust_violations'].append({
+                    'type': 'low_trust_score',
+                    'severity': 'critical',
+                    'message': 'Agent trust score below threshold (45 < 75)',
+                    'node_id': agent_node['id']
+                })
 
         elif break_type == 'signature_invalid':
             # Mark signature as invalid
-            for node in chain['graph']['nodes']:
-                if node['type'] == 'manifest':
-                    node['verified'] = False
-                    node['signature'] = None
+            manifest_node = next((n for n in chain['graph']['nodes'] if n['type'] == 'manifest'), None)
+            
+            if manifest_node:
+                manifest_node['verified'] = False
+                manifest_node['signature'] = None
 
-            # Mark signing edge as unverified
-            for edge in chain['graph']['edges']:
-                if edge['type'] == 'signature':
-                    edge['verified'] = False
+                # Mark signing edge as unverified
+                for edge in chain['graph']['edges']:
+                    if edge['type'] == 'signature':
+                        edge['verified'] = False
 
-            chain['weak_links'].append({
-                'type': 'invalid_signature',
-                'severity': 'critical',
-                'message': 'Artifact signature verification failed',
-                'node_id': next(n['id'] for n in chain['graph']['nodes'] if n['type'] == 'manifest')
-            })
+                chain['weak_links'].append({
+                    'type': 'invalid_signature',
+                    'severity': 'critical',
+                    'message': 'Artifact signature verification failed',
+                    'node_id': manifest_node['id']
+                })
 
         elif break_type == 'checksum_mismatch':
             # Corrupt checksum
+            artifact_node = next((n for n in chain['graph']['nodes'] if n['type'] == 'artifact'), None)
+            
             for node in chain['graph']['nodes']:
                 if node['type'] == 'manifest':
                     node['checksum'] = 'CORRUPTED_' + (node['checksum'] or 'unknown')
@@ -88,31 +91,33 @@ def simulate_chain_break(workflow_id, artifact_name, break_type):
                         if check['name'] == 'Checksum Integrity':
                             check['passed'] = False
                     node['all_checks_passed'] = False
-
-            chain['weak_links'].append({
-                'type': 'checksum_mismatch',
-                'severity': 'critical',
-                'message': 'Artifact checksum does not match manifest',
-                'node_id': next(n['id'] for n in chain['graph']['nodes'] if n['type'] == 'artifact')
-            })
+            
+            if artifact_node:
+                chain['weak_links'].append({
+                    'type': 'checksum_mismatch',
+                    'severity': 'critical',
+                    'message': 'Artifact checksum does not match manifest',
+                    'node_id': artifact_node['id']
+                })
 
         elif break_type == 'unverified_registry':
             # Mark registry as unverified
-            for node in chain['graph']['nodes']:
-                if node['type'] == 'registry':
-                    node['published'] = False
-                    node['status'] = 'unverified'
+            registry_node = next((n for n in chain['graph']['nodes'] if n['type'] == 'registry'), None)
+            
+            if registry_node:
+                registry_node['published'] = False
+                registry_node['status'] = 'unverified'
 
-            for edge in chain['graph']['edges']:
-                if edge['type'] == 'registry':
-                    edge['verified'] = False
+                for edge in chain['graph']['edges']:
+                    if edge['type'] == 'registry':
+                        edge['verified'] = False
 
-            chain['weak_links'].append({
-                'type': 'unverified_registry',
-                'severity': 'high',
-                'message': 'Registry entry not properly verified',
-                'node_id': next(n['id'] for n in chain['graph']['nodes'] if n['type'] == 'registry')
-            })
+                chain['weak_links'].append({
+                    'type': 'unverified_registry',
+                    'severity': 'high',
+                    'message': 'Registry entry not properly verified',
+                    'node_id': registry_node['id']
+                })
 
         # Recalculate chain integrity
         chain['chain_integrity'] = len(chain['trust_violations']) == 0 and len(chain['weak_links']) == 0

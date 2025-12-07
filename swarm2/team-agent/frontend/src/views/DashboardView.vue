@@ -151,6 +151,21 @@
         <Card>
           <template #content>
             <div class="mini-stat">
+              <i class="pi pi-bolt stat-mini-icon"></i>
+              <div>
+                <div class="mini-stat-value">{{ autonomyStats.ratio }}%</div>
+                <div class="mini-stat-label">Autonomy Ratio</div>
+                <div class="mini-stat-detail text-xs text-gray-500 mt-1">
+                  {{ autonomyStats.ai }} AI / {{ autonomyStats.human }} Human
+                </div>
+              </div>
+            </div>
+          </template>
+        </Card>
+
+        <Card>
+          <template #content>
+            <div class="mini-stat">
               <i class="pi pi-exclamation-triangle stat-mini-icon"></i>
               <div>
                 <div class="mini-stat-value">{{ trustStats.securityIncidents }}</div>
@@ -167,18 +182,6 @@
               <div>
                 <div class="mini-stat-value">{{ pkiStats.revoked }}</div>
                 <div class="mini-stat-label">Revoked Certificates</div>
-              </div>
-            </div>
-          </template>
-        </Card>
-
-        <Card>
-          <template #content>
-            <div class="mini-stat">
-              <i class="pi pi-dollar stat-mini-icon"></i>
-              <div>
-                <div class="mini-stat-value">\${{ registryStats.averagePrice.toFixed(0) }}</div>
-                <div class="mini-stat-label">Avg Capability Price</div>
               </div>
             </div>
           </template>
@@ -327,6 +330,7 @@ const registryStore = useRegistryStore()
 const isLoading = ref(true)
 const allArtifacts = ref<any[]>([])
 const agentsStats = ref<any>(null)
+const autonomyStats = ref({ ratio: 0, ai: 0, human: 0 })
 
 // Mission Statistics
 const missionStats = computed(() => {
@@ -365,9 +369,9 @@ const trustStats = computed(() => {
   return {
     totalAgents: agentsStats.value.total_agents || 0,
     averageScore: avgScore,
-    highTrust: agents.filter(a => a.trust_score >= 90).length,
-    mediumTrust: agents.filter(a => a.trust_score >= 75 && a.trust_score < 90).length,
-    lowTrust: agents.filter(a => a.trust_score < 75).length,
+    highTrust: agents.filter((a: any) => a.trust_score >= 90).length,
+    mediumTrust: agents.filter((a: any) => a.trust_score >= 75 && a.trust_score < 90).length,
+    lowTrust: agents.filter((a: any) => a.trust_score < 75).length,
     securityIncidents: 0  // Not tracked in new agent system
   }
 })
@@ -426,10 +430,21 @@ onMounted(async () => {
       agentsStats.value = null
     })
 
+    // Fetch mission stats (autonomy)
+    const missionStatsPromise = axios.get('/api/mission/stats').then(response => {
+        const gov = response.data.governance
+        autonomyStats.value = {
+            ratio: gov.autonomy_ratio ? Math.round(gov.autonomy_ratio * 100) : 0,
+            ai: gov.ai_approved,
+            human: gov.human_approved
+        }
+    }).catch(e => console.error('Failed to fetch mission stats', e))
+
     await Promise.all([
       missionStore.fetchMissions(),
       missionStore.fetchWorkflows(),
       agentsPromise,
+      missionStatsPromise,
       pkiStore.fetchAllCertificates(),
       registryStore.fetchStatistics()
     ])

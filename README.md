@@ -289,17 +289,17 @@ ta_base/
 ### In Progress (Phase 2: Weeks 1-4)
 | Component | Status | Target |
 |-----------|--------|--------|
-| **A2A Protocol** | 🔲 Planned | `.well-known/agent.json` endpoint |
-| **MCP Server** | 🔲 Planned | HTTP/WebSocket capability invocation |
-| **Agent Discovery** | 🔲 Planned | External agent card discovery |
+| **A2A Protocol** | ✅ Complete | `.well-known/agent.json` endpoint |
+| **MCP Server** | ✅ Complete | HTTP/WebSocket capability invocation |
+| **Agent Discovery** | ✅ Complete | External agent card discovery |
 
 ### Roadmap (Phase 3-6: Weeks 5-36)
 | Phase | Component | Timeline |
 |-------|-----------|----------|
 | **Phase 3** | Ethereum Optimism L2 Integration | Weeks 5-20 |
-| | • Smart contracts (3 contracts + DAO) | Weeks 5-12 |
-| | • IPFS artifact storage | Weeks 13-16 |
-| | • Blockchain client integration | Weeks 17-20 |
+| | • Smart contracts (3 contracts + DAO) | ✅ Complete |
+| | • IPFS artifact storage | ✅ Complete |
+| | • Blockchain client integration | ✅ Complete |
 | **Phase 4** | Flexible Payment System | Weeks 21-24 |
 | | • Multi-token support (ETH, OP, USDC) | Week 21 |
 | | • Custom value stores | Week 22 |
@@ -486,10 +486,10 @@ mypy swarms/ utils/ backend/
 ✅ **Legal Document Generation** - Contracts, agreements, compliance documents
 ✅ **Web Dashboard** - Modern Vue.js + PrimeVue frontend
 ✅ **Comprehensive Testing** - 56 tests covering core functionality and PKI
-🔲 **A2A Protocol** - Agent discovery and federation (Phase 2)
-🔲 **MCP Server** - External capability invocation (Phase 2)
-🔲 **Blockchain Integration** - Optimism L2 smart contracts (Phase 3)
-🔲 **IPFS Storage** - Decentralized artifact storage (Phase 3)
+✅ **A2A Protocol** - Agent discovery and federation (Phase 2)
+✅ **MCP Server** - External capability invocation (Phase 2)
+✅ **Blockchain Integration** - Optimism L2 smart contracts (Phase 3)
+✅ **IPFS Storage** - Decentralized artifact storage (Phase 3)
 🔲 **Flexible Payments** - Multi-token and custom value stores (Phase 4)
 🔲 **Research Platform** - Academic and scientific agents (Phase 5)
 

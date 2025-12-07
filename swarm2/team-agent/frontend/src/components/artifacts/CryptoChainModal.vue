@@ -68,48 +68,63 @@
         </div>
       </div>
 
-      <!-- Simulate Breaks (Easter Egg Controls) -->
-      <div class="break-simulator">
-        <h4>
+      <!-- Simulation & Testing Panel -->
+      <div class="simulation-panel">
+        <div class="panel-header">
           <i class="pi pi-bolt"></i>
-          Break Crypto Chain (Simulation)
-        </h4>
-        <div class="break-buttons">
-          <Button
-            label="Trust Violation"
-            icon="pi pi-user-minus"
-            severity="warning"
-            size="small"
-            @click="simulateBreak('trust_violation')"
-          />
-          <Button
-            label="Invalid Signature"
-            icon="pi pi-times-circle"
-            severity="danger"
-            size="small"
-            @click="simulateBreak('signature_invalid')"
-          />
-          <Button
-            label="Checksum Mismatch"
-            icon="pi pi-exclamation-circle"
-            severity="danger"
-            size="small"
-            @click="simulateBreak('checksum_mismatch')"
-          />
-          <Button
-            label="Unverified Registry"
-            icon="pi pi-lock-open"
-            severity="warning"
-            size="small"
-            @click="simulateBreak('unverified_registry')"
-          />
-          <Button
-            label="Reset"
-            icon="pi pi-refresh"
-            severity="secondary"
-            size="small"
-            @click="loadCryptoChain"
-          />
+          <h4>Simulation & Testing (Dev Mode)</h4>
+        </div>
+        
+        <div class="simulation-grid">
+            <div class="sim-group">
+                <span class="sim-label">Asset Integrity</span>
+                <Button
+                    label="Invalidate Artifact"
+                    icon="pi pi-file-excel"
+                    severity="danger"
+                    size="small"
+                    v-tooltip="'Simulate invalid signature or tampered data'"
+                    @click="simulateBreak('signature_invalid')"
+                />
+                <Button
+                    label="Corrupt Data"
+                    icon="pi pi-database"
+                    severity="warning"
+                    size="small"
+                    outlined
+                    @click="simulateBreak('checksum_mismatch')"
+                />
+            </div>
+
+            <div class="sim-group">
+                <span class="sim-label">Chain Trust</span>
+                <Button
+                    label="Invalidate Smart Contract"
+                    icon="pi pi-lock-open"
+                    severity="danger"
+                    size="small"
+                    v-tooltip="'Simulate unverified registry entry or contract failure'"
+                    @click="simulateBreak('unverified_registry')"
+                />
+                <Button
+                    label="Compromise Agent"
+                    icon="pi pi-user-minus"
+                    severity="warning"
+                    size="small"
+                    outlined
+                    @click="simulateBreak('trust_violation')"
+                />
+            </div>
+
+            <div class="sim-group actions">
+                <Button
+                    label="Reset Simulation"
+                    icon="pi pi-refresh"
+                    severity="secondary"
+                    size="small"
+                    @click="loadCryptoChain"
+                />
+            </div>
         </div>
       </div>
     </div>
@@ -117,13 +132,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import Dialog from 'primevue/dialog'
 import Card from 'primevue/card'
 import Button from 'primevue/button'
 import Message from 'primevue/message'
-import { Network } from 'vis-network'
 import axios from 'axios'
+// import { Network } from 'vis-network' // Dynamically imported to avoid build issues
 
 const props = defineProps<{
   isOpen: boolean
@@ -137,7 +152,7 @@ const emit = defineEmits<{
 
 const chainData = ref<any>(null)
 const networkContainer = ref<HTMLElement | null>(null)
-const network = ref<Network | null>(null)
+const network = ref<any>(null) // Typed as any to avoid explicit dependency on vis-network types at top level
 
 const weakLinkSeverity = computed(() => {
   const count = chainData.value?.weak_links?.length || 0
@@ -172,8 +187,21 @@ async function simulateBreak(breakType: string) {
   }
 }
 
-function renderGraph() {
+async function renderGraph() {
   if (!networkContainer.value || !chainData.value) return
+
+  // Dynamically import vis-network to prevent load issues
+  let Network;
+  try {
+      const vis = await import('vis-network');
+      Network = vis.Network;
+  } catch (e) {
+      console.error("Failed to load vis-network", e);
+      return;
+  }
+
+  // Double check container exists after async import (component might have unmounted)
+  if (!networkContainer.value) return;
 
   const nodes = chainData.value.graph.nodes.map((node: any) => ({
     id: node.id,
@@ -217,6 +245,7 @@ function renderGraph() {
     },
     edges: {
       smooth: {
+        enabled: true,
         type: 'cubicBezier',
         forceDirection: 'horizontal',
         roundness: 0.4
@@ -239,6 +268,12 @@ function renderGraph() {
     }
   }
 
+  // Cleanup existing network if any
+  if (network.value) {
+      network.value.destroy();
+      network.value = null;
+  }
+
   // Create network
   network.value = new Network(
     networkContainer.value,
@@ -247,7 +282,7 @@ function renderGraph() {
   )
 
   // Highlight weak links on click
-  network.value.on('selectNode', (params) => {
+  network.value.on('selectNode', (params: any) => {
     const nodeId = params.nodes[0]
     highlightWeakLinks(nodeId)
   })
@@ -379,6 +414,13 @@ onMounted(() => {
     loadCryptoChain()
   }
 })
+
+onBeforeUnmount(() => {
+  if (network.value) {
+    network.value.destroy()
+    network.value = null
+  }
+})
 </script>
 
 <style scoped>
@@ -482,25 +524,53 @@ onMounted(() => {
   gap: 0.5rem;
 }
 
-.break-simulator {
-  padding: 1rem;
-  background: #f1f5f9;
+.simulation-panel {
+  padding: 1.5rem;
+  background: #f8fafc;
   border-radius: 8px;
   border: 1px dashed #cbd5e1;
 }
 
-.break-simulator h4 {
-  margin: 0 0 1rem 0;
-  font-size: 0.875rem;
-  color: #475569;
+.panel-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: #475569;
 }
 
-.break-buttons {
+.panel-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.panel-header i {
+  color: #f59e0b;
+}
+
+.simulation-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 2rem;
+  align-items: flex-end;
+}
+
+.sim-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sim-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.sim-group.actions {
+  margin-left: auto;
 }
 </style>

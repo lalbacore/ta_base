@@ -19,7 +19,21 @@ except ImportError:
     ManifestGenerator = None
 
 
-class Recorder:
+from ..core.node import SwarmNode
+from ..core.message import AgentMessage
+from ..crypto.pki import TrustDomain
+
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer, ManifestGenerator
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+    ManifestGenerator = None
+
+
+class Recorder(SwarmNode):
     """
     Records workflow outputs with signature and audit trail.
     Uses tools for scoring and validation.
@@ -33,9 +47,15 @@ class Recorder:
         registry: Optional[ToolRegistry] = None,
         cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        # Initialize SwarmNode (LOGGING domain)
+        super().__init__(
+            name=name,
+            agent_type="role",
+            agent_id=id,
+            trust_domain=TrustDomain.LOGGING
+        )
+        
         self.workflow_id = workflow_id
-        self.name = name
-        self.id = id
         self.capabilities: List[str] = ["record", "describe"]
         self.records: List[Dict[str, Any]] = []
         
@@ -43,8 +63,7 @@ class Recorder:
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
 
-        # Initialize signer if cert_chain is provided
-        self.signer = None
+        # Handle legacy manual cert_chain override
         if cert_chain and CRYPTO_AVAILABLE:
             try:
                 self.signer = Signer(
@@ -59,6 +78,17 @@ class Recorder:
         self.manifest_generator = None
         if CRYPTO_AVAILABLE and ManifestGenerator:
             self.manifest_generator = ManifestGenerator()
+
+    def handle_message(self, message: AgentMessage) -> Dict[str, Any]:
+        """
+        Handle incoming messages.
+        Supports 'task_request' (alias for logging request).
+        """
+        if message.message_type in ("task_request", "log_request"):
+            self.logger.info(f"Recorder receiving log request from {message.sender_id}")
+            return self.run(message.payload)
+            
+        return super().handle_message(message)
 
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""

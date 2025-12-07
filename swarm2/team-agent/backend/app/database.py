@@ -127,6 +127,11 @@ def init_backend_db():
     Creates all tables defined in SQLAlchemy models.
     """
     from app.models.base import Base
+    # Import all models to ensure they are registered with Base.metadata
+    import app.models.agent
+    import app.models.governance
+    import app.models.provider  # New provider models
+    
     Base.metadata.create_all(backend_engine)
 
 

@@ -18,7 +18,20 @@ except ImportError:
     Signer = None
 
 
-class Critic:
+from ..core.node import SwarmNode
+from ..core.message import AgentMessage
+from ..crypto.pki import TrustDomain
+
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
+
+class Critic(SwarmNode):
     """
     Reviews designs and builds for quality and compliance.
     Uses tools for review and scoring.
@@ -32,9 +45,15 @@ class Critic:
         registry: Optional[ToolRegistry] = None,
         cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        # Initialize SwarmNode (EXECUTION domain)
+        super().__init__(
+            name=name,
+            agent_type="role",
+            agent_id=id,
+            trust_domain=TrustDomain.EXECUTION
+        )
+        
         self.workflow_id = workflow_id
-        self.name = name
-        self.id = id
         self.metadata = {
             "id": self.id,
             "name": self.name,
@@ -59,8 +78,7 @@ class Critic:
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
 
-        # Initialize signer if cert_chain is provided
-        self.signer = None
+        # Handle legacy manual cert_chain override
         if cert_chain and CRYPTO_AVAILABLE:
             try:
                 self.signer = Signer(
@@ -70,6 +88,18 @@ class Critic:
                 )
             except Exception:
                 pass
+
+    def handle_message(self, message: AgentMessage) -> Dict[str, Any]:
+        """
+        Handle incoming messages.
+        Supports 'task_request' (alias for review request).
+        """
+        if message.message_type in ("task_request", "review_request"):
+            self.logger.info(f"Critic receiving review request from {message.sender_id}")
+            # Payload is already the context dict for run()
+            return self.run(message.payload)
+            
+        return super().handle_message(message)
 
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""

@@ -46,7 +46,7 @@
       <div class="mission-stats">
         <div class="stat-item">
           <span class="stat-label">Capabilities</span>
-          <span class="stat-value">{{ mission.required_capabilities.length }}</span>
+          <span class="stat-value">{{ mission.required_capabilities?.length || 0 }}</span>
         </div>
 
         <div class="stat-item">
@@ -56,7 +56,7 @@
 
         <div class="stat-item">
           <span class="stat-label">Breakpoints</span>
-          <span class="stat-value">{{ mission.breakpoints.length }}</span>
+          <span class="stat-value">{{ mission.breakpoints?.length || 0 }}</span>
         </div>
       </div>
     </template>
@@ -178,6 +178,7 @@ function handleOptionsClick() {
   margin-bottom: 1rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

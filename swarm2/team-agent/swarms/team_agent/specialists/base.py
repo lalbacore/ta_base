@@ -10,19 +10,18 @@ from abc import ABC, abstractmethod
 import uuid
 
 
-class BaseSpecialist(ABC):
+from swarms.team_agent.core.node import SwarmNode
+from swarms.team_agent.crypto.pki import TrustDomain
+
+
+class BaseSpecialist(SwarmNode):
     """
     Base class for all specialist agents.
 
     Specialist agents:
+    - Inherit from SwarmNode (Identity + Crypto)
     - Are registered in agent_cards with type="specialist"
     - Use one or more capabilities from capability registry
-    - Have their own trust scores and invocation history
-    - Are selected dynamically by DynamicBuilder based on keywords
-
-    Subclasses must implement:
-    - get_primary_capability(): Return the main capability this specialist uses
-    - run(context): Execute the specialist's task using capabilities
     """
 
     def __init__(self, agent_id: str = None, workflow_id: str = None, cert_chain: List[Dict] = None):
@@ -30,18 +29,34 @@ class BaseSpecialist(ABC):
         Initialize specialist agent.
 
         Args:
-            agent_id: Unique agent identifier (auto-generated if not provided)
+            agent_id: Unique agent identifier
             workflow_id: Current workflow ID
-            cert_chain: PKI certificate chain for signing
+            cert_chain: Optional manual cert chain (legacy/override)
         """
-        self.id = agent_id or self._generate_agent_id()
+        # Initialize SwarmNode base (handles ID, Name, PKI)
+        super().__init__(
+            name="BaseSpecialist",
+            agent_type="specialist",
+            agent_id=agent_id,
+            trust_domain=TrustDomain.EXECUTION
+        )
+        
         self.workflow_id = workflow_id
-        self.cert_chain = cert_chain
+        
+        # Backward compatibility for cert_chain manual override
+        # If cert_chain provided manually, override what SwarmNode loaded
+        if cert_chain:
+            try:
+                from swarms.team_agent.crypto import Signer
+                self.signer = Signer(
+                    private_key_pem=cert_chain['key'],
+                    certificate_pem=cert_chain['cert'],
+                    signer_id=self.id
+                )
+            except Exception:
+                pass
 
-        # Metadata (set by subclasses)
-        self.name = "BaseSpecialist"
-        self.agent_type = "specialist"
-        self.trust_domain = "EXECUTION"
+        # Metadata (default values, subclasses should override)
         self.description = ""
         self.version = "1.0.0"
 
@@ -49,10 +64,8 @@ class BaseSpecialist(ABC):
         self.primary_capability = None
         self.secondary_capabilities = []
 
-    def _generate_agent_id(self) -> str:
-        """Generate unique agent ID."""
-        class_name = self.__class__.__name__.lower().replace("specialist", "")
-        return f"specialist_{class_name}_{uuid.uuid4().hex[:8]}"
+    # Removed _generate_agent_id as SwarmNode handles it
+
 
     @abstractmethod
     def get_primary_capability(self):
@@ -111,13 +124,15 @@ class BaseSpecialist(ABC):
         Returns:
             dict with agent metadata
         """
+        trust_domain_str = self.trust_domain.value if hasattr(self.trust_domain, "value") else str(self.trust_domain)
+        
         return {
             "agent_id": self.id,
             "agent_name": self.name,
             "agent_type": self.agent_type,
             "description": self.description,
             "version": self.version,
-            "trust_domain": self.trust_domain,
+            "trust_domain": trust_domain_str,
             "capabilities": self.get_capabilities(),
             "module_path": f"{self.__class__.__module__}",
             "class_name": self.__class__.__name__

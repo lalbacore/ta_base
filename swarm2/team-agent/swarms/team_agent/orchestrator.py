@@ -24,6 +24,7 @@ from swarms.team_agent.crypto import PKIManager, TrustDomain
 
 # Agent Manager
 from swarms.team_agent.agent_manager import AgentManager
+from swarms.team_agent.state.turing_tape import TuringTape
 
 try:
     from utils.capabilities import HRTGuideCapability
@@ -36,8 +37,10 @@ except ImportError:
 # Import specialist agents (new agent-capability model)
 try:
     from swarms.team_agent.specialists import LegalSpecialist
+    from swarms.team_agent.specialists import WritingSpecialist
 except ImportError:
     LegalSpecialist = None
+    WritingSpecialist = None
 
 try:
     from swarms.team_agent.specialists import AWSSpecialist, AzureSpecialist, GCPSpecialist, OCISpecialist
@@ -47,9 +50,13 @@ except ImportError:
     GCPSpecialist = None
     OCISpecialist = None
 
-class Orchestrator:
+from swarms.team_agent.core.node import SwarmNode
+from swarms.team_agent.core.dispatcher import MessageDispatcher
+
+class Orchestrator(SwarmNode):
     """
     Orchestrator for coordinating multi-agent workflows with capability-aware building.
+    Acts as a Root Swarm Node.
     """
 
     def __init__(self, output_dir: str = "./team_output", max_iterations: int = 3):
@@ -72,6 +79,18 @@ class Orchestrator:
         self.pki_manager.initialize_pki()
         self.logger.info("PKI infrastructure initialized")
 
+        # Initialize SwarmNode base (EXECUTION domain - Head)
+        super().__init__(
+            name="Orchestrator",
+            agent_type="orchestrator",
+            trust_domain=TrustDomain.EXECUTION,
+            pki_manager=self.pki_manager
+        )
+        
+        # Initialize Message Dispatcher (Runtime Mesh)
+        self.dispatcher = MessageDispatcher()
+        self.dispatcher.register_node(self)
+
         # Load certificate chains for each trust domain
         self.cert_chains = {
             TrustDomain.GOVERNMENT: self.pki_manager.get_certificate_chain(TrustDomain.GOVERNMENT),
@@ -93,7 +112,7 @@ class Orchestrator:
         # Register specialist agents (new agent-capability model)
         self._register_specialist_agents()
 
-        self.logger.info("Orchestrator initialized with agent-capability system, PKI, and agent management")
+        self.logger.info("Orchestrator initialized as SwarmNode with agent-capability system")
 
     def _register_specialist_agents(self):
         """Register specialist agents with their capabilities."""
@@ -149,14 +168,15 @@ class Orchestrator:
             except Exception as e:
                 self.logger.error(f"Failed to register OCISpecialist: {e}")
 
-        # Register HRTSpecialist (future - when implemented)
-        # if HRTSpecialist:
-        #     try:
-        #         hrt_specialist = HRTSpecialist()
-        #         self.agent_manager.register_specialist(hrt_specialist)
-        #         specialists_registered += 1
-        #     except Exception as e:
-        #         self.logger.error(f"Failed to register HRTSpecialist: {e}")
+        # Register WritingSpecialist
+        if WritingSpecialist:
+            try:
+                writing_specialist = WritingSpecialist()
+                self.agent_manager.register_specialist(writing_specialist)
+                specialists_registered += 1
+                self.logger.info("Registered WritingSpecialist")
+            except Exception as e:
+                self.logger.error(f"Failed to register WritingSpecialist: {e}")
 
         self.logger.info(f"Registered {specialists_registered} specialist agents")
 
@@ -164,6 +184,10 @@ class Orchestrator:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.current_workflow_id = f"wf_{timestamp}"
         self.logger.info(f"Created new workflow {self.current_workflow_id}")
+
+        # Initialize Turing Tape for this workflow
+        self.tape = TuringTape(workflow_id=self.current_workflow_id)
+        self.tape.append("orchestrator", "workflow_start", {"mission": mission})
 
         # Create agents with their respective certificate chains
         architect = Architect(
@@ -188,7 +212,14 @@ class Orchestrator:
         except Exception:
             pass
 
-        # Register workflow agents in agent_cards table
+        # Register agents with Dispatcher (Mesh Connection)
+        self.dispatcher.register_node(architect)
+        self.dispatcher.register_node(critic)
+        self.dispatcher.register_node(recorder)
+        if governance:
+            self.dispatcher.register_node(governance)
+
+        # Register workflow agents in agent_cards table (DB Persistence)
         self.agent_manager.ensure_registered(architect)
         self.agent_manager.ensure_registered(critic)
         self.agent_manager.ensure_registered(recorder)
@@ -197,44 +228,59 @@ class Orchestrator:
 
         final_record = self._execute_workflow(mission, architect, critic, recorder, governance)
         return {"workflow_id": self.current_workflow_id, "final_record": final_record}
-
-    def _prepare_context(self, base: dict | str) -> dict:
-        """Return normalized context for role agents."""
-        if isinstance(base, str):
-            return {"input": base, "raw_input": base}
-        if "input" not in base:
-            # Preserve original while providing input string form
-            base["input"] = json.dumps(base, default=str)
-        return base
-
-    def _run_agent(self, agent, payload):
-        ctx = self._prepare_context(payload)
-        return agent.run(ctx)
+    
+    def _execute_agent_task(self, target_agent: SwarmNode, task_payload: dict) -> dict:
+        """Helper to execute a task via AgentMessage protocol."""
+        # Create signed message
+        msg = self.create_message(
+            target_id=target_agent.id,
+            message_type="task_request",
+            payload=task_payload,
+            conversation_id=self.current_workflow_id
+        )
+        
+        # Send via dispatcher (sync)
+        response = self.dispatcher.send_message(msg)
+        
+        if response and response.payload:
+            return response.payload
+        
+        return {}
 
     def _execute_workflow(self, mission: str, architect, critic, recorder, governance=None) -> dict:
         self.logger.info(f"Starting workflow execution: {mission}")
 
         # Phase 1
-        self.logger.info("Phase 1: Architecture")
-        architect_output = self._run_agent(architect, {"mission": mission})
+        self.logger.info("Phase 1: Architecture (Dynamic Mesh)")
+        # Use new message protocol
+        architect_output = self._execute_agent_task(architect, {"mission": mission})
+        
         self.agent_manager.track_invocation(
             architect.id, self.current_workflow_id, architect_output, success=True
         )
+        self.tape.append("architect", "design_complete", architect_output)
 
         # Optional governance pre-check
         if governance:
             try:
-                governance_pre = self._run_agent(governance, {"stage": "pre_build", "architecture": architect_output})
+                governance_pre = self._execute_agent_task(
+                    governance, 
+                    {"stage": "pre_build", "architecture": architect_output}
+                )
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, governance_pre, success=True
                 )
+                self.tape.append("governance", "policy_check_pre_build", governance_pre)
             except Exception as e:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, None, success=False, error=str(e)
                 )
 
         # Phase 2
-        self.logger.info("Phase 2: Implementation")
+        self.logger.info("Phase 2: Implementation (Dynamic Capability)")
+        # Note: DynamicBuilder is not a SwarmNode yet, so we invoke it directly.
+        # Future TODO: Make DynamicBuilder a SwarmNode or wrap it in one.
+        
         # Set workflow ID on DynamicBuilder for specialist agent instantiation
         self.dynamic_builder.set_workflow_id(self.current_workflow_id)
 
@@ -260,12 +306,13 @@ class Orchestrator:
             self.agent_manager.track_invocation(
                 f"capability_{capability_used}", self.current_workflow_id, builder_result, success=True
             )
+        
+        self.tape.append("builder", "build_complete", builder_result)
 
         # Phase 3: Review
-        self.logger.info("Phase 3: Review")
+        self.logger.info("Phase 3: Review (Dynamic Mesh)")
 
         # Extract code/content from builder result
-        # DynamicBuilder returns artifacts as a list
         artifacts = builder_result.get("artifacts", [])
         if isinstance(artifacts, list) and artifacts:
             # Combine all artifact content for review
@@ -287,29 +334,36 @@ class Orchestrator:
             "implementation": builder_result,
             "code": code,
         }
-        critic_output = self._run_agent(critic, critic_payload)
+        
+        critic_output = self._execute_agent_task(critic, critic_payload)
+        
         self.agent_manager.track_invocation(
             critic.id, self.current_workflow_id, critic_output, success=True
         )
+        self.tape.append("critic", "review_complete", critic_output)
 
         # Optional governance post-review
         if governance:
             try:
-                governance_post = self._run_agent(governance, {
-                    "stage": "post_review",
-                    "review": critic_output,
-                    "implementation": builder_result
-                })
+                governance_post = self._execute_agent_task(
+                    governance, 
+                    {
+                        "stage": "post_review",
+                        "review": critic_output,
+                        "implementation": builder_result
+                    }
+                )
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, governance_post, success=True
                 )
+                self.tape.append("governance", "policy_check_post_review", governance_post)
             except Exception as e:
                 self.agent_manager.track_invocation(
                     governance.id, self.current_workflow_id, None, success=False, error=str(e)
                 )
 
         # Phase 4: Recording/Publishing
-        self.logger.info("Phase 4: Recording/Publishing")
+        self.logger.info("Phase 4: Recording/Publishing (Dynamic Mesh)")
         workflow_dir = Path(self.output_dir) / self.current_workflow_id
         workflow_dir.mkdir(parents=True, exist_ok=True)
 
@@ -364,10 +418,13 @@ class Orchestrator:
             "review": critic_output,
             "artifacts": published_artifacts
         }
-        recorder_output = self._run_agent(recorder, recorder_payload)
+        
+        recorder_output = self._execute_agent_task(recorder, recorder_payload)
+        
         self.agent_manager.track_invocation(
             recorder.id, self.current_workflow_id, recorder_output, success=True
         )
+        self.tape.append("recorder", "published", recorder_output)
 
         return {
             "workflow_id": self.current_workflow_id,
