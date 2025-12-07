@@ -1,0 +1,37 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "writing_specialist_v1",
+    "agent_name": "Writing Specialist",
+    "agent_type": "specialist",
+    "description": "Expert in content creation, editing, and technical writing.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.writing_specialist",
+    "class_name": "WritingSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_writing_gen_v1",
+            "capability_type": "natural_language",
+            "name": "Creative Writing",
+            "description": "Writes blog posts, articles, and creative content.",
+            "version": "1.0.0",
+            "domains": [
+                "content",
+                "marketing"
+            ],
+            "keywords": [
+                "write",
+                "blog",
+                "edit",
+                "copy"
+            ],
+            "price_per_invocation": 5.0,
+            "input_schema": {
+                "type": "object"
+            },
+            "output_schema": {
+                "type": "object"
+            }
+        }
+    ]
+}

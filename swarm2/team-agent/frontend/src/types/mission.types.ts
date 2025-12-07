@@ -28,7 +28,7 @@ export interface MissionSpec {
 export interface WorkflowStatus {
   workflow_id: string
   mission_id: string
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused' | 'cancelled'
   current_stage: string
   progress: number
   stages: WorkflowStage[]

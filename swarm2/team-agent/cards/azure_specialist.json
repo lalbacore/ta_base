@@ -1,0 +1,37 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "azure_specialist_v1",
+    "agent_name": "Azure Cloud Specialist",
+    "agent_type": "specialist",
+    "description": "Cloud architect for Microsoft Azure infrastructure.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.azure_specialist",
+    "class_name": "AzureSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_azure_deploy_v1",
+            "capability_type": "deployment",
+            "name": "Azure Deployment",
+            "description": "Deploys resources to Azure via ARM/Bicep.",
+            "version": "1.0.0",
+            "domains": [
+                "cloud",
+                "devops"
+            ],
+            "keywords": [
+                "azure",
+                "microsoft",
+                "cloud",
+                "deploy"
+            ],
+            "price_per_invocation": 15.0,
+            "input_schema": {
+                "type": "object"
+            },
+            "output_schema": {
+                "type": "object"
+            }
+        }
+    ]
+}

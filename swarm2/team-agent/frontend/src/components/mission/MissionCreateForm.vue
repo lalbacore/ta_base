@@ -69,11 +69,12 @@
             </div>
 
             <div class="form-field">
-              <label>Max Cost</label>
+              <label>Max Cost (Tokens)</label>
               <InputNumber
                 v-model="cap.max_cost"
                 :min="0"
                 :step="10"
+                suffix=" Tokens"
               />
             </div>
           </div>
@@ -113,11 +114,12 @@
         </div>
 
         <div class="form-field">
-          <label>Max Cost</label>
+          <label>Max Cost (Tokens)</label>
           <InputNumber
             v-model="form.max_cost"
             :min="0"
             :step="50"
+            suffix=" Tokens"
           />
           <small class="p-text-secondary">
             Maximum allowed cost (leave empty for unlimited)

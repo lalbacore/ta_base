@@ -24,7 +24,8 @@ class TuringTape:
         self,
         base_dir: Optional[Path] = None,
         workflow_id: str = "default",
-        signer: Optional[Signer] = None
+        signer: Optional[Signer] = None,
+        on_append: Optional[callable] = None
     ):
         self.workflow_id = workflow_id or "default"
         self.base_dir = base_dir or Path(".team_agent") / "tape"
@@ -32,6 +33,7 @@ class TuringTape:
         self.path = self.base_dir / f"{self.workflow_id}.jsonl"
         self.path.touch(exist_ok=True)
         self.signer = signer
+        self.on_append = on_append
 
     def append(self, agent: str, event: str, state: Dict[str, Any]) -> None:
         record = {
@@ -48,6 +50,13 @@ class TuringTape:
 
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+        if self.on_append:
+            try:
+                self.on_append(record)
+            except Exception as e:
+                # Don't let callback failure break the tape
+                print(f"Error in tape callback: {e}")
 
     def read_all(self) -> Iterable[Dict[str, Any]]:
         with self.path.open("r", encoding="utf-8") as f:

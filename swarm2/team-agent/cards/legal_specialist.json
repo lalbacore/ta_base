@@ -1,0 +1,37 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "legal_specialist_v1",
+    "agent_name": "Legal Specialist",
+    "agent_type": "specialist",
+    "description": "Expert in legal document generation and contract review.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.legal_specialist",
+    "class_name": "LegalSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_legal_gen_v1",
+            "capability_type": "natural_language",
+            "name": "Legal Document Generation",
+            "description": "Generates contracts and legal documents from templates.",
+            "version": "1.0.0",
+            "domains": [
+                "legal",
+                "business"
+            ],
+            "keywords": [
+                "contract",
+                "nda",
+                "legal",
+                "lawyer"
+            ],
+            "price_per_invocation": 10.0,
+            "input_schema": {
+                "type": "object"
+            },
+            "output_schema": {
+                "type": "object"
+            }
+        }
+    ]
+}

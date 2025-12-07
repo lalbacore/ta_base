@@ -96,8 +96,34 @@ def get_workflow_status(workflow_id):
 def resume_workflow(workflow_id):
     """Resume a paused workflow."""
     try:
-        mission_service.resume_workflow(workflow_id)
-        return jsonify({'status': 'resumed'}), 200
+        success = mission_service.resume_workflow(workflow_id)
+        if success:
+            return jsonify({'status': 'resumed'}), 200
+        return jsonify({'error': 'Could not resume workflow (not paused or not found)'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@mission_bp.route('/workflow/<workflow_id>/pause', methods=['POST'])
+def pause_workflow(workflow_id):
+    """Pause a running workflow."""
+    try:
+        success = mission_service.pause_workflow(workflow_id)
+        if success:
+            return jsonify({'status': 'paused'}), 200
+        return jsonify({'error': 'Could not pause workflow (not running or not found)'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@mission_bp.route('/<mission_id>/cancel', methods=['POST'])
+def cancel_mission(mission_id):
+    """Cancel a running mission."""
+    try:
+        success = mission_service.cancel_mission(mission_id)
+        if success:
+            return jsonify({'status': 'cancelled'}), 200
+        return jsonify({'error': 'Could not cancel mission (not active or not found)'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

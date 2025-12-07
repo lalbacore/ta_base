@@ -249,6 +249,19 @@ SAMPLE_AGENTS = [
         'policy_violations': 0,
         'average_completion_time': '3h',
         'last_active': timestamp(hours_ago=10)
+    },
+    {
+        'agent_id': 'agent_writer_005',
+        'name': 'Creative Ink',
+        'type': 'creative_writing',
+        'trust_score': 93,
+        'reputation': 4.8,
+        'total_operations': 45,
+        'success_rate': 0.96,
+        'security_incidents': 0,
+        'policy_violations': 0,
+        'average_completion_time': '30m',
+        'last_active': timestamp(minutes_ago=15)
     }
 ]
 
@@ -294,6 +307,21 @@ SAMPLE_CAPABILITIES = [
         'success_rate': 0.99,
         'tags': ['solidity', 'security', 'audit', 'blockchain'],
         'created_at': timestamp(days_ago=120)
+    },
+    {
+        'capability_id': 'cap_creative_writing',
+        'capability_type': 'creative_writing',
+        'provider_id': 'agent_writer_005',
+        'provider_name': 'Creative Ink',
+        'name': 'Creative Writing Assistance',
+        'description': 'Helps with writer\'s block, outlines, and creative content.',
+        'trust_score': 93,
+        'reputation': 4.8,
+        'price': 50.0,
+        'invocations': 45,
+        'success_rate': 0.96,
+        'tags': ['writing', 'creative', 'blog', 'story'],
+        'created_at': timestamp(days_ago=10)
     }
 ]
 
@@ -329,6 +357,13 @@ SAMPLE_PROVIDERS = [
         'description': 'Governance system design and implementation.',
         'reputation': 4.8,
         'trust_score': 94
+    },
+    {
+        'provider_id': 'agent_writer_005',
+        'name': 'Creative Ink',
+        'description': 'Expert creative writing and content strategy.',
+        'reputation': 4.8,
+        'trust_score': 93
     }
 ]
 

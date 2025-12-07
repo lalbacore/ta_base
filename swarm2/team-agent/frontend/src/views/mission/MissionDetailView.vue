@@ -23,15 +23,41 @@
           </p>
         </div>
 
-        <Menu ref="menu" :model="actionMenuItems" :popup="true" />
-        <Button
-          label="Actions"
-          icon="pi pi-angle-down"
-          iconPos="right"
-          outlined
-          size="small"
-          @click="(event) => menu?.toggle(event)"
-        />
+        <div class="header-actions">
+           <div class="control-toolbar">
+              <Button 
+                v-if="workflow?.status === 'running'"
+                icon="pi pi-pause" 
+                label="Pause" 
+                severity="warning" 
+                @click="handlePause"
+              />
+              <Button 
+                v-if="workflow?.status === 'paused'"
+                icon="pi pi-play" 
+                label="Resume" 
+                severity="success" 
+                @click="handleResume"
+              />
+              <Button 
+                v-if="['running', 'paused'].includes(workflow?.status || '')"
+                icon="pi pi-stop" 
+                label="Cancel" 
+                severity="danger" 
+                outlined
+                @click="handleCancel"
+              />
+           </div>
+           
+           <Menu ref="menu" :model="actionMenuItems" :popup="true" />
+           <Button
+             label="More"
+             icon="pi pi-ellipsis-v"
+             text
+             plain
+             @click="(event) => menu?.toggle(event)"
+           />
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -76,7 +102,17 @@
           <!-- Workflow Timeline -->
           <Card>
             <template #content>
-              <WorkflowStageTimeline :stages="workflow?.stages || []" />
+              <div class="timeline-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                 <h3 class="section-title" style="margin-bottom: 0;">Workflow Timeline</h3>
+                 <div class="debug-toggle" style="display: flex; align-items: center; gap: 0.5rem;">
+                   <label for="debug-mode" style="font-size: 0.875rem; color: #64748b;">Debug Mode</label>
+                   <InputSwitch inputId="debug-mode" v-model="debugMode" />
+                 </div>
+              </div>
+              <WorkflowStageTimeline 
+                :stages="workflow?.stages || []" 
+                :debug-mode="debugMode"
+              />
             </template>
           </Card>
 
@@ -131,7 +167,7 @@
                 <div v-if="mission?.max_cost" class="detail-item">
                   <span class="detail-label">Max Cost</span>
                   <span class="detail-value detail-value-bold">
-                    ${{ mission.max_cost }}
+                    {{ mission.max_cost }} Tokens
                   </span>
                 </div>
               </div>
@@ -202,6 +238,8 @@ import { useWorkflowWebSocket } from '@/composables/useWorkflowWebSocket'
 import WorkflowStageTimeline from '@/components/mission/WorkflowStageTimeline.vue'
 import BreakpointApprovalModal from '@/components/mission/BreakpointApprovalModal.vue'
 
+import InputSwitch from 'primevue/inputswitch'
+
 const route = useRoute()
 const router = useRouter()
 const missionStore = useMissionStore()
@@ -216,6 +254,7 @@ const error = ref('')
 const refreshInterval = ref<number | null>(null)
 const showBreakpointModal = ref(false)
 const currentBreakpoint = ref<any>(null)
+const debugMode = ref(false)
 
 // Connect to WebSocket for real-time updates
 const { isConnected } = useWorkflowWebSocket(missionId.value)
@@ -312,8 +351,47 @@ async function handleRefresh() {
 }
 
 async function handleResume() {
-  // TODO: Implement resume workflow
-  console.log('Resume workflow:', missionId.value)
+  if (!workflow.value?.workflow_id) return
+  isLoading.value = true
+  try {
+    await missionStore.resumeWorkflow(workflow.value.workflow_id)
+    await loadMissionDetails()
+  } catch (err) {
+    console.error('Failed to resume:', err)
+    error.value = 'Failed to resume workflow'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function handlePause() {
+  if (!workflow.value?.workflow_id) return
+  isLoading.value = true
+  try {
+    await missionStore.pauseWorkflow(workflow.value.workflow_id)
+    await loadMissionDetails()
+  } catch (err) {
+    console.error('Failed to pause:', err)
+    error.value = 'Failed to pause workflow'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function handleCancel() {
+  if (!confirm('Are you sure you want to cancel this mission? This cannot be undone.')) return
+  
+  if (!missionId.value) return
+  isLoading.value = true
+  try {
+    await missionStore.cancelMission(missionId.value)
+    await loadMissionDetails()
+  } catch (err) {
+    console.error('Failed to cancel:', err)
+    error.value = 'Failed to cancel mission'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 function handleBreakpointApproval() {
@@ -333,11 +411,6 @@ function handleBreakpointRejected() {
   showBreakpointModal.value = false
   currentBreakpoint.value = null
   loadMissionDetails()
-}
-
-function handleCancel() {
-  // TODO: Implement cancel mission
-  console.log('Cancel mission:', missionId.value)
 }
 
 onMounted(async () => {
