@@ -17,7 +17,19 @@ except ImportError:
     Signer = None
 
 
-class Builder:
+from ..core.node import SwarmNode
+from ..crypto.pki import TrustDomain
+
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
+
+class Builder(SwarmNode):
     """
     Builds implementation artifacts from architecture designs.
     Uses tools for code generation and validation.
@@ -31,9 +43,15 @@ class Builder:
         registry: Optional[ToolRegistry] = None,
         cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        # Initialize SwarmNode (EXECUTION domain)
+        super().__init__(
+            name=name,
+            agent_type="role",
+            agent_id=id,
+            trust_domain=TrustDomain.EXECUTION
+        )
+        
         self.workflow_id = workflow_id
-        self.name = name
-        self.id = id
         self.metadata = {
             "id": self.id,
             "name": self.name,
@@ -56,8 +74,7 @@ class Builder:
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
 
-        # Initialize signer if cert_chain is provided
-        self.signer = None
+        # Handle legacy manual cert_chain override
         if cert_chain and CRYPTO_AVAILABLE:
             try:
                 self.signer = Signer(

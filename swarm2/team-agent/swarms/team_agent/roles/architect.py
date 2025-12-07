@@ -16,7 +16,20 @@ except ImportError:
     Signer = None
 
 
-class Architect:
+from ..core.node import SwarmNode
+from ..core.message import AgentMessage
+from ..crypto.pki import TrustDomain
+
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
+
+
+class Architect(SwarmNode):
     """
     Generates a simple high-level architecture plan from a mission/intent.
     Uses tools for design scoring and validation.
@@ -30,9 +43,15 @@ class Architect:
         registry: Optional[ToolRegistry] = None,
         cert_chain: Optional[Dict[str, bytes]] = None
     ):
+        # Initialize SwarmNode (EXECUTION domain)
+        super().__init__(
+            name=name,
+            agent_type="role",
+            agent_id=id,
+            trust_domain=TrustDomain.EXECUTION
+        )
+        
         self.workflow_id = workflow_id
-        self.name = name
-        self.id = id
         self.metadata = {
             "id": self.id,
             "name": self.name,
@@ -55,8 +74,7 @@ class Architect:
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
 
-        # Initialize signer if cert_chain is provided
-        self.signer = None
+        # Handle legacy manual cert_chain override
         if cert_chain and CRYPTO_AVAILABLE:
             try:
                 self.signer = Signer(
@@ -282,6 +300,21 @@ class Architect:
                 "decisions": {"type": "array"},
             },
         }
+
+    def handle_message(self, message: AgentMessage) -> Dict[str, Any]:
+        """
+        Handle incoming messages.
+        Supports 'task_request' to trigger architecture design.
+        """
+        if message.message_type == "task_request":
+            self.logger.info(f"Architect receiving task from {message.sender_id}")
+            payload = message.payload
+            mission = payload.get("mission") or payload.get("intent") or payload.get("input")
+            
+            result = self.run(mission)
+            return result
+            
+        return super().handle_message(message)
 
     def evaluate_intent(self, intent: str) -> bool:
         """

@@ -8,11 +8,20 @@ from typing import Optional, Dict, Any, List
 import time
 import uuid
 
-from .base import BaseRole
+from ..core.node import SwarmNode
+from ..crypto.pki import TrustDomain
 from ..tools import ToolRegistry, ScoringTool, ReviewTool
 
+# Import crypto modules (optional)
+try:
+    from swarms.team_agent.crypto import Signer
+    CRYPTO_AVAILABLE = True
+except ImportError:
+    CRYPTO_AVAILABLE = False
+    Signer = None
 
-class Governance(BaseRole):
+
+class Governance(SwarmNode):
     """
     Governance role implementation.
     Uses tools for compliance checking and scoring.
@@ -28,10 +37,14 @@ class Governance(BaseRole):
         cert_chain: Optional[Dict[str, bytes]] = None
     ):
         """Initialize governance with workflow ID, tool registry, and cert chain."""
-        # BaseRole doesn't exist, but base_role.py does - check which one to use
-        super().__init__(workflow_id or f"wf_{int(time.time())}", cert_chain=cert_chain)
-        self.name = name
-        self.id = id
+        # Initialize SwarmNode (GOVERNMENT domain)
+        super().__init__(
+            name=name,
+            agent_type="role",
+            agent_id=id,
+            trust_domain=TrustDomain.GOVERNMENT
+        )
+        
         self.workflow_id = workflow_id or f"wf_{int(time.time())}"
         self.policy: Dict[str, Any] = policy or {
             "min_score_threshold": 0.5,
@@ -44,6 +57,16 @@ class Governance(BaseRole):
         # Initialize tool registry
         self._registry = registry or ToolRegistry()
         self._register_default_tools()
+        # Initialize signer if cert_chain is provided (manual override)
+        if cert_chain and CRYPTO_AVAILABLE:
+            try:
+                self.signer = Signer(
+                    private_key_pem=cert_chain['key'],
+                    certificate_pem=cert_chain['cert'],
+                    signer_id="governance"
+                )
+            except Exception:
+                pass
     
     def _register_default_tools(self) -> None:
         """Register default tools if not already present."""
@@ -95,8 +118,9 @@ class Governance(BaseRole):
         }
         self.decisions.append(decision)
 
-        # Sign output using BaseRole's signer (inherited)
-        decision = self._sign_output(decision)
+        # Sign output if signer is available
+        if self.signer and CRYPTO_AVAILABLE:
+            decision = self.signer.sign_dict(decision)
 
         return decision
 

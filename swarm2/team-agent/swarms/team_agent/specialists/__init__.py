@@ -21,6 +21,7 @@ from .aws_specialist import AWSSpecialist
 from .azure_specialist import AzureSpecialist
 from .gcp_specialist import GCPSpecialist
 from .oci_specialist import OCISpecialist
+from .writing_specialist import WritingSpecialist
 
 __all__ = [
     "BaseSpecialist",
@@ -29,4 +30,5 @@ __all__ = [
     "AzureSpecialist",
     "GCPSpecialist",
     "OCISpecialist",
+    "WritingSpecialist",
 ]
