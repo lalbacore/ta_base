@@ -1,0 +1,50 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "test_specialist_v1",
+    "agent_name": "Test Python Specialist",
+    "agent_type": "specialist",
+    "description": "A test specialist for Python code generation.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.test_specialist",
+    "class_name": "TestSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_python_gen_v1",
+            "capability_type": "code_generation",
+            "name": "Python Code Generation",
+            "description": "Generates Python 3.x code from instructions.",
+            "version": "1.0.0",
+            "domains": [
+                "software",
+                "backend"
+            ],
+            "keywords": [
+                "python",
+                "code",
+                "generation"
+            ],
+            "price_per_invocation": 0.001,
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "instructions": {
+                        "type": "string"
+                    }
+                }
+            },
+            "output_schema": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "author": "Les Dunston",
+        "license": "MIT"
+    }
+}

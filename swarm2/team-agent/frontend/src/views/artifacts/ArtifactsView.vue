@@ -226,7 +226,7 @@ import axios from 'axios'
 
 // const router = useRouter() // Unused
 const missionStore = useMissionStore()
-// const registryStore = useRegistryStore() // Unused
+//  // Unused
 
 const isLoading = ref(true)
 const showDetailDialog = ref(false)

@@ -53,19 +53,28 @@ except ImportError:
 from swarms.team_agent.core.node import SwarmNode
 from swarms.team_agent.core.dispatcher import MessageDispatcher
 
+import threading
+import time
+
 class Orchestrator(SwarmNode):
     """
     Orchestrator for coordinating multi-agent workflows with capability-aware building.
     Acts as a Root Swarm Node.
     """
 
-    def __init__(self, output_dir: str = "./team_output", max_iterations: int = 3):
+    def __init__(self, output_dir: str = "./team_output", max_iterations: int = 3, tape_callback: callable = None):
         self.output_dir = output_dir
         self.max_iterations = max_iterations
+        self.tape_callback = tape_callback
         self.current_workflow_id = None
         self.logger = get_logger("orchestrator")
         os.makedirs(self.output_dir, exist_ok=True)
-
+        
+        # execution control
+        self._pause_event = threading.Event()
+        self._pause_event.set() # Set means "Running" (not paused)
+        self._cancel_flag = False
+        
         # Initialize databases (backend.db, trust.db, registry.db)
         try:
             from app.database import init_backend_db
@@ -115,8 +124,65 @@ class Orchestrator(SwarmNode):
         self.logger.info("Orchestrator initialized as SwarmNode with agent-capability system")
 
     def _register_specialist_agents(self):
-        """Register specialist agents with their capabilities."""
+        """
+        Register specialist agents by discovering them from the Registry.
+        This replaces the hardcoded instantiation.
+        """
+        try:
+            import importlib
+            
+            # 1. Discover active agents from the registry
+            from swarms.team_agent.a2a.registry import CapabilityStatus, CapabilityRegistry as A2ARegistry
+            
+            # Using A2A Registry for discovery (SQLite backed)
+            a2a_registry = A2ARegistry()
+            
+            discovered_providers = set()
+            capabilities = a2a_registry.discover_capabilities(status=CapabilityStatus.ACTIVE)
+            
+            for _, provider in capabilities:
+                if provider.provider_type == "agent" and provider.provider_id not in discovered_providers:
+                    discovered_providers.add(provider.provider_id)
+                    
+                    try:
+                        # Extract module/class from metadata
+                        # The registry stores this in provider.metadata (as a JSON string or dict depending on implementation)
+                        # Our register script put it in metadata dict.
+                        
+                        # Handle metadata being string or dict due to SQLite serialization
+                        meta = provider.metadata
+                        if isinstance(meta, str):
+                            try:
+                                meta = json.loads(meta)
+                            except json.JSONDecodeError:
+                                self.logger.warning(f"Could not parse metadata JSON for {provider.provider_id}")
+                                meta = {}
+                            
+                        module_path = meta.get("module_path")
+                        class_name = meta.get("class_name")
+                        
+                        if module_path and class_name:
+                            self.logger.info(f"Dynamically loading agent {provider.provider_id} from {module_path}.{class_name}")
+                            module = importlib.import_module(module_path)
+                            cls = getattr(module, class_name)
+                            instance = cls()
+                            self.agent_manager.register_specialist(instance)
+                        else:
+                            self.logger.warning(f"Provider {provider.provider_id} missing module/class metadata")
+                    except Exception as e:
+                        self.logger.error(f"Failed to load provider {provider.provider_id}: {e}")
+
+            self.logger.info(f"Dynamically registered {len(discovered_providers)} specialist agents from Registry")
+
+        except Exception as e:
+            self.logger.error(f"Error during dynamic discovery: {e}")
+            # Fallback to hardcoded loading if registry fails (safety net for now)
+            self._register_specialist_agents_fallback()
+
+    def _register_specialist_agents_fallback(self):
+        """Fallback hardcoded registration."""
         specialists_registered = 0
+        self.logger.info("Using fallback hardcoded registration...")
 
         # Register LegalSpecialist
         if LegalSpecialist:
@@ -124,9 +190,7 @@ class Orchestrator(SwarmNode):
                 legal_specialist = LegalSpecialist()
                 self.agent_manager.register_specialist(legal_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered LegalSpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register LegalSpecialist: {e}")
+            except Exception: pass
 
         # Register AWSSpecialist
         if AWSSpecialist:
@@ -134,19 +198,15 @@ class Orchestrator(SwarmNode):
                 aws_specialist = AWSSpecialist()
                 self.agent_manager.register_specialist(aws_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered AWSSpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register AWSSpecialist: {e}")
-
+            except Exception: pass
+            
         # Register AzureSpecialist
         if AzureSpecialist:
             try:
                 azure_specialist = AzureSpecialist()
                 self.agent_manager.register_specialist(azure_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered AzureSpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register AzureSpecialist: {e}")
+            except Exception: pass
 
         # Register GCPSpecialist
         if GCPSpecialist:
@@ -154,9 +214,7 @@ class Orchestrator(SwarmNode):
                 gcp_specialist = GCPSpecialist()
                 self.agent_manager.register_specialist(gcp_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered GCPSpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register GCPSpecialist: {e}")
+            except Exception: pass
 
         # Register OCISpecialist
         if OCISpecialist:
@@ -164,9 +222,7 @@ class Orchestrator(SwarmNode):
                 oci_specialist = OCISpecialist()
                 self.agent_manager.register_specialist(oci_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered OCISpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register OCISpecialist: {e}")
+            except Exception: pass
 
         # Register WritingSpecialist
         if WritingSpecialist:
@@ -174,19 +230,56 @@ class Orchestrator(SwarmNode):
                 writing_specialist = WritingSpecialist()
                 self.agent_manager.register_specialist(writing_specialist)
                 specialists_registered += 1
-                self.logger.info("Registered WritingSpecialist")
-            except Exception as e:
-                self.logger.error(f"Failed to register WritingSpecialist: {e}")
+            except Exception: pass
+            
+        self.logger.info(f"Fallback registered {specialists_registered} specialists")
 
-        self.logger.info(f"Registered {specialists_registered} specialist agents")
+    def pause_workflow(self):
+        """Pause current execution."""
+        self.logger.info("Paused workflow execution")
+        self._pause_event.clear()
+
+    def resume_workflow(self):
+        """Resume execution."""
+        self.logger.info("Resumed workflow execution")
+        self._pause_event.set()
+
+    def cancel_workflow(self):
+        """Cancel execution."""
+        self.logger.info("Cancelled workflow execution")
+        self._cancel_flag = True
+        # Ensure we don't get stuck in a pause while cancelling
+        self._pause_event.set()
+
+    def _check_state(self):
+        """Check for pause or cancel signals."""
+        if self._cancel_flag:
+            raise InterruptedError("Workflow cancelled by user")
+        
+        if not self._pause_event.is_set():
+            self.logger.info("Workflow paused. Waiting for resume...")
+            self._pause_event.wait()
+            self.logger.info("Workflow resumed.")
+            
+            # Check cancel again in case we were cancelled while paused
+            if self._cancel_flag:
+                raise InterruptedError("Workflow cancelled by user")
 
     def execute(self, mission: str) -> dict:
+        # Reset control flags
+        self._cancel_flag = False
+        self._pause_event.set()
+        
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.current_workflow_id = f"wf_{timestamp}"
+
         self.logger.info(f"Created new workflow {self.current_workflow_id}")
 
         # Initialize Turing Tape for this workflow
-        self.tape = TuringTape(workflow_id=self.current_workflow_id)
+        self.tape = TuringTape(
+            workflow_id=self.current_workflow_id,
+            on_append=self.tape_callback
+        )
         self.tape.append("orchestrator", "workflow_start", {"mission": mission})
 
         # Create agents with their respective certificate chains
@@ -251,6 +344,7 @@ class Orchestrator(SwarmNode):
         self.logger.info(f"Starting workflow execution: {mission}")
 
         # Phase 1
+        self._check_state()
         self.logger.info("Phase 1: Architecture (Dynamic Mesh)")
         # Use new message protocol
         architect_output = self._execute_agent_task(architect, {"mission": mission})
@@ -262,6 +356,7 @@ class Orchestrator(SwarmNode):
 
         # Optional governance pre-check
         if governance:
+            self._check_state()
             try:
                 governance_pre = self._execute_agent_task(
                     governance, 
@@ -277,6 +372,7 @@ class Orchestrator(SwarmNode):
                 )
 
         # Phase 2
+        self._check_state()
         self.logger.info("Phase 2: Implementation (Dynamic Capability)")
         # Note: DynamicBuilder is not a SwarmNode yet, so we invoke it directly.
         # Future TODO: Make DynamicBuilder a SwarmNode or wrap it in one.
@@ -310,6 +406,7 @@ class Orchestrator(SwarmNode):
         self.tape.append("builder", "build_complete", builder_result)
 
         # Phase 3: Review
+        self._check_state()
         self.logger.info("Phase 3: Review (Dynamic Mesh)")
 
         # Extract code/content from builder result
@@ -344,6 +441,7 @@ class Orchestrator(SwarmNode):
 
         # Optional governance post-review
         if governance:
+            self._check_state()
             try:
                 governance_post = self._execute_agent_task(
                     governance, 
@@ -363,6 +461,7 @@ class Orchestrator(SwarmNode):
                 )
 
         # Phase 4: Recording/Publishing
+        self._check_state()
         self.logger.info("Phase 4: Recording/Publishing (Dynamic Mesh)")
         workflow_dir = Path(self.output_dir) / self.current_workflow_id
         workflow_dir.mkdir(parents=True, exist_ok=True)

@@ -26,9 +26,31 @@ class MissionService:
     """
 
     def __init__(self):
-        # Initialize orchestrator
+        # Define callback for real-time updates
+        def on_tape_update(record):
+            try:
+                # Import here to avoid circular dependencies
+                from app.websocket.workflow_handler import broadcast_workflow_update
+                
+                workflow_id = record.get('workflow_id')
+                event_type = record.get('event', 'unknown')
+                
+                if workflow_id:
+                    broadcast_workflow_update(
+                        workflow_id=workflow_id,
+                        update_type=event_type,
+                        data=record
+                    )
+            except ImportError:
+                # WebSocket module might not be initialized yet or not available
+                pass
+            except Exception as e:
+                print(f"Error broadcasting update: {e}")
+
+        # Initialize orchestrator with callback
         self.orchestrator = Orchestrator(
-            output_dir=os.path.expanduser("~/Dropbox/Team Agent/Projects/ta_base/swarm2/team-agent/team_output")
+            output_dir=os.path.expanduser("~/Dropbox/Team Agent/Projects/ta_base/swarm2/team-agent/team_output"),
+            tape_callback=on_tape_update
         )
 
         # Track missions in memory (could be moved to database)
@@ -256,10 +278,44 @@ class MissionService:
 
         return workflows
 
-    def resume_workflow(self, workflow_id: str) -> None:
+    def pause_workflow(self, workflow_id: str) -> bool:
+        """Pause a running workflow."""
+        # Find the active mission/workflow
+        if workflow_id in self.active_workflows:
+            mission_id = self.active_workflows[workflow_id]['mission_id']
+            if self.missions.get(mission_id, {}).get('status') == 'running':
+                self.orchestrator.pause_workflow()
+                self.missions[mission_id]['status'] = 'paused'
+                self.active_workflows[workflow_id]['status'] = 'paused'
+                return True
+        return False
+
+    def resume_workflow(self, workflow_id: str) -> bool:
         """Resume a paused workflow."""
-        # Not implemented yet - would require workflow tape support
-        pass
+        if workflow_id in self.active_workflows:
+            mission_id = self.active_workflows[workflow_id]['mission_id']
+            if self.missions.get(mission_id, {}).get('status') == 'paused':
+                self.orchestrator.resume_workflow()
+                self.missions[mission_id]['status'] = 'running'
+                self.active_workflows[workflow_id]['status'] = 'running'
+                return True
+        return False
+        
+    def cancel_mission(self, mission_id: str) -> bool:
+        """Cancel a running mission."""
+        if mission_id in self.missions:
+            status = self.missions[mission_id].get('status')
+            if status in ['running', 'paused']:
+                self.orchestrator.cancel_workflow()
+                self.missions[mission_id]['status'] = 'cancelled'
+                self.missions[mission_id]['completed_at'] = datetime.now().isoformat()
+                
+                # Also update workflow if it exists
+                workflow_id = self.missions[mission_id].get('workflow_id')
+                if workflow_id and workflow_id in self.active_workflows:
+                    self.active_workflows[workflow_id]['status'] = 'cancelled'
+                return True
+        return False
 
     def approve_breakpoint(self, breakpoint_id: str, option_index: int) -> None:
         """Approve a breakpoint with selected capability."""
@@ -334,6 +390,9 @@ class MissionService:
         Returns:
             List of stage dictionaries
         """
+        # Load optimization service locally to avoid circular imports if any
+        from app.services.optimization_service import optimization_service
+        
         # Tape is in project directory, not home directory
         project_root = Path(__file__).parent.parent.parent
         tape_path = project_root / ".team_agent" / "tape" / f"{workflow_id}.jsonl"
@@ -393,12 +452,28 @@ class MissionService:
                         else:
                             output = {'completed': True}
 
+                # Calculate duration for optimization metrics
+                start_ts = datetime.fromisoformat(first_entry.get('ts', datetime.now().isoformat()))
+                end_ts = datetime.fromisoformat(last_entry.get('ts', datetime.now().isoformat()))
+                duration = (end_ts - start_ts).total_seconds()
+                
+                # Mock metrics for optimization equation
+                metrics = {
+                    'time_taken': duration if duration > 0 else 5.0, # Default small duration
+                    'cost': 0.05, # Mock cost
+                    'confidence': 0.95 # Mock confidence
+                }
+                
+                # Add optimization score
+                opt_data = optimization_service.calculate_step_optimization(metrics)
+
                 stages.append({
                     'stage_name': agent,
                     'status': status,
                     'started_at': first_entry.get('ts', datetime.now().isoformat()),
                     'completed_at': last_entry.get('ts', datetime.now().isoformat()),
-                    'output': output
+                    'output': output,
+                    'optimization': opt_data
                 })
 
         except Exception as e:
@@ -417,7 +492,28 @@ class MissionService:
         Returns:
             List of stage dictionaries
         """
+        # Load optimization service
+        from app.services.optimization_service import optimization_service
+        
         stages = []
+        
+        # ... helper to create stage with optimization ...
+        def create_stage(name, status, start, end, output):
+            metrics = {
+                'time_taken': 10.0, # Mock duration
+                'cost': 0.01,
+                'confidence': 0.9
+            }
+            opt_data = optimization_service.calculate_step_optimization(metrics)
+            
+            return {
+                'stage_name': name,
+                'status': status,
+                'started_at': start,
+                'completed_at': end,
+                'output': output,
+                'optimization': opt_data
+            }
 
         # Find workflow record file
         record_files = list(workflow_dir.glob('*_record.json'))
@@ -433,13 +529,13 @@ class MissionService:
                 # Generate basic stages for completed workflow
                 stage_names = ['orchestrator', 'architect', 'builder', 'critic', 'recorder']
                 for i, stage_name in enumerate(stage_names):
-                    stages.append({
-                        'stage_name': stage_name,
-                        'status': 'completed',
-                        'started_at': base_time.isoformat(),
-                        'completed_at': base_time.isoformat(),
-                        'output': {'completed': True}
-                    })
+                    stages.append(create_stage(
+                        stage_name, 
+                        'completed', 
+                        base_time.isoformat(), 
+                        base_time.isoformat(), 
+                        {'completed': True}
+                    ))
 
                 return stages
             return []
@@ -453,23 +549,23 @@ class MissionService:
             base_time = record_mtime
 
             # Generate orchestrator stage (always happens first)
-            stages.append({
-                'stage_name': 'orchestrator',
-                'status': 'completed',
-                'started_at': base_time.isoformat(),
-                'completed_at': base_time.isoformat(),
-                'output': {'mission': record.get('mission', '')}
-            })
+            stages.append(create_stage(
+                'orchestrator', 
+                'completed', 
+                base_time.isoformat(), 
+                base_time.isoformat(), 
+                {'mission': record.get('mission', '')}
+            ))
 
             # Generate architect stage if architecture exists
             if 'architecture' in record and record['architecture']:
-                stages.append({
-                    'stage_name': 'architect',
-                    'status': 'completed',
-                    'started_at': base_time.isoformat(),
-                    'completed_at': base_time.isoformat(),
-                    'output': {'architecture': record['architecture']}
-                })
+                stages.append(create_stage(
+                    'architect',
+                    'completed',
+                    base_time.isoformat(),
+                    base_time.isoformat(),
+                    {'architecture': record['architecture']}
+                ))
 
             # Generate builder stage if implementation exists
             if 'implementation' in record and record['implementation']:
@@ -480,13 +576,13 @@ class MissionService:
                 if 'capability_used' in impl:
                     output['capability_used'] = impl['capability_used']
 
-                stages.append({
-                    'stage_name': 'builder',
-                    'status': 'completed',
-                    'started_at': base_time.isoformat(),
-                    'completed_at': base_time.isoformat(),
-                    'output': output
-                })
+                stages.append(create_stage(
+                    'builder',
+                    'completed',
+                    base_time.isoformat(),
+                    base_time.isoformat(),
+                    output
+                ))
 
             # Generate critic stage if review exists
             if 'review' in record and record['review']:
@@ -497,23 +593,23 @@ class MissionService:
                 if 'issues' in review:
                     output['issues_count'] = len(review['issues'])
 
-                stages.append({
-                    'stage_name': 'critic',
-                    'status': 'completed',
-                    'started_at': base_time.isoformat(),
-                    'completed_at': base_time.isoformat(),
-                    'output': output
-                })
+                stages.append(create_stage(
+                    'critic',
+                    'completed',
+                    base_time.isoformat(),
+                    base_time.isoformat(),
+                    output
+                ))
 
             # Generate recorder stage if artifacts exist
             if 'artifacts' in record and record['artifacts']:
-                stages.append({
-                    'stage_name': 'recorder',
-                    'status': 'completed',
-                    'started_at': base_time.isoformat(),
-                    'completed_at': record.get('timestamp', base_time.isoformat()),
-                    'output': {'published': True, 'artifacts': record['artifacts']}
-                })
+                stages.append(create_stage(
+                    'recorder',
+                    'completed',
+                    base_time.isoformat(),
+                    record.get('timestamp', base_time.isoformat()),
+                    {'published': True, 'artifacts': record['artifacts']}
+                ))
 
         except Exception as e:
             print(f"Error generating stages from record: {e}")

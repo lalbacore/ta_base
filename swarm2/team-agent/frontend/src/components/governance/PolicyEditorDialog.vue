@@ -65,12 +65,12 @@
         <h3>Cost Constraints</h3>
 
         <div class="form-field">
-          <label for="max-cost">Maximum Cost Per Mission</label>
+          <label for="max-cost">Maximum Cost Per Mission (Tokens)</label>
           <InputNumber
             id="max-cost"
             v-model="formData.max_cost_per_mission"
             :min="0"
-            prefix="$"
+            suffix=" Tokens"
             showButtons
             class="w-full"
           />

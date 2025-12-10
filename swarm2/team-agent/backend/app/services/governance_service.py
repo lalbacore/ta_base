@@ -265,7 +265,7 @@ class GovernanceService:
         else:
             satisfied.append({
                 'policy': 'max_cost_per_mission',
-                'message': f'Cost within budget (${max_cost} <= ${policy_config["max_cost_per_mission"]})'
+                'message': f'Cost within budget ({max_cost} tokens <= {policy_config["max_cost_per_mission"]} tokens)'
             })
 
         # Check if security review is required

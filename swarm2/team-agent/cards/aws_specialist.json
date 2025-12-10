@@ -1,0 +1,37 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "aws_specialist_v1",
+    "agent_name": "AWS Cloud Specialist",
+    "agent_type": "specialist",
+    "description": "Cloud architect for Amazon Web Services infrastructure.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.aws_specialist",
+    "class_name": "AWSSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_aws_deploy_v1",
+            "capability_type": "deployment",
+            "name": "AWS Deployment",
+            "description": "Deploys resources to AWS via CloudFormation/Terraform.",
+            "version": "1.0.0",
+            "domains": [
+                "cloud",
+                "devops"
+            ],
+            "keywords": [
+                "aws",
+                "cloud",
+                "deploy",
+                "serverless"
+            ],
+            "price_per_invocation": 15.0,
+            "input_schema": {
+                "type": "object"
+            },
+            "output_schema": {
+                "type": "object"
+            }
+        }
+    ]
+}

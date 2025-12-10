@@ -50,6 +50,30 @@
             </span>
           </div>
 
+  <div
+            v-if="slotProps.item.optimization && debugMode"
+            class="stage-optimization"
+          >
+            <div class="optimization-header">
+              <span class="opt-label">Optimization Score</span>
+              <span class="opt-value">{{ slotProps.item.optimization.score }}</span>
+            </div>
+            
+            <div 
+              class="math-equation"
+              v-html="renderMath(slotProps.item.optimization.equation_md)"
+            ></div>
+
+            <div class="optimization-details">
+              <div v-for="(comp, key) in slotProps.item.optimization.components" :key="key" class="opt-component">
+                <span class="comp-key">{{ key }}</span>
+                <span class="comp-val">
+                  {{ comp.weight }} × {{ comp.value.toFixed(2) }} = <strong>{{ comp.contribution }}</strong>
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div
             v-if="slotProps.item.output && slotProps.item.status === 'completed'"
             class="stage-output"
@@ -68,10 +92,24 @@ import Timeline from 'primevue/timeline'
 import Tag from 'primevue/tag'
 import ProgressSpinner from 'primevue/progressspinner'
 import type { WorkflowStage } from '@/types/mission.types'
+import { computed } from 'vue'
 
-defineProps<{
-  stages: WorkflowStage[]
+const props = defineProps<{
+  stages: WorkflowStage[],
+  debugMode?: boolean
 }>()
+
+function renderMath(equation: string): string {
+  if (!(window as any).katex) return equation
+  try {
+    return (window as any).katex.renderToString(equation, {
+      throwOnError: false,
+      displayMode: true
+    })
+  } catch (e) {
+    return equation
+  }
+}
 
 function formatStageName(stage: string): string {
   return stage
@@ -228,6 +266,44 @@ function calculateDuration(start: string, end: string): string {
   border-radius: 6px;
 }
 
+.stage-optimization {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+}
+
+.optimization-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.optimization-details {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #166534;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.opt-component {
+  background: rgba(255,255,255,0.5);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.comp-key {
+  text-transform: capitalize;
+  margin-right: 4px;
+  color: #14532d;
+}
+
 .output-label {
   font-size: 0.875rem;
   font-weight: 600;
@@ -242,5 +318,9 @@ function calculateDuration(start: string, end: string): string {
   word-wrap: break-word;
   margin: 0;
   color: #1e293b;
+}
+
+:deep(.katex) {
+  font-size: 1.1em;
 }
 </style>

@@ -1,0 +1,37 @@
+{
+    "agent_card_version": "1.0",
+    "agent_id": "gcp_specialist_v1",
+    "agent_name": "GCP Cloud Specialist",
+    "agent_type": "specialist",
+    "description": "Cloud architect for Google Cloud Platform.",
+    "version": "1.0.0",
+    "trust_domain": "EXECUTION",
+    "module_path": "swarms.team_agent.specialists.gcp_specialist",
+    "class_name": "GCPSpecialist",
+    "capabilities": [
+        {
+            "capability_id": "cap_gcp_deploy_v1",
+            "capability_type": "deployment",
+            "name": "GCP Deployment",
+            "description": "Deploys resources to GCP.",
+            "version": "1.0.0",
+            "domains": [
+                "cloud",
+                "devops"
+            ],
+            "keywords": [
+                "gcp",
+                "google",
+                "cloud",
+                "deploy"
+            ],
+            "price_per_invocation": 15.0,
+            "input_schema": {
+                "type": "object"
+            },
+            "output_schema": {
+                "type": "object"
+            }
+        }
+    ]
+}

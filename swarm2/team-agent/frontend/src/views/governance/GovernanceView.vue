@@ -25,7 +25,7 @@
               <div class="policy-item">
                 <label>Maximum Cost Per Mission</label>
                 <div class="policy-value">
-                  <span class="cost-value">\${{ policyConfig.max_cost_per_mission }}</span>
+                  <span class="cost-value">{{ policyConfig.max_cost_per_mission }} Tokens</span>
                 </div>
               </div>
 
@@ -129,9 +129,9 @@
                   />
                 </template>
               </Column>
-              <Column field="max_cost_per_mission" header="Max Cost" sortable>
+              <Column field="max_cost_per_mission" header="Max Cost (Tokens)" sortable>
                 <template #body="slotProps">
-                  ${{ slotProps.data.max_cost_per_mission }}
+                  {{ slotProps.data.max_cost_per_mission }}
                 </template>
               </Column>
               <Column field="allowed_languages" header="Languages">
@@ -257,7 +257,7 @@
                       id="mission-cost"
                       v-model="testMission.max_cost"
                       :min="0"
-                      prefix="$"
+                      suffix=" Tokens"
                       showButtons
                     />
                   </div>

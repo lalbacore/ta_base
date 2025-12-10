@@ -23,6 +23,14 @@ export class MissionService {
     await apiClient.post(`/mission/workflow/${workflowId}/resume`)
   }
 
+  async pauseWorkflow(workflowId: string): Promise<void> {
+    await apiClient.post(`/mission/workflow/${workflowId}/pause`)
+  }
+
+  async cancelMission(missionId: string): Promise<void> {
+    await apiClient.post(`/mission/${missionId}/cancel`)
+  }
+
   async approveBreakpoint(breakpointId: string, optionIndex: number): Promise<void> {
     await apiClient.post(`/mission/breakpoint/${breakpointId}/approve`, { option_index: optionIndex })
   }

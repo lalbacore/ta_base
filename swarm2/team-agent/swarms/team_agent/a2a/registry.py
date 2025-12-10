@@ -367,7 +367,8 @@ class CapabilityRegistry:
         tags: Optional[List[str]] = None,
         categories: Optional[List[str]] = None,
         expires_at: Optional[datetime] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: Optional[Dict[str, Any]] = None,
+        capability_id: Optional[str] = None
     ) -> Capability:
         """
         Register a new capability.
@@ -387,11 +388,13 @@ class CapabilityRegistry:
             categories: List of categories
             expires_at: Expiration timestamp
             metadata: Additional metadata
+            capability_id: Optional custom ID (defaults to auto-generated)
 
         Returns:
             Capability object
         """
-        capability_id = f"cap-{uuid4().hex[:12]}"
+        if not capability_id:
+            capability_id = f"cap-{uuid4().hex[:12]}"
 
         capability = Capability(
             capability_id=capability_id,
@@ -461,20 +464,10 @@ class CapabilityRegistry:
     ) -> List[Tuple[Capability, Provider]]:
         """
         Discover available capabilities.
-
-        Args:
-            capability_type: Filter by capability type
-            tags: Filter by tags (must have all tags)
-            min_reputation: Minimum reputation score
-            min_trust_score: Minimum provider trust score
-            status: Capability status
-            limit: Maximum number of results
-
-        Returns:
-            List of (Capability, Provider) tuples
         """
+        # We explicitly alias metadata columns to avoid ambiguity in sqlite3.Row
         query = """
-            SELECT c.*, p.*
+            SELECT c.*, p.*, c.metadata as c_metadata, p.metadata as p_metadata
             FROM capabilities c
             JOIN providers p ON c.provider_id = p.provider_id
             WHERE c.status = ?
@@ -507,6 +500,23 @@ class CapabilityRegistry:
                 results.append((capability, provider))
 
         return results
+
+    # ... (skipping match_capabilities logic for brevity if unchanging) ...
+    # We need to maintain match_capabilities in the file, but replace_file_content replaces blocks.
+    # Since I can't skip the middle 300 lines easily without using multi_replace or large block.
+    # I will split this into smaller edits.
+    # First edit: discover_capabilities.
+    # Second edit: _row_to_capability.
+    # Third edit: _row_to_provider.
+
+    # But replace_file_content requires contiguous block if using single call.
+    # I will use multi_replace for this if I can, but the methods are far apart.
+    # I will do 3 separate calls.
+    # WAIT! discover_capabilities is lines 456-512.
+    # _row_to_capability is lines 884-912.
+    # _row_to_provider is lines 914-930.
+
+    # I will start with discover_capabilities.
 
     def match_capabilities(
         self,
@@ -880,6 +890,9 @@ class CapabilityRegistry:
 
     def _row_to_capability(self, row: sqlite3.Row) -> Capability:
         """Convert a database row to a Capability object."""
+        # Prefer aliased metadata if available (from join queries)
+        meta_json = row['c_metadata'] if 'c_metadata' in row.keys() else row['metadata']
+        
         return Capability(
             capability_id=row['capability_id'],
             provider_id=row['provider_id'],
@@ -905,14 +918,14 @@ class CapabilityRegistry:
             categories=json.loads(row['categories']),
             contract_address=row['contract_address'],
             contract_abi=json.loads(row['contract_abi']) if row['contract_abi'] else None,
-            metadata=json.loads(row['metadata'])
+            metadata=json.loads(meta_json)
         )
 
     def _row_to_provider(self, row: sqlite3.Row) -> Provider:
         """Convert a database row to a Provider object."""
-        # Handle prefixed column names when joining tables
-        provider_id_col = 'provider_id' if 'provider_id' in row.keys() else row['provider_id']
-
+        # Prefer aliased metadata if available (from join queries)
+        meta_json = row['p_metadata'] if 'p_metadata' in row.keys() else row['metadata']
+        
         return Provider(
             provider_id=row['provider_id'],
             provider_type=row['provider_type'],
@@ -923,5 +936,5 @@ class CapabilityRegistry:
             success_rate=row['success_rate'],
             created_at=datetime.fromisoformat(row['created_at']),
             last_seen=datetime.fromisoformat(row['last_seen']),
-            metadata=json.loads(row['metadata'])
+            metadata=json.loads(meta_json)
         )

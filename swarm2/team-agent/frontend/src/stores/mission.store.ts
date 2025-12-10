@@ -11,15 +11,15 @@ export const useMissionStore = defineStore('mission', () => {
 
   // Getters
   const activeMissions = computed(() =>
-    Array.from(workflows.values()).filter(w => w.status === 'running')
+    Array.from(workflows.value.values()).filter(w => w.status === 'running')
   )
 
   const completedMissions = computed(() =>
-    Array.from(workflows.values()).filter(w => w.status === 'completed')
+    Array.from(workflows.value.values()).filter(w => w.status === 'completed')
   )
 
   const pendingBreakpoints = computed(() =>
-    Array.from(breakpoints.values()).filter(b => b.status === 'pending')
+    Array.from(breakpoints.value.values()).filter(b => b.status === 'pending')
   )
 
   // Actions
@@ -94,6 +94,37 @@ export const useMissionStore = defineStore('mission', () => {
     })
   }
 
+  async function resumeWorkflow(workflowId: string): Promise<void> {
+    const missionService = await import('@/services/mission.service')
+    await missionService.default.resumeWorkflow(workflowId)
+    // Optimistic update
+    const workflow = workflows.value.get(workflowId)
+    if (workflow) workflow.status = 'running'
+  }
+
+  async function pauseWorkflow(workflowId: string): Promise<void> {
+    const missionService = await import('@/services/mission.service')
+    await missionService.default.pauseWorkflow(workflowId)
+    // Optimistic update
+    const workflow = workflows.value.get(workflowId)
+    if (workflow) workflow.status = 'paused'
+  }
+
+  async function cancelMission(missionId: string): Promise<void> {
+    const missionService = await import('@/services/mission.service')
+    await missionService.default.cancelMission(missionId)
+    // Optimistic update
+    const workflow = workflows.value.get(missionId) // missions use same ID key often
+    if (workflow) workflow.status = 'cancelled'
+
+    // Also try finding by value if key doesn't match
+    for (const wf of workflows.value.values()) {
+      if (wf.mission_id === missionId) {
+        wf.status = 'cancelled'
+      }
+    }
+  }
+
   // Aliases for compatibility
   const fetchMissions = listMissions
   const fetchWorkflows = listWorkflows
@@ -113,6 +144,9 @@ export const useMissionStore = defineStore('mission', () => {
     listMissions,
     listWorkflows,
     fetchMissions,
-    fetchWorkflows
+    fetchWorkflows,
+    resumeWorkflow,
+    pauseWorkflow,
+    cancelMission
   }
 })

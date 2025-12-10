@@ -1,0 +1,121 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Agent Card",
+    "description": "Standardized definition of an Autonomous Agent for the A2A Registry",
+    "type": "object",
+    "required": [
+        "agent_id",
+        "agent_name",
+        "agent_type",
+        "version",
+        "trust_domain",
+        "module_path",
+        "class_name"
+    ],
+    "properties": {
+        "agent_card_version": {
+            "type": "string",
+            "const": "1.0",
+            "description": "Version of the Card Schema itself"
+        },
+        "agent_id": {
+            "type": "string",
+            "description": "Unique identifier (UUID or human-readable slug)"
+        },
+        "agent_name": {
+            "type": "string",
+            "description": "Display name of the agent"
+        },
+        "agent_type": {
+            "type": "string",
+            "enum": [
+                "role",
+                "specialist",
+                "tool"
+            ],
+            "description": "Classification of the agent's role"
+        },
+        "description": {
+            "type": "string",
+            "description": "Human-readable description of what the agent does"
+        },
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+\\.\\d+$",
+            "description": "Semantic version of the agent implementation"
+        },
+        "trust_domain": {
+            "type": "string",
+            "enum": [
+                "EXECUTION",
+                "GOVERNMENT",
+                "LOGGING"
+            ],
+            "description": "PKI Trust Domain this agent belongs to"
+        },
+        "module_path": {
+            "type": "string",
+            "description": "Python import path for the agent class (internal use)"
+        },
+        "class_name": {
+            "type": "string",
+            "description": "Name of the Python class to instantiate (internal use)"
+        },
+        "capabilities": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "capability_id",
+                    "capability_type",
+                    "name",
+                    "description"
+                ],
+                "properties": {
+                    "capability_id": {
+                        "type": "string"
+                    },
+                    "capability_type": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "version": {
+                        "type": "string",
+                        "default": "1.0.0"
+                    },
+                    "domains": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "keywords": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "price_per_invocation": {
+                        "type": "number",
+                        "default": 0.0
+                    },
+                    "input_schema": {
+                        "type": "object"
+                    },
+                    "output_schema": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Arbitrary extra metadata"
+        }
+    }
+}
