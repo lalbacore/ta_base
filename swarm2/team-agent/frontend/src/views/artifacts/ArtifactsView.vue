@@ -7,6 +7,20 @@
           View workflow artifacts, verify signatures, and publish to registry
         </p>
       </div>
+      
+      <!-- Search Bar -->
+      <div class="search-container">
+        <i class="pi pi-search search-icon"></i>
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search artifacts by name or workflow ID..."
+          class="search-input"
+        />
+        <button v-if="searchQuery" @click="searchQuery = ''" class="clear-search">
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Loading State -->
@@ -72,19 +86,19 @@
                     </div>
                   </div>
 
-                  <!-- Mock reputation/earnings data -->
+                  <!-- Token consumption metrics -->
                   <div class="artifact-metrics">
                     <div class="metric">
-                      <span class="metric-label">Reputation</span>
-                      <span class="metric-value">{{ getMockReputation(artifact.name) }}</span>
+                      <span class="metric-label">Total Tokens</span>
+                      <span class="metric-value">{{ formatNumber(getWorkflowTokens(workflow.workflow_id)) }}</span>
                     </div>
                     <div class="metric">
-                      <span class="metric-label">Earnings</span>
-                      <span class="metric-value">${{ getMockEarnings(artifact.name) }}</span>
+                      <span class="metric-label">Prompt</span>
+                      <span class="metric-value">{{ formatNumber(getWorkflowPromptTokens(workflow.workflow_id)) }}</span>
                     </div>
                     <div class="metric">
-                      <span class="metric-label">Downloads</span>
-                      <span class="metric-value">{{ getMockDownloads(artifact.name) }}</span>
+                      <span class="metric-label">Completion</span>
+                      <span class="metric-value">{{ formatNumber(getWorkflowCompletionTokens(workflow.workflow_id)) }}</span>
                     </div>
                   </div>
                 </div>
@@ -238,12 +252,29 @@ const workflowArtifacts = ref<Map<string, any[]>>(new Map())
 const loadingTuringTape = ref(false)
 const turingTapeContent = ref('')
 
+const searchQuery = ref('')
+const episodeTokens = ref<Map<string, any>>(new Map())
+
 const workflowsWithArtifacts = computed(() => {
   const workflows = Array.from(missionStore.workflows.values())
-  return workflows.map(workflow => ({
+  let filtered = workflows.map(workflow => ({
     ...workflow,
     artifacts: workflowArtifacts.value.get(workflow.workflow_id) || []
   }))
+  
+  // Apply search filter
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase()
+    filtered = filtered.filter(workflow => {
+      const matchesWorkflow = workflow.workflow_id.toLowerCase().includes(query)
+      const matchesArtifact = workflow.artifacts.some((a: any) => 
+        a.name.toLowerCase().includes(query)
+      )
+      return matchesWorkflow || matchesArtifact
+    })
+  }
+  
+  return filtered
 })
 
 async function loadArtifacts() {
@@ -360,24 +391,52 @@ function getProvenanceSeverity(score: number): string {
   return 'info'
 }
 
-// Mock data generators
-function getMockReputation(filename: string): number {
-  const hash = filename.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  return 75 + (hash % 20)
+// Token data functions
+function formatNumber(num: number): string {
+  return num.toLocaleString()
 }
 
-function getMockEarnings(filename: string): number {
-  const hash = filename.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  return (hash % 500) + 100
+function getWorkflowTokens(workflowId: string): number {
+  const episode = episodeTokens.value.get(workflowId)
+  return episode?.tokens?.total || 0
 }
 
-function getMockDownloads(filename: string): number {
-  const hash = filename.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  return (hash % 1000) + 50
+function getWorkflowPromptTokens(workflowId: string): number {
+  const episode = episodeTokens.value.get(workflowId)
+  return episode?.tokens?.prompt || 0
 }
 
-onMounted(() => {
-  loadArtifacts()
+function getWorkflowCompletionTokens(workflowId: string): number {
+  const episode = episodeTokens.value.get(workflowId)
+  return episode?.tokens?.completion || 0
+}
+
+async function loadEpisodeTokens() {
+  try {
+    const response = await axios.get('/api/episodes')
+    const episodes = response.data.episodes || []
+    
+    // Map episodes to workflows by mission_id
+    for (const episode of episodes) {
+      // Try to find matching workflow
+      const workflows = Array.from(missionStore.workflows.values())
+      const matchingWorkflow = workflows.find(w => 
+        w.mission_id === episode.mission_id || 
+        w.workflow_id.includes(episode.episode_id.split('_').slice(-1)[0])
+      )
+      
+      if (matchingWorkflow) {
+        episodeTokens.value.set(matchingWorkflow.workflow_id, episode)
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load episode tokens:', error)
+  }
+}
+
+onMounted(async () => {
+  await loadArtifacts()
+  await loadEpisodeTokens()
 })
 </script>
 
@@ -401,6 +460,57 @@ onMounted(() => {
 .page-subtitle {
   color: #64748b;
   margin: 0;
+}
+
+/* Search Bar */
+.search-container {
+  position: relative;
+  margin-top: 1.5rem;
+  max-width: 500px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 2.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.clear-search {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.clear-search:hover {
+  color: #64748b;
 }
 
 .loading-state {
