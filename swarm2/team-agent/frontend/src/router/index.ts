@@ -62,6 +62,18 @@ const routes: Array<RouteRecordRaw> = [
     meta: { title: 'Logs' }
   },
   {
+    path: '/episodes',
+    name: 'Episodes',
+    component: () => import('@/views/episodes/EpisodeListView.vue'),
+    meta: { title: 'Episodes' }
+  },
+  {
+    path: '/episodes/:id',
+    name: 'EpisodeDetail',
+    component: () => import('@/views/episodes/EpisodeDetailView.vue'),
+    meta: { title: 'Episode Details' }
+  },
+  {
     path: '/providers',
     name: 'Providers',
     component: () => import('@/views/providers/ProvidersView.vue'),
