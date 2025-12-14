@@ -86,13 +86,26 @@ class MissionService:
         # Execute mission in background thread
         def execute_mission():
             try:
+                # Create episode for this mission
+                from app.services.episode_service import episode_service
+                from app.services.execution_tracker import execution_tracker
+                
+                episode = episode_service.create_episode(mission_id=mission_id)
+                episode_id = episode.episode_id
+                
+                # Store episode_id with mission
+                self.missions[mission_id]['episode_id'] = episode_id
+                
                 # Update status to running
                 self.missions[mission_id]['status'] = 'running'
                 self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
                 self.missions[mission_id]['started_at'] = datetime.now().isoformat()
+                
+                # Start episode tracking
+                execution_tracker.start_episode(episode_id)
 
-                # Execute the mission
-                results = self.orchestrator.execute(description)
+                # Execute the mission with episode tracking
+                results = self.orchestrator.execute(description, episode_id=episode_id)
                 workflow_id = results.get('workflow_id')
 
                 # Store workflow info
@@ -109,12 +122,22 @@ class MissionService:
                 self.missions[mission_id]['status'] = 'completed'
                 self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
                 self.missions[mission_id]['completed_at'] = datetime.now().isoformat()
+                
+                # Complete episode with effectiveness score
+                execution_tracker.complete_episode(episode_id, effectiveness_score=80.0)
 
             except Exception as e:
                 self.missions[mission_id]['status'] = 'failed'
                 self.missions[mission_id]['error'] = str(e)
                 self.missions[mission_id]['updated_at'] = datetime.now().isoformat()
                 self.missions[mission_id]['failed_at'] = datetime.now().isoformat()
+                
+                # Fail episode if it exists
+                if 'episode_id' in self.missions[mission_id]:
+                    execution_tracker.fail_episode(
+                        self.missions[mission_id]['episode_id'],
+                        error=str(e)
+                    )
 
         thread = threading.Thread(target=execute_mission, daemon=True)
         thread.start()
