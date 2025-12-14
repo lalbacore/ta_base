@@ -34,3 +34,4 @@ web3==6.9.0
 # LLM and token tracking
 tiktoken==0.5.2
 scipy==1.11.4
+pyyaml==6.0.1
