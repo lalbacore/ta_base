@@ -36,6 +36,7 @@ def create_app():
     from app.api.well_known import well_known_bp
     from app.api.episodes import episodes_bp  # NEW
     from app.api.missions import missions_bp  # NEW
+    from app.api.drift import drift_bp  # NEW
 
     app.register_blueprint(mission_bp, url_prefix='/api/mission')
     app.register_blueprint(trust_bp, url_prefix='/api/trust')
@@ -49,6 +50,7 @@ def create_app():
     app.register_blueprint(well_known_bp)  # No prefix - .well-known at root
     app.register_blueprint(episodes_bp)  # NEW - /api/episodes
     app.register_blueprint(missions_bp)  # NEW - /api/missions
+    app.register_blueprint(drift_bp)  # NEW - /api/drift
     
     from app.api.provider import provider_bp
     app.register_blueprint(provider_bp, url_prefix='/api/provider')
