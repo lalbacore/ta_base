@@ -4,6 +4,9 @@ services:
   team-agent:
     build: .
     container_name: team-agent
+    ports:
+      - "5000:5000" # Backend API
+      - "3000:80" # Frontend
     environment:
       - STORAGE_TYPE=file
       - DATA_DIR=/app/data
@@ -54,6 +57,7 @@ services:
 
 volumes:
   elasticsearch_data:
+
 
 networks:
   elk:
