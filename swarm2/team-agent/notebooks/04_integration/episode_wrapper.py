@@ -141,7 +141,6 @@ class EpisodeTransaction:
         
         return self.episode_id
     
-        }
 
     
     def evaluate(self) -> Dict[str, Any]:
