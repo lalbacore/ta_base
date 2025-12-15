@@ -11,6 +11,10 @@
 # MAGIC 3. Verify the classification (scrutable/partially_scrutable/inscrutable)
 
 # COMMAND ----------
+# MAGIC %pip install mlflow
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
 from datetime import datetime
 import uuid
 

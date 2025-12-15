@@ -12,6 +12,10 @@
 # MAGIC 4. Get binary decision: computes or doesn't compute
 
 # COMMAND ----------
+# MAGIC %pip install mlflow
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
 from episode_wrapper import mcp_episode, a2a_episode
 
 # COMMAND ----------
