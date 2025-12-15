@@ -43,6 +43,12 @@ print("✅ Dependencies installed and imported")
 # MAGIC ## 2. Infrastructure Verification
 
 # COMMAND ----------
+# Cleanup old tables to ensure fresh schema
+spark.sql("DROP TABLE IF EXISTS ai_eval.episodes")
+spark.sql("DROP TABLE IF EXISTS ai_eval.episode_steps")
+spark.sql("DROP TABLE IF EXISTS ai_eval.episode_evaluations")
+print("✅ Cleaned up existing tables")
+
 # Create Schema
 spark.sql("CREATE SCHEMA IF NOT EXISTS ai_eval")
 
@@ -98,9 +104,9 @@ evaluations_schema_ddl = """
 """
 
 # Create Tables
-spark.sql(f"CREATE TABLE IF NOT EXISTS ai_eval.episodes ({episodes_schema}) USING DELTA")
-spark.sql(f"CREATE TABLE IF NOT EXISTS ai_eval.episode_steps ({steps_schema_ddl}) USING DELTA")
-spark.sql(f"CREATE TABLE IF NOT EXISTS ai_eval.episode_evaluations ({evaluations_schema_ddl}) USING DELTA")
+spark.sql(f"CREATE TABLE ai_eval.episodes ({episodes_schema}) USING DELTA")
+spark.sql(f"CREATE TABLE ai_eval.episode_steps ({steps_schema_ddl}) USING DELTA")
+spark.sql(f"CREATE TABLE ai_eval.episode_evaluations ({evaluations_schema_ddl}) USING DELTA")
 
 print("✅ Delta tables verified (ai_eval.episodes, .episode_steps, .episode_evaluations)")
 
@@ -124,6 +130,19 @@ step_struct = StructType([
     StructField("has_explanation", BooleanType(), True),
     StructField("explanation", StringType(), True),
     StructField("reasoning_quality", DoubleType(), True),
+    StructField("metadata", MapType(StringType(), StringType()), True)
+])
+
+# Explicit schema for Episodes to avoid Long/Int type mismatch
+episode_struct = StructType([
+    StructField("episode_id", StringType(), False),
+    StructField("run_id", StringType(), True),
+    StructField("job_id", StringType(), True),
+    StructField("model", StringType(), True),
+    StructField("start_ts", TimestampType(), True),
+    StructField("end_ts", TimestampType(), True),
+    StructField("status", StringType(), True),
+    StructField("total_steps", IntegerType(), True),
     StructField("metadata", MapType(StringType(), StringType()), True)
 ])
 
@@ -192,7 +211,7 @@ def create_test_episode(is_scrutable=True):
         ]
         
     # Write to Delta
-    spark.createDataFrame([episode]).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
+    spark.createDataFrame([episode], schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
     spark.createDataFrame(steps, schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
     
     return ep_id
