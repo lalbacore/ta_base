@@ -246,7 +246,9 @@ print(f"✅ Generated Bad Episode:     {bad_ep_id}")
 
 # COMMAND ----------
 def evaluate_episode(episode_id):
-    """Simple, self-contained evaluator."""
+    """Simple, self-contained evaluator. Uses builtins to avoid Spark SQL function shadowing."""
+    import builtins
+    
     steps = spark.table("ai_eval.episode_steps").filter(col("episode_id") == episode_id).collect()
     
     if not steps: return {"error": "No steps"}
@@ -255,21 +257,29 @@ def evaluate_episode(episode_id):
     coherence_score = 0.0
     for s in steps:
         if s.has_explanation: coherence_score += 0.4
-        ratio = s.tokens_out / max(s.tokens_in, 1)
+        t_in = s.tokens_in if s.tokens_in else 0
+        # Use builtins.max as max() is shadowed by pyspark.sql.functions
+        ratio = s.tokens_out / builtins.max(t_in, 1)
         if ratio < 2.0: coherence_score += 0.2
-    coherence_score = min(coherence_score / max(len(steps), 1) * 3, 1.0) # Normalizing roughly
+        
+    step_count = builtins.max(len(steps), 1)
+    raw_coherence = coherence_score / step_count * 3
+    coherence_score = builtins.min(raw_coherence, 1.0)
     
     # 2. Consistency: Simple contradiction check
     consistency_score = 1.0
     text = " ".join([s.output.lower() for s in steps])
     if "certain" in text and "not sure" in text: consistency_score -= 0.5
     if "impossible" in text and "possible" in text: consistency_score -= 0.5
-    consistency_score = max(consistency_score, 0.0)
+    
+    consistency_score = builtins.max(consistency_score, 0.0)
     
     # 3. Efficiency
-    total_in = sum(s.tokens_in for s in steps)
-    total_out = sum(s.tokens_out for s in steps)
-    eff_score = 1.0 if (total_out / max(total_in, 1)) < 3.0 else 0.4
+    # Use builtins.sum as sum() is shadowed
+    total_in = builtins.sum(s.tokens_in for s in steps if s.tokens_in)
+    total_out = builtins.sum(s.tokens_out for s in steps if s.tokens_out)
+    
+    eff_score = 1.0 if (total_out / builtins.max(total_in, 1)) < 3.0 else 0.4
     
     # Weighted Score
     final_score = (coherence_score * 0.4) + (consistency_score * 0.4) + (eff_score * 0.2)
@@ -293,10 +303,6 @@ def evaluate_episode(episode_id):
         "instruction_drifts": 0, "token_ratio": 0.0, "tokens_per_semantic_delta": 0.0,
         "repetition_rate": 0.0, "flags": [], "notes": "Test Run", "evaluation_duration_ms": 0
     }
-    
-    # Use explicit schema for evaluations if needed, but infer works often for simple types. 
-    # For safety with array/map, let's just append carefully or rely on schema match.
-    # To be safe against PySpark inference issues, we map to dataframe then save.
     
     spark.createDataFrame([eval_row]).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
     
