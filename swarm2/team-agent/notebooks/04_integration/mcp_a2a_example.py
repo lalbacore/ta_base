@@ -46,8 +46,12 @@ from episode_wrapper import mcp_episode, a2a_episode
 # MAGIC ## Example 1: MCP Workflow That COMPUTES
 
 # COMMAND ----------
+import uuid
+
 # Create MCP episode with tight boundary
-mcp_tx = mcp_episode(spark, transaction_id="mcp-query-001")
+# Use unique ID to ensuring fresh test run
+mcp_id = f"mcp-query-{str(uuid.uuid4())[:8]}"
+mcp_tx = mcp_episode(spark, transaction_id=mcp_id)
 
 # Step 1: Parse request
 mcp_tx.add_step(
@@ -121,7 +125,8 @@ else:
 
 # COMMAND ----------
 # Create A2A episode with intentional issues
-a2a_tx = a2a_episode(spark, transaction_id="a2a-transfer-002")
+a2a_id = f"a2a-transfer-{str(uuid.uuid4())[:8]}"
+a2a_tx = a2a_episode(spark, transaction_id=a2a_id)
 
 # Step 1: Receive A2A message (good)
 a2a_tx.add_step(
