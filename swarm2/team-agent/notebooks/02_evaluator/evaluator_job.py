@@ -258,6 +258,7 @@ class EpisodeEvaluator:
         """Log metrics to MLflow."""
         
         # Log scores
+        import mlflow
         mlflow.log_metric("coherence_score", coherence["score"])
         mlflow.log_metric("consistency_score", consistency["score"])
         mlflow.log_metric("efficiency_score", efficiency["score"])
