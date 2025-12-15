@@ -328,7 +328,6 @@ def evaluate_episode(episode_id):
         "repetition_rate": 0.0, "flags": [], "notes": "Test Run", "evaluation_duration_ms": 0
     }
     
-    }
     
     import pandas as pd
     spark.createDataFrame(pd.DataFrame([eval_row]), schema=evaluations_struct).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
