@@ -272,7 +272,8 @@ class EpisodeEvaluator:
             "repetition_rate": float(efficiency.get("repetition", 0.0)),
             "flags": flags,
             "evaluator_version": self.evaluator_version,
-            "evaluated_at": datetime.now(),
+            "evaluator_version": self.evaluator_version,
+            "evaluated_at": str(datetime.now()),
             "evaluation_duration_ms": duration_ms
         }]
         
@@ -294,7 +295,8 @@ class EpisodeEvaluator:
             StructField("flags", ArrayType(StringType()), True),
             StructField("notes", StringType(), True),
             StructField("evaluator_version", StringType(), True),
-            StructField("evaluated_at", TimestampType(), True),
+            StructField("evaluator_version", StringType(), True),
+            StructField("evaluated_at", StringType(), True),
             StructField("evaluation_duration_ms", IntegerType(), True)
         ])
 
