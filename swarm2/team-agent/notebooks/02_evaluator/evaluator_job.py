@@ -13,11 +13,15 @@
 # MAGIC **Logs:** MLflow metrics
 
 # COMMAND ----------
+# MAGIC %pip install mlflow
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
+import mlflow
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from datetime import datetime
-import mlflow
 
 # COMMAND ----------
 # MAGIC %md

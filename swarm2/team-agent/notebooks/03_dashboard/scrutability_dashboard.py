@@ -12,6 +12,10 @@
 # MAGIC ## Setup
 
 # COMMAND ----------
+# MAGIC %pip install plotly pandas
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
 from pyspark.sql.functions import *
 from pyspark.sql.window import Window
 import plotly.express as px

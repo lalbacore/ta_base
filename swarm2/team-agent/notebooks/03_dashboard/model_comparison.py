@@ -8,6 +8,10 @@
 # MAGIC Compare transparency and explainability across different LLM models.
 
 # COMMAND ----------
+# MAGIC %pip install mlflow pandas plotly scipy
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
 from pyspark.sql.functions import *
 import plotly.express as px
 import plotly.graph_objects as go
