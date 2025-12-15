@@ -24,6 +24,9 @@ except ImportError:
 
 import contextlib
 
+# Ensure pandas is available for schema enforcement
+import pandas as pd
+
 @contextlib.contextmanager
 def nullcontext():
     yield None
