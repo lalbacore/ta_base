@@ -270,11 +270,34 @@ class EpisodeEvaluator:
             "flags": flags,
             "notes": self.generate_notes(coherence, consistency, efficiency),
             "evaluator_version": self.evaluator_version,
-            "evaluated_at": datetime.now(),
-            "evaluation_duration_ms": duration_ms
-        }]
+        
+        # Define explicit schema to avoid inference issues (e.g. ArrayType(NullType) for empty flags)
+        eval_schema = StructType([
+            StructField("episode_id", StringType(), False),
+            StructField("coherence_score", DoubleType(), True),
+            StructField("consistency_score", DoubleType(), True),
+            StructField("efficiency_score", DoubleType(), True),
+            StructField("scrutability_score", DoubleType(), True),
+            StructField("scrutability_level", StringType(), True),
+            StructField("semantic_jumps", IntegerType(), True),
+            StructField("contradictions", IntegerType(), True),
+            StructField("confidence_inversions", IntegerType(), True),
+            StructField("instruction_drifts", IntegerType(), True),
+            StructField("token_ratio", DoubleType(), True),
+            StructField("tokens_per_semantic_delta", DoubleType(), True),
+            StructField("repetition_rate", DoubleType(), True),
+            StructField("flags", ArrayType(StringType()), True),
+            StructField("notes", StringType(), True),
+            StructField("evaluator_version", StringType(), True),
+            StructField("evaluated_at", TimestampType(), True),
+            StructField("evaluation_duration_ms", IntegerType(), True)
+        ])
+
         import pandas as pd
-        eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data))
+        # Create DataFrame with explicit schema
+        # Note: Using pandas first helps with some python type conversions, 
+        # but passing schema is key for the array types.
+        eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data), schema=eval_schema)
         
         try:
             eval_df.write.format("delta").mode("append") \
