@@ -55,6 +55,7 @@ class EpisodeEvaluator:
         start_time = datetime.now()
         
         # Start MLflow run
+        import mlflow
         with mlflow.start_run(run_name=f"eval_{episode_id}"):
             
             # 1. Load episode steps
