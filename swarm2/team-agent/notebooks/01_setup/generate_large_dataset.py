@@ -29,6 +29,16 @@ import builtins  # Explicit builtins to avoid Spark shadowing
 
 # COMMAND ----------
 # MAGIC %md
+# MAGIC ## 0. Cleanup (Fresh State)
+# MAGIC Start with a clean slate to avoid schema conflicts (Integer vs Long inference issues).
+
+# COMMAND ----------
+spark.sql("DROP TABLE IF EXISTS ai_eval.episodes")
+spark.sql("DROP TABLE IF EXISTS ai_eval.episode_steps")
+spark.sql("DROP TABLE IF EXISTS ai_eval.episode_evaluations")
+
+# COMMAND ----------
+# MAGIC %md
 # MAGIC ## 1. Schemas
 
 # COMMAND ----------
