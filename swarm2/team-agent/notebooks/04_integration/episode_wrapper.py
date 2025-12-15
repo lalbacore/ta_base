@@ -188,6 +188,24 @@ class EpisodeTransaction:
         from evaluator_job import EpisodeEvaluator
         
         evaluator = EpisodeEvaluator(self.spark)
+        
+        # Retry logic for Serverless eventual consistency
+        import time
+        max_retries = 3
+        for attempt in range(max_retries):
+            try:
+                # Check if steps exist before evaluating
+                count = self.spark.table("ai_eval.episode_steps") \
+                    .filter(f"episode_id = '{self.episode_id}'").count()
+                
+                if count > 0:
+                    break
+                else:
+                    print(f"Waiting for data consistency (attempt {attempt+1}/{max_retries})...")
+                    time.sleep(2)
+            except Exception:
+                time.sleep(2)
+                
         result = evaluator.evaluate_episode(self.episode_id)
         
         # Determine if it "computes"
