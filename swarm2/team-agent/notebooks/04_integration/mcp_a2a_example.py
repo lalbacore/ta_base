@@ -55,6 +55,14 @@ except ImportError:
 
 # COMMAND ----------
 import uuid
+from pyspark.sql import SparkSession
+
+# Ensure we have a valid Spark session (recovers from timeouts)
+if 'spark' not in globals():
+    spark = SparkSession.builder.getOrCreate()
+else:
+    # Optional: Test connectivity?
+    pass
 
 # Create MCP episode with tight boundary
 # Use unique ID to ensuring fresh test run
