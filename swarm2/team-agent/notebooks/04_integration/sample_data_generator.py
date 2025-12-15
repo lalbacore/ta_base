@@ -14,6 +14,37 @@ from pyspark.sql.types import *
 from datetime import datetime, timedelta
 import uuid
 import random
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, TimestampType, BooleanType, DoubleType, MapType
+
+# Define Explicit Schemas (Matches Delta Table)
+episode_struct = StructType([
+    StructField("episode_id", StringType(), False),
+    StructField("run_id", StringType(), True),
+    StructField("job_id", StringType(), True),
+    StructField("model", StringType(), True),
+    StructField("start_ts", TimestampType(), True),
+    StructField("end_ts", TimestampType(), True),
+    StructField("status", StringType(), True),
+    StructField("total_steps", IntegerType(), True),
+    StructField("metadata", MapType(StringType(), StringType()), True)
+])
+
+step_struct = StructType([
+    StructField("episode_id", StringType(), False),
+    StructField("step_id", IntegerType(), False),
+    StructField("task_name", StringType(), True),
+    StructField("model", StringType(), True),
+    StructField("prompt", StringType(), True),
+    StructField("output", StringType(), True),
+    StructField("tokens_in", IntegerType(), True),
+    StructField("tokens_out", IntegerType(), True),
+    StructField("latency_ms", IntegerType(), True),
+    StructField("ts", TimestampType(), True),
+    StructField("has_explanation", BooleanType(), True),
+    StructField("explanation", StringType(), True),
+    StructField("reasoning_quality", DoubleType(), True),
+    StructField("metadata", MapType(StringType(), StringType()), True)
+])
 
 # COMMAND ----------
 # MAGIC %md
@@ -294,8 +325,9 @@ all_episodes = good_episodes + problematic_episodes
 all_steps = good_steps + problematic_steps
 
 # Create DataFrames
-episodes_df = spark.createDataFrame(all_episodes)
-steps_df = spark.createDataFrame(all_steps)
+# Create DataFrames with explicit schema
+episodes_df = spark.createDataFrame(all_episodes, schema=episode_struct)
+steps_df = spark.createDataFrame(all_steps, schema=step_struct)
 
 # Write to Delta tables
 episodes_df.write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
