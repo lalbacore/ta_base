@@ -141,21 +141,8 @@ class EpisodeTransaction:
         
         return self.episode_id
     
-    def evaluate(self) -> Dict[str, Any]:
-        """
-        Evaluate episode scrutability.
-        
-        Returns:
-            {
-                "computes": bool,  # True if scrutable, False otherwise
-                "scrutability_score": float,
-                "scrutability_level": str,
-                "obfuscation_point": int or None,  # Step where it breaks
-                "breakdown": {...}
-            }
-            "obfuscation_point": obfuscation_point,
-            "breakdown": self._get_step_breakdown()
         }
+
     
     def evaluate(self) -> Dict[str, Any]:
         """
