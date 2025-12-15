@@ -23,42 +23,19 @@ print(f"Current CWD: {os.getcwd()}")
 print(f"Initial sys.path: {sys.path}")
 
 # Robust path discovery
-try:
-    # Get current notebook path from context
-    notebook_path = dbutils.notebook.getContext().notebookPath().get()
-    print(f"Notebook logical path: {notebook_path}")
-    
-    # Construct base filesystem path
-    # If path starts with /Workspace, use it as is.
-    # Otherwise, check if valid file exists at /Workspace + path
-    candidate_path = "/Workspace" + notebook_path
-    if os.path.exists("/Workspace" + os.path.dirname(notebook_path)):
-        base_path = candidate_path
-    else:
-        # Fallback to just using the notebook path if it looks like a filesystem path
-        base_path = notebook_path
-        
-    current_dir = os.path.dirname(base_path)
-    print(f"Derived source directory: {current_dir}")
-    
-    # Add project root and current dir
-    if current_dir not in sys.path:
-        sys.path.append(current_dir)
-        print(f"Added {current_dir} to sys.path")
-        
-    # Also add the parent 'notebooks' dir to help find other modules
-    parent_dir = os.path.dirname(current_dir)
-    if parent_dir not in sys.path:
-        sys.path.append(parent_dir)
-        # Also add 02_evaluator explicitly while we are at it
-        eval_dir = os.path.join(parent_dir, "02_evaluator")
-        if os.path.exists(eval_dir) and eval_dir not in sys.path:
-             sys.path.append(eval_dir)
-
-except Exception as e:
-    print(f"Warning: automatic path discovery failed: {e}")
-    # Fallback values
+# Simplified path setup
+# Add the current directory to sys.path to ensure local imports work
+if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
+
+# Attempt to import - if it fails, we are likely in a weird state
+try:
+    import episode_wrapper
+    from episode_wrapper import mcp_episode, a2a_episode
+except ImportError as e:
+    print(f"CRITICAL ERROR: Could not import episode_wrapper. CWD: {os.getcwd()}")
+    print(f"sys.path: {sys.path}")
+    raise e
 
 import episode_wrapper
 from episode_wrapper import mcp_episode, a2a_episode
