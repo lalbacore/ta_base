@@ -41,6 +41,14 @@ if parent_dir not in sys.path:
 import episode_wrapper
 from episode_wrapper import mcp_episode, a2a_episode
 
+# Ensure evaluator_job is also importable (needed later)
+try:
+    import evaluator_job
+except ImportError:
+    # It might be in 02_evaluator, which we added to path above but maybe not correctly?
+    # Rerun the path logic specifically for evaluator
+    pass
+
 # COMMAND ----------
 # MAGIC %md
 # MAGIC ## Example 1: MCP Workflow That COMPUTES
