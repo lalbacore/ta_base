@@ -12,15 +12,16 @@ from pyspark.sql.functions import col
 
 # 1. SETUP
 spark = SparkSession.builder.getOrCreate()
+dbutils.library.restartPython()
 
-# 2. CLEANUP
+# 2. CLEANUP & SCHEMA
 print("🧹 Cleaning tables...")
 spark.sql("DROP TABLE IF EXISTS ai_eval.episodes")
 spark.sql("DROP TABLE IF EXISTS ai_eval.episode_steps")
 spark.sql("DROP TABLE IF EXISTS ai_eval.episode_evaluations")
-print("✅ Cleaned.")
+spark.sql("CREATE SCHEMA IF NOT EXISTS ai_eval")
 
-# 3. SCHEMAS
+# Define Schemas (Strict Typing)
 step_schema = StructType([
     StructField("episode_id", StringType(), False),
     StructField("step_id", IntegerType(), False),
@@ -37,6 +38,8 @@ eval_schema = StructType([
     StructField("scrutability_level", StringType(), True),
     StructField("flags", ArrayType(StringType()), True)
 ])
+
+print("✅ Cleaned tables and defined schemas")
 
 # 4. HELPERS
 def create_episode_data(ep_type):
