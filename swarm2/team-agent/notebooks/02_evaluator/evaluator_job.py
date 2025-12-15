@@ -260,13 +260,13 @@ class EpisodeEvaluator:
             "efficiency_score": efficiency["score"],
             "scrutability_score": scrutability["score"],
             "scrutability_level": scrutability["level"],
-            "semantic_jumps": coherence.get("jumps", 0),
-            "contradictions": consistency.get("contradictions", 0),
-            "confidence_inversions": consistency.get("inversions", 0),
-            "instruction_drifts": consistency.get("drifts", 0),
-            "token_ratio": efficiency.get("ratio", 0.0),
-            "tokens_per_semantic_delta": efficiency.get("per_delta", 0.0),
-            "repetition_rate": efficiency.get("repetition", 0.0),
+            "semantic_jumps": int(coherence.get("jumps", 0)),
+            "contradictions": int(consistency.get("contradictions", 0)),
+            "confidence_inversions": int(consistency.get("inversions", 0)),
+            "instruction_drifts": int(consistency.get("drifts", 0)),
+            "token_ratio": float(efficiency.get("ratio", 0.0)),
+            "tokens_per_semantic_delta": float(efficiency.get("per_delta", 0.0)),
+            "repetition_rate": float(efficiency.get("repetition", 0.0)),
             "flags": flags,
             "notes": self.generate_notes(coherence, consistency, efficiency),
             "evaluator_version": self.evaluator_version,
@@ -274,9 +274,9 @@ class EpisodeEvaluator:
             "evaluation_duration_ms": duration_ms
         }]
         
-        import pandas as pd
         eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data))
         eval_df.write.format("delta").mode("append") \
+            .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episode_evaluations")
     
     def generate_notes(self, coherence, consistency, efficiency):
