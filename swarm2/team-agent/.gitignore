@@ -99,3 +99,7 @@ demo_output/
 
 # External directories
 ../../target_test1/
+
+# Ignore local test environment and coverage reports
+test_env/
+coverage.xml
