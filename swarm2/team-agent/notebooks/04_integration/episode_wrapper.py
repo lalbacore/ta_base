@@ -172,11 +172,7 @@ class EpisodeTransaction:
         if eval_dir not in sys.path:
             sys.path.append(eval_dir)
 
-        try:
-            from evaluator_job import EpisodeEvaluator
-        except ImportError:
-            # Try importing as package if top-level
-            from notebooks.02_evaluator.evaluator_job import EpisodeEvaluator
+        from evaluator_job import EpisodeEvaluator
         
         evaluator = EpisodeEvaluator(self.spark)
         result = evaluator.evaluate_episode(self.episode_id)
