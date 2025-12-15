@@ -109,11 +109,11 @@ class EpisodeTransaction:
             sys.path.append(eval_dir)
             
         try:
-            from evaluator_job import EpisodeEvaluator
+            from run_evaluation import EpisodeEvaluator
         except ImportError:
             # Fallback if running relative
             sys.path.append("../02_evaluator")
-            from evaluator_job import EpisodeEvaluator
+            from run_evaluation import EpisodeEvaluator
 
         evaluator = EpisodeEvaluator(self.spark)
         
