@@ -143,11 +143,9 @@ class EpisodeTransaction:
             .saveAsTable("ai_eval.episode_steps")
             
         # Explicitly refresh tables to ensure immediate consistency for evaluation
-        try:
-            self.spark.sql("REFRESH TABLE ai_eval.episodes")
-            self.spark.sql("REFRESH TABLE ai_eval.episode_steps")
-        except Exception as e:
-            print(f"Warning: Failed to refresh tables: {e}")
+        # Tables are automatically managed in Unity Catalog / Serverless
+        # Explicit refresh is not supported and not needed for Serverless immediate consistency
+        pass
         
         return self.episode_id
     
