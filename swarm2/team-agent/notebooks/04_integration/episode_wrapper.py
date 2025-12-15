@@ -27,6 +27,7 @@ class EpisodeTransaction:
             workflow_type: "mcp" or "a2a"
             transaction_id: Optional transaction ID (generated if not provided)
         """
+        from pyspark.sql.types import StructType, StructField, StringType, IntegerType, TimestampType, BooleanType, DoubleType, MapType
         self.spark = spark
         self.workflow_type = workflow_type
         self.episode_id = transaction_id or str(uuid.uuid4())
@@ -34,6 +35,36 @@ class EpisodeTransaction:
         self.start_ts = datetime.now()
         self.status = "running"
         self.obfuscation_point = None  # Step where scrutability breaks
+
+        # Define Explicit Schemas (Matches test_suite.py)
+        self.episode_struct = StructType([
+            StructField("episode_id", StringType(), False),
+            StructField("run_id", StringType(), True),
+            StructField("job_id", StringType(), True),
+            StructField("model", StringType(), True),
+            StructField("start_ts", TimestampType(), True),
+            StructField("end_ts", TimestampType(), True),
+            StructField("status", StringType(), True),
+            StructField("total_steps", IntegerType(), True),
+            StructField("metadata", MapType(StringType(), StringType()), True)
+        ])
+
+        self.step_struct = StructType([
+            StructField("episode_id", StringType(), False),
+            StructField("step_id", IntegerType(), False),
+            StructField("task_name", StringType(), True),
+            StructField("model", StringType(), True),
+            StructField("prompt", StringType(), True),
+            StructField("output", StringType(), True),
+            StructField("tokens_in", IntegerType(), True),
+            StructField("tokens_out", IntegerType(), True),
+            StructField("latency_ms", IntegerType(), True),
+            StructField("ts", TimestampType(), True),
+            StructField("has_explanation", BooleanType(), True),
+            StructField("explanation", StringType(), True),
+            StructField("reasoning_quality", DoubleType(), True),
+            StructField("metadata", MapType(StringType(), StringType()), True)
+        ])
         
     def add_step(self, 
                  task_name: str,
@@ -96,12 +127,16 @@ class EpisodeTransaction:
         }
         
         # Write to Delta
-        self.spark.createDataFrame([episode]).write \
+        # Write to Delta with explicit schema
+        # Use persist schema to avoid inference errors (Integer vs Long)
+        self.spark.createDataFrame([episode], schema=self.episode_struct).write \
             .format("delta").mode("append") \
+            .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episodes")
         
-        self.spark.createDataFrame(self.steps).write \
+        self.spark.createDataFrame(self.steps, schema=self.step_struct).write \
             .format("delta").mode("append") \
+            .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episode_steps")
         
         return self.episode_id
