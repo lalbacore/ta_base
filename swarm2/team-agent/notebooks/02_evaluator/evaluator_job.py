@@ -273,12 +273,23 @@ class EpisodeEvaluator:
             "evaluated_at": datetime.now(),
             "evaluation_duration_ms": duration_ms
         }]
-        
         import pandas as pd
         eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data))
-        eval_df.write.format("delta").mode("append") \
-            .option("mergeSchema", "true") \
-            .saveAsTable("ai_eval.episode_evaluations")
+        
+        try:
+            eval_df.write.format("delta").mode("append") \
+                .option("mergeSchema", "true") \
+                .saveAsTable("ai_eval.episode_evaluations")
+        except Exception as e:
+            if "DELTA_FAILED_TO_MERGE_FIELDS" in str(e) or "schema mismatch" in str(e).lower():
+                print("Warning: Schema mismatch detected. Dropping table to reset schema...")
+                self.spark.sql("DROP TABLE IF EXISTS ai_eval.episode_evaluations")
+                # Retry write
+                eval_df.write.format("delta").mode("overwrite") \
+                    .option("mergeSchema", "true") \
+                    .saveAsTable("ai_eval.episode_evaluations")
+            else:
+                raise e
     
     def generate_notes(self, coherence, consistency, efficiency):
         """Generate human-readable evaluation notes."""
