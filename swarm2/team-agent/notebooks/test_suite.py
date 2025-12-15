@@ -146,6 +146,28 @@ episode_struct = StructType([
     StructField("metadata", MapType(StringType(), StringType()), True)
 ])
 
+# Explicit schema for Evaluations to handle empty arrays/maps
+evaluations_struct = StructType([
+    StructField("episode_id", StringType(), False),
+    StructField("coherence_score", DoubleType(), True),
+    StructField("consistency_score", DoubleType(), True),
+    StructField("efficiency_score", DoubleType(), True),
+    StructField("scrutability_score", DoubleType(), True),
+    StructField("scrutability_level", StringType(), True),
+    StructField("semantic_jumps", IntegerType(), True),
+    StructField("contradictions", IntegerType(), True),
+    StructField("confidence_inversions", IntegerType(), True),
+    StructField("instruction_drifts", IntegerType(), True),
+    StructField("token_ratio", DoubleType(), True),
+    StructField("tokens_per_semantic_delta", DoubleType(), True),
+    StructField("repetition_rate", DoubleType(), True),
+    StructField("flags", ArrayType(StringType()), True),
+    StructField("notes", StringType(), True),
+    StructField("evaluator_version", StringType(), True),
+    StructField("evaluated_at", TimestampType(), True),
+    StructField("evaluation_duration_ms", IntegerType(), True)
+])
+
 def create_test_episode(scrutability_level):
     ep_id = str(uuid.uuid4())
     start = datetime.now()
@@ -304,7 +326,7 @@ def evaluate_episode(episode_id):
         "repetition_rate": 0.0, "flags": [], "notes": "Test Run", "evaluation_duration_ms": 0
     }
     
-    spark.createDataFrame([eval_row]).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
+    spark.createDataFrame([eval_row], schema=evaluations_struct).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
     
     return eval_row
 
