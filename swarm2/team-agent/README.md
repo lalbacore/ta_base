@@ -1,5 +1,12 @@
 # Databricks AI Episode Evaluation Platform
 
+## System Philosophy & Goals
+**This system is explicitly not designed to generate, modify, or execute AI workflows.**
+
+It does not take autonomous action, does not persist side-effects, and does not "do" anything. Its sole function is **idempotent evaluation**: given the same inputs, it will always produce the same assessment, and it is safe to rerun at any time.
+
+The system exists to **observe, score, and attest** to AI behavior—not replace human judgement or operational control. The system must never go beyond idempotent AI checking.
+
 ## Overview
 
 A **scrutability-focused AI evaluation platform** built on Databricks, designed to measure how transparent and explainable AI decision-making is across different agents, swarms, and LLMs.
@@ -113,10 +120,16 @@ ORDER BY evaluated_at DESC;
 ```
 databricks-ai-eval/
 ├── notebooks/
-│   ├── 01_setup/              # Delta table creation
-│   ├── 02_evaluator/          # Spark evaluation jobs
+│   ├── 00_verify_pipeline.py  # System health check (The "Green Check")
+│   ├── 00_unit_tests.py       # Local python unit tests
+│   ├── 01_setup/
+│   │   └── generate_data.py   # Synthetic data generation
+│   ├── 02_evaluator/
+│   │   └── run_evaluation.py  # Spark evaluation job
 │   ├── 03_dashboard/          # Interactive dashboards
-│   └── 04_integration/        # AI pipeline integration
+│   └── 04_integration/
+│       ├── example_integration.py # MCP/A2A example
+│       └── episode_wrapper.py     # Integration helper
 ├── sql/
 │   ├── schema/                # Delta table DDL
 │   └── queries/               # Common queries
