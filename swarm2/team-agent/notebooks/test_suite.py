@@ -18,7 +18,7 @@
 
 # COMMAND ----------
 # Install required packages
-%pip install mlflow scipy numpy
+%pip install mlflow scipy numpy pandas
 
 # COMMAND ----------
 dbutils.library.restartPython()
@@ -249,8 +249,9 @@ def create_test_episode(scrutability_level):
     }
     
     # Write to Delta
-    spark.createDataFrame([episode], schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
-    spark.createDataFrame(steps, schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
+    import pandas as pd
+    spark.createDataFrame(pd.DataFrame([episode]), schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
+    spark.createDataFrame(pd.DataFrame(steps), schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
     
     return ep_id
 
@@ -327,7 +328,11 @@ def evaluate_episode(episode_id):
         "repetition_rate": 0.0, "flags": [], "notes": "Test Run", "evaluation_duration_ms": 0
     }
     
-    spark.createDataFrame([eval_row], schema=evaluations_struct).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
+        "repetition_rate": 0.0, "flags": [], "notes": "Test Run", "evaluation_duration_ms": 0
+    }
+    
+    import pandas as pd
+    spark.createDataFrame(pd.DataFrame([eval_row]), schema=evaluations_struct).write.format("delta").mode("append").option("mergeSchema", "true").saveAsTable("ai_eval.episode_evaluations")
     
     return eval_row
 

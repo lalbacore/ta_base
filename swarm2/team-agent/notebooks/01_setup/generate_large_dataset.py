@@ -14,7 +14,7 @@
 
 # COMMAND ----------
 # Install dependencies
-%pip install faker numpy scipy mlflow
+%pip install faker numpy scipy mlflow pandas
 
 # COMMAND ----------
 dbutils.library.restartPython()
@@ -222,8 +222,9 @@ print(f"✅ Generated {len(all_episodes)} episodes and {len(all_steps)} steps.")
 
 # COMMAND ----------
 # Using explicit schemas from test_suite.py to avoid type inference issues
-batch_ep_df = spark.createDataFrame(all_episodes, schema=episode_struct)
-batch_step_df = spark.createDataFrame(all_steps, schema=step_struct)
+import pandas as pd
+batch_ep_df = spark.createDataFrame(pd.DataFrame(all_episodes), schema=episode_struct)
+batch_step_df = spark.createDataFrame(pd.DataFrame(all_steps), schema=step_struct)
 
 # Append to tables
 batch_ep_df.write.format("delta").mode("append").saveAsTable("ai_eval.episodes")

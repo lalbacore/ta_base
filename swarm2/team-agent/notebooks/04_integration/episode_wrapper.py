@@ -129,12 +129,15 @@ class EpisodeTransaction:
         # Write to Delta
         # Write to Delta with explicit schema
         # Use persist schema to avoid inference errors (Integer vs Long)
-        self.spark.createDataFrame([episode], schema=self.episode_struct).write \
+        # Use Pandas for Serverless compatibility
+        import pandas as pd
+        
+        self.spark.createDataFrame(pd.DataFrame([episode]), schema=self.episode_struct).write \
             .format("delta").mode("append") \
             .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episodes")
         
-        self.spark.createDataFrame(self.steps, schema=self.step_struct).write \
+        self.spark.createDataFrame(pd.DataFrame(self.steps), schema=self.step_struct).write \
             .format("delta").mode("append") \
             .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episode_steps")

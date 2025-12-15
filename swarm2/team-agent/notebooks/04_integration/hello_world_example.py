@@ -11,7 +11,7 @@
 # MAGIC 3. Verify the classification (scrutable/partially_scrutable/inscrutable)
 
 # COMMAND ----------
-# MAGIC %pip install mlflow
+# MAGIC %pip install mlflow pandas
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -163,8 +163,9 @@ print(f"Steps: {len(steps)}")
 # COMMAND ----------
 # Write to Delta tables
 # Write to Delta tables (using explicit schema)
-episodes_df = spark.createDataFrame([episode], schema=episode_struct)
-steps_df = spark.createDataFrame(steps, schema=step_struct)
+import pandas as pd
+episodes_df = spark.createDataFrame(pd.DataFrame([episode]), schema=episode_struct)
+steps_df = spark.createDataFrame(pd.DataFrame(steps), schema=step_struct)
 
 episodes_df.write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
 steps_df.write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
@@ -368,8 +369,9 @@ bad_episode, bad_steps = create_problematic_hello_world()
 
 # Write to Delta
 # Write to Delta
-spark.createDataFrame([bad_episode], schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
-spark.createDataFrame(bad_steps, schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
+import pandas as pd
+spark.createDataFrame(pd.DataFrame([bad_episode]), schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
+spark.createDataFrame(pd.DataFrame(bad_steps), schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
 
 # Evaluate
 bad_result = evaluator.evaluate_episode(bad_episode['episode_id'])

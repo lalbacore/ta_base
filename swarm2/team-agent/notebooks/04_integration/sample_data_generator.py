@@ -2,6 +2,10 @@
 # Creates test episodes with "good" and "problematic" patterns
 
 # Databricks notebook source
+# MAGIC %pip install pandas
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
 # MAGIC %md
 # MAGIC # Sample Test Data Generator
 # MAGIC 
@@ -326,8 +330,9 @@ all_steps = good_steps + problematic_steps
 
 # Create DataFrames
 # Create DataFrames with explicit schema
-episodes_df = spark.createDataFrame(all_episodes, schema=episode_struct)
-steps_df = spark.createDataFrame(all_steps, schema=step_struct)
+import pandas as pd
+episodes_df = spark.createDataFrame(pd.DataFrame(all_episodes), schema=episode_struct)
+steps_df = spark.createDataFrame(pd.DataFrame(all_steps), schema=step_struct)
 
 # Write to Delta tables
 episodes_df.write.format("delta").mode("append").saveAsTable("ai_eval.episodes")

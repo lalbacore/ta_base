@@ -12,7 +12,7 @@
 # MAGIC 4. Get binary decision: computes or doesn't compute
 
 # COMMAND ----------
-# MAGIC %pip install mlflow
+# MAGIC %pip install mlflow pandas
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
