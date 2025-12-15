@@ -116,6 +116,7 @@ class EpisodeEvaluator:
     
     def load_episode_steps(self, episode_id: str):
         """Load steps for episode from Delta table."""
+    def compute_coherence(self, steps_df):
         """
         Compute semantic coherence (Simplified for restricted environments).
         """
@@ -136,34 +137,7 @@ class EpisodeEvaluator:
             "jump_details": []
         }
     
-    def compute_coherence(self, steps_df):
-        """
-        Compute semantic coherence using embeddings.
-        
-        Returns:
-            {
-                "score": float,
-                "avg_similarity": float,
-                "jumps": int,
-                "jump_details": List[Tuple[int, float]]
-            }
-        """
-        from coherence import compute_coherence_score
-        return compute_coherence_score(self.spark, steps_df)
-    
     def compute_consistency(self, steps_df):
-        """
-        Detect logical consistency issues.
-        
-        Returns:
-            {
-                "score": float,
-                "contradictions": int,
-                "inversions": int,
-                "drifts": int,
-                "details": Dict
-            }
-        """
         """
         Detect logical consistency issues (Simplified).
         """
@@ -184,17 +158,6 @@ class EpisodeEvaluator:
         }
     
     def compute_efficiency(self, steps_df):
-        """
-        Compute token efficiency metrics.
-        
-        Returns:
-            {
-                "score": float,
-                "ratio": float,
-                "per_delta": float,
-                "repetition": float
-            }
-        """
         """
         Compute token efficiency metrics (Simplified).
         """
