@@ -373,5 +373,5 @@ Generated: {pd.Timestamp.now()}
 print(summary_report)
 
 # Save to file
-dbutils.fs.put("/tmp/scrutability_report.txt", summary_report, overwrite=True)
+dbutils.fs.put("/dbfs/tmp/scrutability_report.txt", summary_report, overwrite=True)
 print("\nReport saved to /tmp/scrutability_report.txt")
