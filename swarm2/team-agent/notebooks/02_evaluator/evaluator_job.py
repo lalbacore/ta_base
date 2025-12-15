@@ -123,6 +123,13 @@ class EpisodeEvaluator:
     
     def load_episode_steps(self, episode_id: str):
         """Load steps for episode from Delta table."""
+        try:
+            return self.spark.table("ai_eval.episode_steps") \
+                .filter(col("episode_id") == episode_id) \
+                .orderBy("step_id")
+        except Exception as e:
+            print(f"Warning: Failed to load steps for {episode_id}: {e}")
+            return None
     def compute_coherence(self, steps_df):
         """
         Compute semantic coherence (Simplified for restricted environments).
