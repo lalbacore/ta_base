@@ -137,8 +137,8 @@ a2a_tx.add_step(
     tokens_in=35,
     tokens_out=170,
     has_explanation=False,
-    explanation=None)
-
+    explanation=None
+)
 
 # Commit episode
 bad_episode_id = a2a_tx.commit(model="gpt-3.5-turbo")
