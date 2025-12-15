@@ -64,11 +64,14 @@ class EpisodeEvaluator:
         """
         start_time = datetime.now()
         
-        # Start MLflow run
-        # Start MLflow run (failsafe)
+        # Start MLflow run (failsafe for both v2 and v3)
         try:
             import mlflow
-            run_ctx = mlflow.start_run(run_name=f"eval_{episode_id}")
+            # Check if we are in a notebook context where run management is automatic
+            if mlflow.active_run():
+                run_ctx = nullcontext()
+            else:
+                run_ctx = mlflow.start_run(run_name=f"eval_{episode_id}")
         except Exception as e:
             print(f"Warning: MLflow logging disabled: {e}")
             run_ctx = nullcontext()
