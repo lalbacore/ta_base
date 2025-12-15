@@ -268,8 +268,10 @@ class EpisodeEvaluator:
             "tokens_per_semantic_delta": float(efficiency.get("per_delta", 0.0)),
             "repetition_rate": float(efficiency.get("repetition", 0.0)),
             "flags": flags,
-            "notes": self.generate_notes(coherence, consistency, efficiency),
             "evaluator_version": self.evaluator_version,
+            "evaluated_at": datetime.now(),
+            "evaluation_duration_ms": duration_ms
+        }]
         
         # Define explicit schema to avoid inference issues (e.g. ArrayType(NullType) for empty flags)
         eval_schema = StructType([
