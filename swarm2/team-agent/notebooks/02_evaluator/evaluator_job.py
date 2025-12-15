@@ -17,7 +17,17 @@
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
-import mlflow
+try:
+    import mlflow
+except ImportError:
+    mlflow = None
+
+import contextlib
+
+@contextlib.contextmanager
+def nullcontext():
+    yield None
+
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
@@ -55,8 +65,15 @@ class EpisodeEvaluator:
         start_time = datetime.now()
         
         # Start MLflow run
-        import mlflow
-        with mlflow.start_run(run_name=f"eval_{episode_id}"):
+        # Start MLflow run (failsafe)
+        try:
+            import mlflow
+            run_ctx = mlflow.start_run(run_name=f"eval_{episode_id}")
+        except Exception as e:
+            print(f"Warning: MLflow logging disabled: {e}")
+            run_ctx = nullcontext()
+
+        with run_ctx:
             
             # 1. Load episode steps
             steps_df = self.load_episode_steps(episode_id)
@@ -258,35 +275,39 @@ class EpisodeEvaluator:
         """Log metrics to MLflow."""
         
         # Log scores
-        import mlflow
-        mlflow.log_metric("coherence_score", coherence["score"])
-        mlflow.log_metric("consistency_score", consistency["score"])
-        mlflow.log_metric("efficiency_score", efficiency["score"])
-        mlflow.log_metric("scrutability_score", scrutability["score"])
-        
-        # Log detailed metrics
-        mlflow.log_metric("semantic_jumps", coherence.get("jumps", 0))
-        mlflow.log_metric("contradictions", consistency.get("contradictions", 0))
-        mlflow.log_metric("confidence_inversions", consistency.get("inversions", 0))
-        mlflow.log_metric("instruction_drifts", consistency.get("drifts", 0))
-        mlflow.log_metric("token_ratio", efficiency.get("ratio", 0.0))
-        mlflow.log_metric("repetition_rate", efficiency.get("repetition", 0.0))
-        
-        # Log parameters
-        mlflow.log_param("episode_id", episode_id)
-        mlflow.log_param("evaluator_version", self.evaluator_version)
-        
-        # Get model from episode
-        episode = self.spark.table("ai_eval.episodes") \
-            .filter(col("episode_id") == episode_id) \
-            .select("model").collect()
-        
-        if episode:
-            mlflow.log_param("model", episode[0].model)
-        
-        # Tags
-        mlflow.set_tag("scrutability_level", scrutability["level"])
-        mlflow.set_tag("episode_id", episode_id)
+        # Log scores
+        try:
+            import mlflow
+            mlflow.log_metric("coherence_score", coherence["score"])
+            mlflow.log_metric("consistency_score", consistency["score"])
+            mlflow.log_metric("efficiency_score", efficiency["score"])
+            mlflow.log_metric("scrutability_score", scrutability["score"])
+            
+            # Log detailed metrics
+            mlflow.log_metric("semantic_jumps", coherence.get("jumps", 0))
+            mlflow.log_metric("contradictions", consistency.get("contradictions", 0))
+            mlflow.log_metric("confidence_inversions", consistency.get("inversions", 0))
+            mlflow.log_metric("instruction_drifts", consistency.get("drifts", 0))
+            mlflow.log_metric("token_ratio", efficiency.get("ratio", 0.0))
+            mlflow.log_metric("repetition_rate", efficiency.get("repetition", 0.0))
+            
+            # Log parameters
+            mlflow.log_param("episode_id", episode_id)
+            mlflow.log_param("evaluator_version", self.evaluator_version)
+            
+            # Get model from episode
+            episode = self.spark.table("ai_eval.episodes") \
+                .filter(col("episode_id") == episode_id) \
+                .select("model").collect()
+            
+            if episode:
+                mlflow.log_param("model", episode[0].model)
+            
+            # Tags
+            mlflow.set_tag("scrutability_level", scrutability["level"])
+            mlflow.set_tag("episode_id", episode_id)
+        except Exception as e:
+            print(f"Warning: Failed to log to MLflow: {e}")
 
 # COMMAND ----------
 # MAGIC %md
