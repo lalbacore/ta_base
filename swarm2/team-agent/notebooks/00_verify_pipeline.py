@@ -126,6 +126,7 @@ eval_schema = StructType([
 ])
 # MAGIC %md
 ## 4. Evaluator (Self-Contained)
+%md
 
 # COMMAND ----------
 
