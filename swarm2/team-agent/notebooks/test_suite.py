@@ -146,81 +146,99 @@ episode_struct = StructType([
     StructField("metadata", MapType(StringType(), StringType()), True)
 ])
 
-def create_test_episode(is_scrutable=True):
-    """Creates a test episode and writes to Delta."""
+def create_test_episode(scrutability_level):
     ep_id = str(uuid.uuid4())
     start = datetime.now()
     
-    # 1. Episode Record
-    episode = {
-        "episode_id": ep_id,
-        "run_id": "test_suite_run",
-        "job_id": "test_suite_job",
-        "model": "gpt-4" if is_scrutable else "gpt-3.5-turbo",
-        "start_ts": start,
-        "end_ts": start + timedelta(seconds=30),
-        "status": "completed",
-        "total_steps": 3,
-        "metadata": {"type": "test_suite", "scrutable": str(is_scrutable).lower()}
-    }
-    
-    # 2. Steps
-    if is_scrutable:
-        # Scrutable: Coherent, consistent, efficient
+    if scrutability_level == "scrutable":
         steps = [
             {
                 "episode_id": ep_id, "step_id": 0, "task_name": "step1", "model": "gpt-4",
-                "prompt": "Task 1", "output": "Clear output with reasoning.", 
+                "prompt": "Task 1", "output": "Clear output with reasoning.",
                 "tokens_in": 50, "tokens_out": 60, "latency_ms": 500, "ts": start,
                 "has_explanation": True, "explanation": "Reasoning 1", "reasoning_quality": 0.9, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 1, "task_name": "step2", "model": "gpt-4",
-                "prompt": "Task 2", "output": "Consistent follow-up.", 
+                "prompt": "Task 2", "output": "Consistent follow-up.",
                 "tokens_in": 50, "tokens_out": 60, "latency_ms": 500, "ts": start,
                 "has_explanation": True, "explanation": "Reasoning 2", "reasoning_quality": 0.9, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 2, "task_name": "step3", "model": "gpt-4",
-                "prompt": "Task 3", "output": "Final conclusion.", 
+                "prompt": "Task 3", "output": "Final conclusion.",
                 "tokens_in": 50, "tokens_out": 60, "latency_ms": 500, "ts": start,
                 "has_explanation": True, "explanation": "Reasoning 3", "reasoning_quality": 0.9, "metadata": {}
             }
         ]
-    else:
-        # Inscrutable: Incoherent, contradictory, verbose
+    elif scrutability_level == "partially_scrutable":
         steps = [
-             {
+            {
                 "episode_id": ep_id, "step_id": 0, "task_name": "step1", "model": "gpt-3.5",
-                "prompt": "Task 1", "output": "Random text about weather.", 
+                "prompt": "Task 1", "output": "Somewhat clear output.",
+                "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
+                "has_explanation": True, "explanation": "Partial reasoning", "reasoning_quality": 0.5, "metadata": {}
+            },
+            {
+                "episode_id": ep_id, "step_id": 1, "task_name": "step2", "model": "gpt-3.5",
+                "prompt": "Task 2", "output": "Some inconsistencies.",
+                "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
+                "has_explanation": False, "explanation": None, "reasoning_quality": 0.3, "metadata": {}
+            },
+            {
+                "episode_id": ep_id, "step_id": 2, "task_name": "step3", "model": "gpt-3.5",
+                "prompt": "Task 3", "output": "Conclusion with some drift.",
+                "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
+                "has_explanation": True, "explanation": "Partial reasoning", "reasoning_quality": 0.5, "metadata": {}
+            }
+        ]
+    else:  # "inscrutable"
+        steps = [
+            {
+                "episode_id": ep_id, "step_id": 0, "task_name": "step1", "model": "gpt-3.5",
+                "prompt": "Task 1", "output": "Random text about weather.",
                 "tokens_in": 50, "tokens_out": 200, "latency_ms": 500, "ts": start,
                 "has_explanation": False, "explanation": None, "reasoning_quality": 0.1, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 1, "task_name": "step2", "model": "gpt-3.5",
-                "prompt": "Task 2", "output": "I am absolutely certain. No doubt.", 
+                "prompt": "Task 2", "output": "I am absolutely certain. No doubt.",
                 "tokens_in": 50, "tokens_out": 200, "latency_ms": 500, "ts": start,
                 "has_explanation": False, "explanation": None, "reasoning_quality": 0.1, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 2, "task_name": "step3", "model": "gpt-3.5",
-                "prompt": "Task 3", "output": "Actually, I am not sure. Ignore previous.", 
+                "prompt": "Task 3", "output": "Actually, I am not sure. Ignore previous.",
                 "tokens_in": 50, "tokens_out": 200, "latency_ms": 500, "ts": start,
                 "has_explanation": False, "explanation": None, "reasoning_quality": 0.1, "metadata": {}
             }
         ]
         
+    episode = {
+        "episode_id": ep_id,
+        "run_id": "test_suite_run",
+        "job_id": "test_suite_job",
+        "model": steps[0]["model"],
+        "start_ts": start,
+        "end_ts": start + timedelta(seconds=30),
+        "status": "completed",
+        "total_steps": 3,
+        "metadata": {"type": "test_suite", "scrutable": scrutability_level}
+    }
+    
     # Write to Delta
     spark.createDataFrame([episode], schema=episode_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episodes")
     spark.createDataFrame(steps, schema=step_struct).write.format("delta").mode("append").saveAsTable("ai_eval.episode_steps")
     
     return ep_id
 
-good_ep_id = create_test_episode(is_scrutable=True)
-bad_ep_id = create_test_episode(is_scrutable=False)
+good_ep_id = create_test_episode("scrutable")
+partial_ep_id = create_test_episode("partially_scrutable")
+bad_ep_id = create_test_episode("inscrutable")
 
-print(f"✅ Generated Good Episode: {good_ep_id}")
-print(f"✅ Generated Bad Episode:  {bad_ep_id}")
+print(f"✅ Generated Good Episode:    {good_ep_id}")
+print(f"✅ Generated Partial Episode: {partial_ep_id}")
+print(f"✅ Generated Bad Episode:     {bad_ep_id}")
 
 # COMMAND ----------
 # MAGIC %md
@@ -295,12 +313,19 @@ print(f"Evaluating Good Episode ({good_ep_id})...")
 res_good = evaluate_episode(good_ep_id)
 print(f"   Score: {res_good['scrutability_score']:.2f} ({res_good['scrutability_level']})")
 
+print(f"Evaluating Partial Episode ({partial_ep_id})...")
+res_partial = evaluate_episode(partial_ep_id)
+print(f"   Score: {res_partial['scrutability_score']:.2f} ({res_partial['scrutability_level']})")
+
 print(f"Evaluating Bad Episode ({bad_ep_id})...")
 res_bad = evaluate_episode(bad_ep_id)
 print(f"   Score: {res_bad['scrutability_score']:.2f} ({res_bad['scrutability_level']})")
 
 # Assertions
 assert res_good['scrutability_level'] == "scrutable", f"Expected scrutable, got {res_good['scrutability_level']}"
-assert res_bad['scrutability_level'] != "scrutable", f"Expected NOT scrutable, got {res_bad['scrutability_level']}"
+assert res_bad['scrutability_level'] == "inscrutable", f"Expected inscrutable, got {res_bad['scrutability_level']}"
+# Partial might be "partially_scrutable" or "inscrutable" depending on exact scoring, but we target middle ground.
+# Let's assert it's NOT scrutable.
+assert res_partial['scrutability_level'] != "scrutable", f"Expected not fully scrutable, got {res_partial['scrutability_level']}"
 
 print("\n🎉 SUCCESS: Test Suite Passed! Platform is functioning correctly.")
