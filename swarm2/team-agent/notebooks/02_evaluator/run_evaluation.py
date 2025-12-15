@@ -272,9 +272,8 @@ class EpisodeEvaluator:
             "repetition_rate": float(efficiency.get("repetition", 0.0)),
             "flags": flags,
             "evaluator_version": self.evaluator_version,
-            "evaluator_version": self.evaluator_version,
             "evaluated_at": str(datetime.now()),
-            "evaluation_duration_ms": duration_ms
+            "evaluation_duration_ms": str(duration_ms)
         }]
         
         # Define explicit schema to avoid inference issues (e.g. ArrayType(NullType) for empty flags)
@@ -295,9 +294,8 @@ class EpisodeEvaluator:
             StructField("flags", ArrayType(StringType()), True),
             StructField("notes", StringType(), True),
             StructField("evaluator_version", StringType(), True),
-            StructField("evaluator_version", StringType(), True),
             StructField("evaluated_at", StringType(), True),
-            StructField("evaluation_duration_ms", IntegerType(), True)
+            StructField("evaluation_duration_ms", StringType(), True)
         ])
 
         import pandas as pd
