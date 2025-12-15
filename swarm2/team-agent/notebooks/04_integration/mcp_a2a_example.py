@@ -23,19 +23,20 @@ print(f"Current CWD: {os.getcwd()}")
 print(f"Initial sys.path: {sys.path}")
 
 # Robust path discovery
-# Simplified path setup
-# Add the current directory to sys.path to ensure local imports work
+# Robustly find directory containing this notebook (Databricks Repos)
+# Add the current directory to sys.path
 if os.getcwd() not in sys.path:
     sys.path.append(os.getcwd())
 
-# Attempt to import - if it fails, we are likely in a weird state
-try:
-    import episode_wrapper
-    from episode_wrapper import mcp_episode, a2a_episode
-except ImportError as e:
-    print(f"CRITICAL ERROR: Could not import episode_wrapper. CWD: {os.getcwd()}")
-    print(f"sys.path: {sys.path}")
-    raise e
+# Also add the parent 'notebooks' dir to help find other modules if we are in a subdir
+current_dir = os.getcwd()
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.append(parent_dir)
+    # Also add 02_evaluator explicitly while we are at it
+    eval_dir = os.path.join(parent_dir, "02_evaluator")
+    if os.path.exists(eval_dir) and eval_dir not in sys.path:
+            sys.path.append(eval_dir)
 
 import episode_wrapper
 from episode_wrapper import mcp_episode, a2a_episode
