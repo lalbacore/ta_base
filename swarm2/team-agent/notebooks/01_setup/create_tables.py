@@ -13,16 +13,20 @@
 # MAGIC 3. `ai_eval.episode_evaluations` - Scrutability scores
 
 # COMMAND ----------
+# MAGIC %pip install pandas
+# MAGIC dbutils.library.restartPython()
+
+# COMMAND ----------
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, TimestampType, MapType
+import pandas as pd
+
+# COMMAND ----------
 # MAGIC %md
 # MAGIC ## 1. Create Unity Catalog Schema
 
 # COMMAND ----------
 # Create schema if it doesn't exist
-spark.sql("""
-  CREATE SCHEMA IF NOT EXISTS ai_eval
-  COMMENT 'AI Episode Evaluation Platform'
-  LOCATION 's3://your-bucket/ai_eval'
-""")
+spark.sql("CREATE SCHEMA IF NOT EXISTS ai_eval COMMENT 'AI Episode Evaluation Platform'")
 
 # Verify schema created
 spark.sql("SHOW SCHEMAS").filter("databaseName = 'ai_eval'").show()
@@ -32,9 +36,20 @@ spark.sql("SHOW SCHEMAS").filter("databaseName = 'ai_eval'").show()
 # MAGIC ## 2. Create Episodes Table
 
 # COMMAND ----------
-# Read and execute episodes table DDL
-with open('/Workspace/Repos/your-repo/sql/schema/episodes.sql', 'r') as f:
-    episodes_ddl = f.read()
+# Define Episodes Table DDL
+episodes_ddl = """
+CREATE TABLE IF NOT EXISTS ai_eval.episodes (
+  episode_id STRING NOT NULL,
+  run_id STRING,
+  job_id STRING,
+  model STRING,
+  start_ts TIMESTAMP,
+  end_ts TIMESTAMP,
+  status STRING,
+  total_steps INT,
+  metadata MAP<STRING, STRING>
+) USING DELTA
+"""
 
 spark.sql(episodes_ddl)
 
@@ -46,9 +61,25 @@ spark.sql("DESCRIBE TABLE EXTENDED ai_eval.episodes").show(truncate=False)
 # MAGIC ## 3. Create Episode Steps Table
 
 # COMMAND ----------
-# Read and execute steps table DDL
-with open('/Workspace/Repos/your-repo/sql/schema/episode_steps.sql', 'r') as f:
-    steps_ddl = f.read()
+# Define Steps Table DDL
+steps_ddl = """
+CREATE TABLE IF NOT EXISTS ai_eval.episode_steps (
+  episode_id STRING NOT NULL,
+  step_id INT NOT NULL,
+  task_name STRING,
+  model STRING,
+  prompt STRING,
+  output STRING,
+  tokens_in INT,
+  tokens_out INT,
+  latency_ms INT,
+  ts TIMESTAMP,
+  has_explanation BOOLEAN,
+  explanation STRING,
+  reasoning_quality DOUBLE,
+  metadata MAP<STRING, STRING>
+) USING DELTA
+"""
 
 spark.sql(steps_ddl)
 
@@ -60,9 +91,29 @@ spark.sql("DESCRIBE TABLE EXTENDED ai_eval.episode_steps").show(truncate=False)
 # MAGIC ## 4. Create Episode Evaluations Table
 
 # COMMAND ----------
-# Read and execute evaluations table DDL
-with open('/Workspace/Repos/your-repo/sql/schema/episode_evaluations.sql', 'r') as f:
-    evals_ddl = f.read()
+# Define Evaluations Table DDL
+evals_ddl = """
+CREATE TABLE IF NOT EXISTS ai_eval.episode_evaluations (
+  episode_id STRING NOT NULL,
+  coherence_score DOUBLE,
+  consistency_score DOUBLE,
+  efficiency_score DOUBLE,
+  scrutability_score DOUBLE,
+  scrutability_level STRING,
+  semantic_jumps INT,
+  contradictions INT,
+  confidence_inversions INT,
+  instruction_drifts INT,
+  token_ratio DOUBLE,
+  tokens_per_semantic_delta DOUBLE,
+  repetition_rate DOUBLE,
+  flags ARRAY<STRING>,
+  notes STRING,
+  evaluator_version STRING,
+  evaluated_at TIMESTAMP,
+  evaluation_duration_ms INT
+) USING DELTA
+"""
 
 spark.sql(evals_ddl)
 
@@ -103,8 +154,21 @@ sample_episode = {
     "metadata": {"prompt": "Sample AI task"}
 }
 
-# Insert sample episode
-spark.createDataFrame([sample_episode]).write \
+# Define explicit schema for sample
+episode_struct = StructType([
+    StructField("episode_id", StringType(), False),
+    StructField("run_id", StringType(), True),
+    StructField("job_id", StringType(), True),
+    StructField("model", StringType(), True),
+    StructField("start_ts", TimestampType(), True),
+    StructField("end_ts", TimestampType(), True),
+    StructField("status", StringType(), True),
+    StructField("total_steps", IntegerType(), True),
+    StructField("metadata", MapType(StringType(), StringType()), True)
+])
+
+# Insert sample episode using Pandas and Explicit Schema
+spark.createDataFrame(pd.DataFrame([sample_episode]), schema=episode_struct).write \
     .format("delta") \
     .mode("append") \
     .saveAsTable("ai_eval.episodes")
