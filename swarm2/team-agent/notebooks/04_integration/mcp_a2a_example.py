@@ -18,6 +18,18 @@
 # COMMAND ----------
 import sys
 import os
+
+# Robustly find directory containing this notebook (Databricks Repos)
+try:
+    notebook_path = dbutils.notebook.getContext().notebookPath().get()
+    # Convert Workspace path (/Repos/...) to Filesystem path (/Workspace/Repos/...)
+    if notebook_path.startswith("/Repos"):
+         repo_dir = "/Workspace" + os.path.dirname(notebook_path)
+         if repo_dir not in sys.path:
+             sys.path.append(repo_dir)
+except Exception:
+    pass
+
 sys.path.append(os.getcwd())
 from episode_wrapper import mcp_episode, a2a_episode
 
