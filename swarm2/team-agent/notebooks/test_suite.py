@@ -203,13 +203,13 @@ def create_test_episode(scrutability_level):
             },
             {
                 "episode_id": ep_id, "step_id": 1, "task_name": "step2", "model": "gpt-3.5",
-                "prompt": "Task 2", "output": "Some inconsistencies.",
+                "prompt": "Task 2", "output": "Some inconsistencies found here.",
                 "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
                 "has_explanation": False, "explanation": None, "reasoning_quality": 0.3, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 2, "task_name": "step3", "model": "gpt-3.5",
-                "prompt": "Task 3", "output": "Conclusion with some drift.",
+                "prompt": "Task 3", "output": "Conclusion with significant drift.",
                 "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
                 "has_explanation": True, "explanation": "Partial reasoning", "reasoning_quality": 0.5, "metadata": {}
             }
@@ -301,10 +301,11 @@ def evaluate_episode(episode_id):
     total_in = builtins.sum(s.tokens_in for s in steps if s.tokens_in)
     total_out = builtins.sum(s.tokens_out for s in steps if s.tokens_out)
     
-    eff_score = 1.0 if (total_out / builtins.max(total_in, 1)) < 3.0 else 0.4
+    # Stricter efficiency threshold for test
+    eff_score = 1.0 if (total_out / builtins.max(total_in, 1)) < 2.0 else 0.4
     
-    # Weighted Score
-    final_score = (coherence_score * 0.4) + (consistency_score * 0.4) + (eff_score * 0.2)
+    # Weighted Score (Adjusted weights to penalize lack of explanations more)
+    final_score = (coherence_score * 0.5) + (consistency_score * 0.3) + (eff_score * 0.2)
     
     level = "inscrutable"
     if final_score >= 0.8: level = "scrutable"
