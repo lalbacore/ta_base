@@ -258,11 +258,11 @@ class EpisodeEvaluator:
         
         eval_data = [{
             "episode_id": episode_id,
-            "coherence_score": coherence["score"],
-            "consistency_score": consistency["score"],
-            "efficiency_score": efficiency["score"],
-            "scrutability_score": scrutability["score"],
-            "scrutability_level": scrutability["level"],
+            "coherence_score": float(coherence["score"]),
+            "consistency_score": float(consistency["score"]),
+            "efficiency_score": float(efficiency["score"]),
+            "scrutability_score": float(scrutability["score"]),
+            "scrutability_level": str(scrutability["level"]),
             "semantic_jumps": int(coherence.get("jumps", 0)),
             "contradictions": int(consistency.get("contradictions", 0)),
             "confidence_inversions": int(consistency.get("inversions", 0)),
@@ -292,17 +292,14 @@ class EpisodeEvaluator:
             StructField("tokens_per_semantic_delta", DoubleType(), True),
             StructField("repetition_rate", DoubleType(), True),
             StructField("flags", ArrayType(StringType()), True),
-            StructField("notes", StringType(), True),
             StructField("evaluator_version", StringType(), True),
             StructField("evaluated_at", StringType(), True),
             StructField("evaluation_duration_ms", StringType(), True)
         ])
 
-        import pandas as pd
-        # Create DataFrame with explicit schema
-        # Note: Using pandas first helps with some python type conversions, 
-        # but passing schema is key for the array types.
-        eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data), schema=eval_schema)
+        # Write directly from Pyton objects to Spark DataFrame, skipping Pandas/Arrow
+        # This avoids ArrowInvalid errors when column counts/types mismatch between Pandas and Spark Schema
+        eval_df = self.spark.createDataFrame(eval_data, schema=eval_schema)
         
         try:
             eval_df.write.format("delta").mode("append") \
@@ -341,7 +338,7 @@ class EpisodeEvaluator:
         return "; ".join(notes) if notes else "No major issues detected"
     
     def log_to_mlflow(self, episode_id, coherence, consistency, 
-                     efficiency, scrutability):
+                      efficiency, scrutability):
         """Log metrics to MLflow."""
         
         # Log scores
@@ -423,32 +420,35 @@ if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
     
     # Get episode IDs from job parameter
-    episode_ids_param = dbutils.widgets.get("episode_ids")
-    episode_ids = episode_ids_param.split(",")
-    
-    print(f"Evaluating {len(episode_ids)} episodes...")
-    
-    # Run batch evaluation
-    results = evaluate_episodes_batch(spark, episode_ids)
-    
-    # Log summary
-    success_count = sum(1 for _, status, _, _ in results if status == "success")
-    failed_count = len(results) - success_count
-    
-    print(f"\n=== Evaluation Complete ===")
-    print(f"Success: {success_count}/{len(results)}")
-    print(f"Failed: {failed_count}/{len(results)}")
-    
-    if failed_count > 0:
-        print("\nFailed episodes:")
-        for ep_id, status, error, _ in results:
-            if status == "failed":
-                print(f"  {ep_id}: {error}")
-    
-    # Display results
-    import pandas as pd
-    results_df = spark.createDataFrame(
-        pd.DataFrame([(ep, status, score) for ep, status, _, score in results],
-        columns=["episode_id", "status", "scrutability_score"])
-    )
-    display(results_df)
+    try:
+        episode_ids_param = dbutils.widgets.get("episode_ids")
+        episode_ids = episode_ids_param.split(",")
+        
+        print(f"Evaluating {len(episode_ids)} episodes...")
+        
+        # Run batch evaluation
+        results = evaluate_episodes_batch(spark, episode_ids)
+        
+        # Log summary
+        success_count = sum(1 for _, status, _, _ in results if status == "success")
+        failed_count = len(results) - success_count
+        
+        print(f"\n=== Evaluation Complete ===")
+        print(f"Success: {success_count}/{len(results)}")
+        print(f"Failed: {failed_count}/{len(results)}")
+        
+        if failed_count > 0:
+            print("\nFailed episodes:")
+            for ep_id, status, error, _ in results:
+                if status == "failed":
+                    print(f"  {ep_id}: {error}")
+        
+        # Display results
+        import pandas as pd
+        results_df = spark.createDataFrame(
+            pd.DataFrame([(ep, status, score) for ep, status, _, score in results],
+            columns=["episode_id", "status", "scrutability_score"])
+        )
+        display(results_df)
+    except Exception:
+        print("No episode_ids widget found, assuming library usage mode.")
