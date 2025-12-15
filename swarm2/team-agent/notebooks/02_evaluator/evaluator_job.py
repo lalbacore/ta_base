@@ -274,6 +274,7 @@ class EpisodeEvaluator:
             "evaluation_duration_ms": duration_ms
         }]
         
+        import pandas as pd
         eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data))
         eval_df.write.format("delta").mode("append") \
             .option("mergeSchema", "true") \
