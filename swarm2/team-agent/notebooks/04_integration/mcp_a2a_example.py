@@ -16,6 +16,9 @@
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
+import sys
+import os
+sys.path.append(os.getcwd())
 from episode_wrapper import mcp_episode, a2a_episode
 
 # COMMAND ----------
