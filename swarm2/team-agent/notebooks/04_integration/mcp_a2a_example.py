@@ -15,22 +15,52 @@
 # MAGIC %pip install mlflow pandas
 # MAGIC dbutils.library.restartPython()
 
-# COMMAND ----------
 import sys
 import os
 
-# Robustly find directory containing this notebook (Databricks Repos)
-try:
-    notebook_path = dbutils.notebook.getContext().notebookPath().get()
-    # Convert Workspace path (/Repos/...) to Filesystem path (/Workspace/Repos/...)
-    if notebook_path.startswith("/Repos"):
-         repo_dir = "/Workspace" + os.path.dirname(notebook_path)
-         if repo_dir not in sys.path:
-             sys.path.append(repo_dir)
-except Exception:
-    pass
+# debug info
+print(f"Current CWD: {os.getcwd()}")
+print(f"Initial sys.path: {sys.path}")
 
-sys.path.append(os.getcwd())
+# Robust path discovery
+try:
+    # Get current notebook path from context
+    notebook_path = dbutils.notebook.getContext().notebookPath().get()
+    print(f"Notebook logical path: {notebook_path}")
+    
+    # Construct base filesystem path
+    # If path starts with /Workspace, use it as is.
+    # Otherwise, check if valid file exists at /Workspace + path
+    candidate_path = "/Workspace" + notebook_path
+    if os.path.exists("/Workspace" + os.path.dirname(notebook_path)):
+        base_path = candidate_path
+    else:
+        # Fallback to just using the notebook path if it looks like a filesystem path
+        base_path = notebook_path
+        
+    current_dir = os.path.dirname(base_path)
+    print(f"Derived source directory: {current_dir}")
+    
+    # Add project root and current dir
+    if current_dir not in sys.path:
+        sys.path.append(current_dir)
+        print(f"Added {current_dir} to sys.path")
+        
+    # Also add the parent 'notebooks' dir to help find other modules
+    parent_dir = os.path.dirname(current_dir)
+    if parent_dir not in sys.path:
+        sys.path.append(parent_dir)
+        # Also add 02_evaluator explicitly while we are at it
+        eval_dir = os.path.join(parent_dir, "02_evaluator")
+        if os.path.exists(eval_dir) and eval_dir not in sys.path:
+             sys.path.append(eval_dir)
+
+except Exception as e:
+    print(f"Warning: automatic path discovery failed: {e}")
+    # Fallback values
+    sys.path.append(os.getcwd())
+
+import episode_wrapper
 from episode_wrapper import mcp_episode, a2a_episode
 
 # COMMAND ----------
