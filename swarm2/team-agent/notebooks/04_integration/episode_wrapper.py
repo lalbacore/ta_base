@@ -162,7 +162,10 @@ class EpisodeTransaction:
         # Ensure evaluator module is visible
         import sys
         import os
-        import mlflow # Ensure mlflow is available
+        try:
+            import mlflow # Ensure mlflow is available if installed
+        except ImportError:
+            pass
 
         
         # Add 02_evaluator to path if not present
