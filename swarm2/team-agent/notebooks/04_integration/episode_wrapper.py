@@ -218,7 +218,10 @@ class EpisodeTransaction:
             return None
         
         # Parse flags to find earliest problematic step
-        flags = eval_result[0].flags
+        try:
+            flags = eval_result[0].flags
+        except IndexError:
+            return None
         min_step = None
         
         for flag in flags:
@@ -248,9 +251,15 @@ class EpisodeTransaction:
                 flags
             FROM ai_eval.episode_evaluations 
             WHERE episode_id = '{self.episode_id}'
-        """).collect()[0]
+        """).collect()
         
-        flags = eval_result.flags or []
+        if not eval_result:
+            # Fallback if evaluation record isn't found immediately
+            return [{"step_id": i, "task_name": s["task_name"], "is_scrutable": True, "issues": [], "tokens_ratio": 0.0} for i, s in enumerate(self.steps)]
+
+        eval_data = eval_result[0]
+        
+        flags = eval_data.flags or []
         
         # Build per-step breakdown
         breakdown = []
