@@ -197,13 +197,13 @@ def create_test_episode(scrutability_level):
         steps = [
             {
                 "episode_id": ep_id, "step_id": 0, "task_name": "step1", "model": "gpt-3.5",
-                "prompt": "Task 1", "output": "Somewhat clear output.",
+                "prompt": "Task 1", "output": "I am certain this result is correct.",
                 "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
                 "has_explanation": True, "explanation": "Partial reasoning", "reasoning_quality": 0.5, "metadata": {}
             },
             {
                 "episode_id": ep_id, "step_id": 1, "task_name": "step2", "model": "gpt-3.5",
-                "prompt": "Task 2", "output": "Some inconsistencies found here.",
+                "prompt": "Task 2", "output": "Actually, I am not sure about the previous step.",
                 "tokens_in": 50, "tokens_out": 120, "latency_ms": 500, "ts": start,
                 "has_explanation": False, "explanation": None, "reasoning_quality": 0.3, "metadata": {}
             },
