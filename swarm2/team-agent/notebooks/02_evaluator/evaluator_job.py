@@ -148,7 +148,7 @@ class EpisodeEvaluator:
                 score -= 0.1
                 
         return {
-            "score": max(0.0, score),
+            "score": 0.0 if score < 0.0 else score,
             "avg_similarity": 0.8,
             "jumps": jumps,
             "jump_details": []
