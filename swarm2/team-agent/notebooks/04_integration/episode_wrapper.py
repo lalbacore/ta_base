@@ -141,6 +141,13 @@ class EpisodeTransaction:
             .format("delta").mode("append") \
             .option("mergeSchema", "true") \
             .saveAsTable("ai_eval.episode_steps")
+            
+        # Explicitly refresh tables to ensure immediate consistency for evaluation
+        try:
+            self.spark.sql("REFRESH TABLE ai_eval.episodes")
+            self.spark.sql("REFRESH TABLE ai_eval.episode_steps")
+        except Exception as e:
+            print(f"Warning: Failed to refresh tables: {e}")
         
         return self.episode_id
     
