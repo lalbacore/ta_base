@@ -13,7 +13,7 @@
 # MAGIC **Logs:** MLflow metrics
 
 # COMMAND ----------
-# MAGIC %pip install mlflow
+# MAGIC %pip install mlflow pandas
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -226,7 +226,8 @@ class EpisodeEvaluator:
             "evaluation_duration_ms": duration_ms
         }]
         
-        eval_df = self.spark.createDataFrame(eval_data)
+        import pandas as pd
+        eval_df = self.spark.createDataFrame(pd.DataFrame(eval_data))
         eval_df.write.format("delta").mode("append") \
             .saveAsTable("ai_eval.episode_evaluations")
     
@@ -352,8 +353,9 @@ if __name__ == "__main__":
                 print(f"  {ep_id}: {error}")
     
     # Display results
+    import pandas as pd
     results_df = spark.createDataFrame(
-        [(ep, status, score) for ep, status, _, score in results],
-        ["episode_id", "status", "scrutability_score"]
+        pd.DataFrame([(ep, status, score) for ep, status, _, score in results],
+        columns=["episode_id", "status", "scrutability_score"])
     )
     display(results_df)

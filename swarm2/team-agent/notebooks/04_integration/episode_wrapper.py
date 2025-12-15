@@ -162,6 +162,8 @@ class EpisodeTransaction:
         # Ensure evaluator module is visible
         import sys
         import os
+        import mlflow # Ensure mlflow is available
+
         
         # Add 02_evaluator to path if not present
         # Assuming struct: notebooks/04_integration/wrapper.py -> ../02_evaluator/
