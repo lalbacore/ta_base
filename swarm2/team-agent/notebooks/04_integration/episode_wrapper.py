@@ -153,8 +153,44 @@ class EpisodeTransaction:
                 "obfuscation_point": int or None,  # Step where it breaks
                 "breakdown": {...}
             }
+            "obfuscation_point": obfuscation_point,
+            "breakdown": self._get_step_breakdown()
+        }
+    
+    def evaluate(self) -> Dict[str, Any]:
         """
-        from evaluator_job import EpisodeEvaluator
+        Evaluate episode scrutability.
+        
+        Returns:
+            {
+                "computes": bool,  # True if scrutable, False otherwise
+                "scrutability_score": float,
+                "scrutability_level": str,
+                "obfuscation_point": int or None,  # Step where it breaks
+                "breakdown": {...}
+            }
+        """
+        # Ensure evaluator module is visible
+        import sys
+        import os
+        
+        # Add 02_evaluator to path if not present
+        # Assuming struct: notebooks/04_integration/wrapper.py -> ../02_evaluator/
+        current_dir = os.getcwd()
+        if "04_integration" in current_dir:
+            eval_dir = os.path.abspath(os.path.join(current_dir, "../02_evaluator"))
+        else:
+            # Fallback for when running from root or elsewhere
+            eval_dir = os.path.abspath("notebooks/02_evaluator")
+            
+        if eval_dir not in sys.path:
+            sys.path.append(eval_dir)
+
+        try:
+            from evaluator_job import EpisodeEvaluator
+        except ImportError:
+            # Try importing as package if top-level
+            from notebooks.02_evaluator.evaluator_job import EpisodeEvaluator
         
         evaluator = EpisodeEvaluator(self.spark)
         result = evaluator.evaluate_episode(self.episode_id)
