@@ -124,7 +124,7 @@ eval_schema = StructType([
     StructField("scrutability_score", DoubleType(), True),
     StructField("scrutability_level", StringType(), True)
 ])
-# MAGIC %md
+%md
 ## 4. Evaluator (Self-Contained)
 %md
 
