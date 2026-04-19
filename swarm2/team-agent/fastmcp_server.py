@@ -11,31 +11,31 @@ except ImportError:
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 try:
-    from swarms.team_agent.orchestrator import Orchestrator
+    from swarms.team_agent.trusted_orchestrator import TrustedOrchestrator
 except ImportError as e:
-    print(f"FATAL ERROR: Could not import Orchestrator from ta_base. {e}")
+    print(f"FATAL ERROR: Could not import TrustedOrchestrator from ta_base. {e}")
     sys.exit(1)
 
 # Initialize FastMCP
-mcp = FastMCP("Team Agent Orchestrator")
+mcp = FastMCP("Zero-Trust Artifact Orchestrator")
 
 @mcp.tool()
 def run_mission(mission_prompt: str) -> str:
     """
-    Executes a high-level mission prompt by securely deploying the Team Agent Multi-Agent Orchestrator.
-    This natively wakes up specialized autonomous agents (Architects, Builders, Cloud Specialists) 
-    who will collaborate, execute workflows, and cryptographically log them to fulfill the mission_prompt.
+    Executes a mission prompt natively through the Tripartite Zero-Trust framework.
+    Rather than simply executing arbitrary code, this tool mathematically forces the framework
+    to physically issue a Trusted AI Artifact manifest that is verifiably signed by the Governance chain.
     """
     try:
-        orchestrator = Orchestrator()
+        orchestrator = TrustedOrchestrator()
         result = orchestrator.execute(mission_prompt)
         
-        return f"Mission Completed Successfully.\n\n[Orchestrator Result Blob]:\n{result}"
+        result_json = str(result)
+        return f"Mission Completed under Mathematical Restraint.\n\n[Trusted AI Artifact Manifest Generated]:\n{result_json}"
         
     except Exception as e:
-        return f"Mission Execution Failed at the Orchestrator level: {str(e)}"
+        return f"Mission Execution Failed at the Tripartite level: {str(e)}"
 
 if __name__ == "__main__":
-    # If run as a python file directly, FastMCP defaults to standard stdio for any MCP-compliant client.
-    # E.g. Claude Desktop testing.
+    # Standard stdio wrapping for standard MCP clients.
     mcp.run(transport='stdio')
